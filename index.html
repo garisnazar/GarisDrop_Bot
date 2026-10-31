@@ -69,6 +69,15 @@
   .title{ font-size:22px; font-weight:900; margin-bottom:14px; flex-shrink: 0; }
   .title span{ color:var(--neon); }
 
+  /* НОВАЯ КНОПКА НАЗАД */
+  .back-btn {
+    background: var(--card2); border: 1px solid var(--border); color: var(--neon);
+    padding: 12px 18px; border-radius: 16px; font-size: 15px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    cursor: pointer; margin-bottom: 16px; width: fit-content; transition: transform 0.1s;
+  }
+  .back-btn:active { transform: scale(0.95); }
+
   /* ===== GAMES GRID ===== */
   .games-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; align-content: start; }
   .game-card{ position:relative; background:var(--card2); border:1px solid var(--border); border-radius:22px; padding:18px 14px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; cursor:pointer; transition: transform 0.1s; min-height: 120px; }
@@ -228,7 +237,7 @@
 
   <!-- ИГРА СЛОТЫ -->
   <div class="page" id="page-slots">
-    <div class="title" onclick="switchPage('games')" style="cursor:pointer; font-size:16px; margin-bottom:10px;">← Назад</div>
+    <button class="back-btn" onclick="switchPage('games')">← Назад в меню</button>
     <div class="game-wrap">
       <div class="mode-selector">
         <button class="mode-btn active" id="btn-slot-easy" onclick="setSlotMode('easy')">Легкий (x1.5)</button>
@@ -251,7 +260,7 @@
 
   <!-- ИГРА МАЙНЕР -->
   <div class="page" id="page-mines">
-    <div class="title" onclick="switchPage('games')" style="cursor:pointer; font-size:16px; margin-bottom:10px;">← Назад</div>
+    <button class="back-btn" onclick="switchPage('games')">← Назад в меню</button>
     <div class="game-wrap">
       <div class="mode-selector">
         <button class="mode-btn active" id="btn-mine-easy" onclick="setMineMode('easy')">Легкий 3x3</button>
@@ -272,7 +281,7 @@
 
   <!-- ИСТОРИЯ -->
   <div class="page" id="page-history">
-    <div class="title" onclick="switchPage('profile')" style="cursor:pointer; font-size:16px; margin-bottom:10px;">← Назад в профиль</div>
+    <button class="back-btn" onclick="switchPage('profile')">← Назад в профиль</button>
     <div id="historyList"></div>
   </div>
 
@@ -336,82 +345,83 @@
 
 <script>
 // ==========================================
-// СИСТЕМА ЗВУКОВ (Web Audio API)
+// СИСТЕМА ЗВУКОВ (Web Audio API) - МЯГКИЕ И ТИХИЕ
 // ==========================================
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 let audioCtx;
 
-// Инициализация при первом клике (требование браузеров)
 document.body.addEventListener('click', () => {
-  if (!audioCtx) {
-    audioCtx = new AudioContext();
-  }
-  if (audioCtx.state === 'suspended') {
-    audioCtx.resume();
-  }
+  if (!audioCtx) audioCtx = new AudioContext();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
 }, { once: true });
 
-function playTone(freq, type, duration, vol = 0.1) {
+function playTone(freq, type, duration, vol = 0.03) {
   if (!audioCtx) return;
   const osc = audioCtx.createOscillator();
   const gain = audioCtx.createGain();
   osc.type = type;
   osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
   gain.gain.setValueAtTime(vol, audioCtx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
   osc.connect(gain);
   gain.connect(audioCtx.destination);
   osc.start();
   osc.stop(audioCtx.currentTime + duration);
 }
 
-function playNoise(duration, vol = 0.1) {
+// Мягкий глухой взрыв через фильтр
+function playNoise(duration, vol = 0.05) {
   if (!audioCtx) return;
   const bufferSize = audioCtx.sampleRate * duration;
   const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
   const data = buffer.getChannelData(0);
-  for (let i = 0; i < bufferSize; i++) {
-    data[i] = Math.random() * 2 - 1;
-  }
+  for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+  
   const noise = audioCtx.createBufferSource();
   noise.buffer = buffer;
+  
+  const filter = audioCtx.createBiquadFilter();
+  filter.type = 'lowpass';
+  filter.frequency.value = 400; // Делает звук глухим
+  
   const gain = audioCtx.createGain();
   gain.gain.setValueAtTime(vol, audioCtx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
-  noise.connect(gain);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+  
+  noise.connect(filter);
+  filter.connect(gain);
   gain.connect(audioCtx.destination);
   noise.start();
 }
 
-// Звуки
 const SOUNDS = {
-  click: () => playTone(600, 'sine', 0.05, 0.05),
+  click: () => playTone(400, 'sine', 0.08, 0.03),
   win: () => {
-    playTone(523.25, 'square', 0.1, 0.08); // C5
-    setTimeout(() => playTone(659.25, 'square', 0.1, 0.08), 100); // E5
-    setTimeout(() => playTone(783.99, 'square', 0.15, 0.08), 200); // G5
-    setTimeout(() => playTone(1046.50, 'square', 0.3, 0.1), 300); // C6
+    // Плавное, тихое арпеджио
+    playTone(523.25, 'sine', 0.2, 0.04); 
+    setTimeout(() => playTone(659.25, 'sine', 0.2, 0.04), 120); 
+    setTimeout(() => playTone(783.99, 'sine', 0.3, 0.04), 240); 
+    setTimeout(() => playTone(1046.50, 'sine', 0.4, 0.05), 360); 
   },
   lose: () => {
-    playTone(300, 'sawtooth', 0.2, 0.08);
-    setTimeout(() => playTone(250, 'sawtooth', 0.2, 0.08), 150);
-    setTimeout(() => playTone(200, 'sawtooth', 0.3, 0.08), 300);
+    // Мягкое, тихое понижение
+    playTone(300, 'sine', 0.2, 0.03);
+    setTimeout(() => playTone(250, 'sine', 0.3, 0.03), 150);
   },
-  spinTick: () => playTone(800, 'triangle', 0.03, 0.02),
-  gem: () => playTone(1200, 'sine', 0.1, 0.1),
+  spinTick: () => playTone(600, 'sine', 0.03, 0.01),
+  gem: () => playTone(1000, 'sine', 0.15, 0.04),
   bomb: () => {
-    playNoise(0.3, 0.2);
-    playTone(100, 'sawtooth', 0.3, 0.15);
+    playNoise(0.4, 0.08);
+    playTone(80, 'triangle', 0.3, 0.05);
   },
   cashout: () => {
-    playTone(1000, 'square', 0.05, 0.05);
-    setTimeout(() => playTone(1200, 'square', 0.05, 0.05), 50);
-    setTimeout(() => playTone(1400, 'square', 0.1, 0.05), 100);
+    playTone(800, 'sine', 0.05, 0.03);
+    setTimeout(() => playTone(1000, 'sine', 0.05, 0.03), 60);
+    setTimeout(() => playTone(1200, 'sine', 0.1, 0.03), 120);
   }
 };
 
-// Автоматический звук клика для всех кнопок
-document.querySelectorAll('button, .game-card, .nav-btn, .currency-switch-btn').forEach(el => {
+document.querySelectorAll('button, .game-card, .nav-btn, .currency-switch-btn, .back-btn').forEach(el => {
   el.addEventListener('click', () => SOUNDS.click());
 });
 
@@ -653,7 +663,7 @@ function spinSlots() {
     
     spinIntervals[col] = setInterval(() => { 
         colCells.forEach(c => c.textContent = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)]); 
-        if (Math.random() < 0.2) SOUNDS.spinTick(); // Рандомный стук во время прокрутки
+        if (Math.random() < 0.1) SOUNDS.spinTick(); 
     }, 60);
   }
 
@@ -666,7 +676,7 @@ function spinSlots() {
         c.textContent = grid[rowIndex * mode.cols + col];
       });
       
-      SOUNDS.spinTick(); // Звук остановки барабана
+      SOUNDS.spinTick();
 
       if (col === mode.cols - 1) {
         setTimeout(() => {
@@ -788,7 +798,7 @@ function clickMineCell(index) {
       unopened.splice(r, 1); bombsToShow--;
     }
 
-    SOUNDS.bomb(); // Звук взрыва
+    SOUNDS.bomb();
 
     setTimeout(() => {
       document.getElementById('mineCashoutBtn').classList.remove('show');
@@ -806,7 +816,7 @@ function clickMineCell(index) {
     cellData.el.innerHTML = '';
     mineState.opened++;
     
-    SOUNDS.gem(); // Звук кристалла
+    SOUNDS.gem();
 
     const multTable = MULT_TABLES[mineState.mode];
     mineState.currentMult = multTable[Math.min(mineState.opened - 1, multTable.length - 1)];
@@ -829,7 +839,7 @@ function cashoutMines() {
   document.getElementById('minesBetPanel').style.display = 'flex';
   document.getElementById('multiplierDisplay').classList.remove('show');
   
-  SOUNDS.cashout(); // Звук монет
+  SOUNDS.cashout();
   showWinModal(formatMoney(winAmountStars), getCurrencyIcon(), mineState.currentMult.toFixed(1));
   resetMinesBoard();
 }
