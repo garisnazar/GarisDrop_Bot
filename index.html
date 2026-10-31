@@ -50,11 +50,19 @@
   #app{ position:fixed; inset:0; z-index:1; display:flex; flex-direction:column; padding:16px 16px calc(92px + env(safe-area-inset-bottom)); overflow:hidden; }
   .header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; flex-shrink: 0; }
   .logo{ font-weight:900; font-size:19px; background:linear-gradient(90deg,#00ff9d,#5cbf4a,#00ff9d); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  
   .header-right{ display:flex; align-items:center; gap:8px; }
   
-  .balance-pill{ background:var(--card); border:1px solid var(--border); padding:8px 12px; border-radius:999px; font-size:14px; font-weight:800; color:var(--neon); display:flex; align-items:center; gap:6px; cursor:pointer; transition: transform 0.1s, background 0.2s; }
-  .balance-pill:active { transform: scale(0.95); background: rgba(0,255,157,0.1); }
-  .deposit-btn-top{ background:linear-gradient(135deg,#00ff9d,#5cbf4a); border:none; padding:8px 12px; border-radius:999px; font-size:12px; font-weight:900; color:#001a10; cursor:pointer; }
+  /* Кнопка переключения валюты */
+  .currency-switch-btn {
+    background: var(--card); border: 1px solid var(--border); color: var(--neon);
+    width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 900; cursor: pointer; transition: transform 0.1s, background 0.2s;
+    box-shadow: 0 0 10px rgba(0,255,157,0.1);
+  }
+  .currency-switch-btn:active { transform: scale(0.9); background: rgba(0,255,157,0.15); }
+
+  .balance-pill{ background:var(--card); border:1px solid var(--border); padding:8px 12px; border-radius:999px; font-size:14px; font-weight:800; color:var(--neon); display:flex; align-items:center; gap:6px; }
 
   /* ===== PAGES ===== */
   .page{ flex:1; min-height: 0; overflow-y:auto; display:none; flex-direction: column; padding-bottom:12px; color: var(--text); }
@@ -64,12 +72,11 @@
 
   /* ===== GAMES GRID ===== */
   .games-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; align-content: start; }
-  .game-card{ position:relative; background:var(--card2); border:1px solid var(--border); border-radius:22px; padding:18px 14px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; cursor:pointer; transition: transform 0.1s; min-height: 110px; }
+  .game-card{ position:relative; background:var(--card2); border:1px solid var(--border); border-radius:22px; padding:18px 14px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; cursor:pointer; transition: transform 0.1s; min-height: 120px; }
   .game-card:active{ transform:scale(.96); }
-  .game-card .emoji{ font-size:32px; }
-  .game-card .name{ font-size:14px; font-weight:800; text-align: center; }
+  .game-card .emoji{ font-size:38px; }
+  .game-card .name{ font-size:15px; font-weight:900; text-align: center; }
   .game-card .tag{ font-size:10px; color:var(--muted); text-align: center; }
-  .game-card.coming{ opacity:.42; cursor:default; border-style:dashed; }
   .game-card .nft-badge{ position:absolute; top:8px; right:8px; font-size:8px; font-weight:900; padding:3px 7px; border-radius:999px; background:var(--neon); color:#001a10; }
 
   /* ===== SLOTS ===== */
@@ -98,74 +105,27 @@
   /* ===== MINES ===== */
   .mines-grid-wrap { position: relative; width: 100%; max-width: 340px; margin: 0 auto; }
   
-  /* Жесткая сетка, чтобы ячейки были идеально квадратными */
   .mines-grid { 
-    display: grid; 
-    gap: 8px; 
-    padding: 12px; 
-    background: var(--card); 
-    border: 1px solid var(--border); 
-    border-radius: 24px; 
-    box-shadow: 0 0 30px rgba(0,255,157,0.05); 
-    width: 100%; 
-    aspect-ratio: 1; 
-    grid-template-rows: repeat(var(--size, 3), 1fr); 
-    grid-template-columns: repeat(var(--size, 3), 1fr); 
+    display: grid; gap: 8px; padding: 12px; background: var(--card); border: 1px solid var(--border); border-radius: 24px; 
+    box-shadow: 0 0 30px rgba(0,255,157,0.05); width: 100%; aspect-ratio: 1; 
+    grid-template-rows: repeat(var(--size, 3), 1fr); grid-template-columns: repeat(var(--size, 3), 1fr); 
   }
   
   .mine-cell { 
-    aspect-ratio: 1;
-    background: #0d1f18; 
-    border: 1px solid var(--border); 
-    border-radius: 12px; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    font-size: 24px; 
-    cursor: pointer; 
-    user-select: none; 
-    box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
-    transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
-    /* Предотвращаем вылезание контента за границы */
-    overflow: hidden;
-    position: relative;
+    aspect-ratio: 1; background: #0d1f18; border: 1px solid var(--border); border-radius: 12px; 
+    display: flex; align-items: center; justify-content: center; font-size: 24px; 
+    cursor: pointer; user-select: none; box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+    transition: background 0.2s, border-color 0.2s, box-shadow 0.2s; overflow: hidden; position: relative;
   }
-  
   .mine-cell:active { transform: scale(0.95); }
 
-  /* Анимация звезды - выпрыгивает из центра, не меняя размеров сетки */
-  .mine-cell.gem { 
-    background: rgba(0,255,157,0.1); 
-    border-color: var(--neon); 
-    box-shadow: 0 0 15px rgba(0,255,157,0.6), inset 0 0 10px rgba(0,255,157,0.3); 
-  }
-  .mine-cell.gem::after {
-    content: '⭐';
-    animation: popGem 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-    display: inline-block;
-  }
-  @keyframes popGem { 
-    0% { transform: scale(0); opacity: 0; } 
-    60% { transform: scale(1.3); opacity: 1; } 
-    100% { transform: scale(1); opacity: 1; } 
-  }
+  .mine-cell.gem { background: rgba(0,255,157,0.1); border-color: var(--neon); box-shadow: 0 0 15px rgba(0,255,157,0.6), inset 0 0 10px rgba(0,255,157,0.3); }
+  .mine-cell.gem::after { content: '⭐'; animation: popGem 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; display: inline-block; }
+  @keyframes popGem { 0% { transform: scale(0); opacity: 0; } 60% { transform: scale(1.3); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
 
-  /* Анимация бомбы - взрыв */
-  .mine-cell.bomb { 
-    background: rgba(255,77,109,0.2); 
-    border-color: var(--red); 
-    box-shadow: 0 0 20px rgba(255,77,109,0.8), inset 0 0 15px rgba(255,77,109,0.5); 
-  }
-  .mine-cell.bomb::after {
-    content: '💣';
-    animation: bombBoom 0.5s ease-out forwards;
-    display: inline-block;
-  }
-  @keyframes bombBoom { 
-    0% { transform: scale(0.5) rotate(-20deg); opacity: 0; } 
-    50% { transform: scale(1.4) rotate(10deg); opacity: 1; } 
-    100% { transform: scale(1) rotate(0); opacity: 1; } 
-  }
+  .mine-cell.bomb { background: rgba(255,77,109,0.2); border-color: var(--red); box-shadow: 0 0 20px rgba(255,77,109,0.8), inset 0 0 15px rgba(255,77,109,0.5); }
+  .mine-cell.bomb::after { content: '💣'; animation: bombBoom 0.5s ease-out forwards; display: inline-block; }
+  @keyframes bombBoom { 0% { transform: scale(0.5) rotate(-20deg); opacity: 0; } 50% { transform: scale(1.4) rotate(10deg); opacity: 1; } 100% { transform: scale(1) rotate(0); opacity: 1; } }
 
   .multiplier-display { font-size: 16px; font-weight: 900; color: var(--yellow); text-align: center; margin: 10px 0; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); display: none; }
   .multiplier-display.show { display: block; }
@@ -193,8 +153,15 @@
   .level-bar { height: 100%; background: linear-gradient(90deg, #00ff9d, #5cbf4a); width: 0%; transition: width 0.3s; border-radius: 10px; box-shadow: 0 0 10px rgba(0,255,157,0.5);}
 
   .profile-balance{ font-size:34px; font-weight:900; color:var(--neon); margin-top:10px; }
+  
+  /* Сетка кнопок в профиле */
+  .action-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:14px; }
+  .action-btn-icon { padding:14px 5px; border-radius:18px; border:1px solid var(--border); background:var(--card2); color:white; font-weight:800; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:6px; font-size:11px;}
+  .action-btn-icon .ic { font-size: 22px; }
+
   .action-row{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px; }
   .action-btn{ padding:18px; border-radius:20px; border:1px solid var(--border); background:var(--card2); color:white; font-weight:800; cursor:pointer; }
+  
   .info-block{ background:var(--card); border:1px solid var(--border); border-radius:18px; padding:16px; margin-bottom:12px; }
   .info-block h4{ font-size:13px; color:var(--neon); margin-bottom:8px; }
   .info-block p{ font-size:12px; color:var(--muted); line-height:1.5; }
@@ -227,48 +194,38 @@
 <body>
 
 <div id="loader" class="loader-overlay"><div class="spinner"></div></div>
-
 <div id="bg"></div>
 
 <div id="app">
   <div class="header">
     <div class="logo">🐸 GARISDROP</div>
     <div class="header-right">
-      <button class="deposit-btn-top" onclick="openModal('deposit')">+ Пополнить</button>
-      <div class="balance-pill" onclick="toggleCurrency()">
+      <!-- Кнопка переключения валюты -->
+      <div class="currency-switch-btn" onclick="toggleCurrency()">
+        <span id="btnCurrencyIcon">⭐</span>
+      </div>
+      <div class="balance-pill" id="balancePillHeader">
         <span id="currencyIcon">⭐</span> <span id="balanceTop">0</span>
       </div>
     </div>
   </div>
 
-  <!-- ГЛАВНОЕ МЕНЮ -->
+  <!-- ГЛАВНОЕ МЕНЮ (ТОЛЬКО ИГРЫ) -->
   <div class="page active" id="page-games">
-    <div class="title">Экосистема <span>▸</span></div>
+    <div class="title">Игры <span>▸</span></div>
     <div class="games-grid">
       <div class="game-card" onclick="openGame('slots')">
         <div class="nft-badge">HOT</div>
         <div class="emoji">🍌🎰</div>
         <div class="name">Слоты</div>
+        <div class="tag">3 режима</div>
       </div>
       <div class="game-card" onclick="openGame('mines')">
-        <div class="nft-badge" style="background:var(--yellow); color:#000;">NEW</div>
+        <div class="nft-badge" style="background:var(--yellow); color:#000; box-shadow:0 0 10px rgba(255,215,0,0.5);">NEW</div>
         <div class="emoji">💣💎</div>
         <div class="name">Майнер</div>
+        <div class="tag">Играй и забирай</div>
       </div>
-      
-      <div class="game-card" onclick="claimDaily()">
-        <div class="emoji">🎁</div>
-        <div class="name">Бонус дня</div>
-        <div class="tag">Забрать 50 ⭐</div>
-      </div>
-      <div class="game-card" onclick="switchPage('history')">
-        <div class="emoji">📊</div>
-        <div class="name">История</div>
-        <div class="tag">Последние игры</div>
-      </div>
-      
-      <div class="game-card coming"><div class="emoji">🏆</div><div class="name">Топ игроков</div></div>
-      <div class="game-card coming"><div class="emoji">📦</div><div class="name">Кейсы</div></div>
     </div>
   </div>
 
@@ -318,7 +275,7 @@
 
   <!-- ИСТОРИЯ -->
   <div class="page" id="page-history">
-    <div class="title" onclick="switchPage('games')" style="cursor:pointer; font-size:16px; margin-bottom:10px;">← Назад</div>
+    <div class="title" onclick="switchPage('profile')" style="cursor:pointer; font-size:16px; margin-bottom:10px;">← Назад в профиль</div>
     <div id="historyList"></div>
   </div>
 
@@ -338,10 +295,24 @@
         <div class="level-wrap"><div class="level-bar" id="xpBar"></div></div>
       </div>
 
-      <div class="profile-balance" onclick="toggleCurrency()" style="cursor:pointer;" title="Сменить валюту">
-        <small id="profileCurrencyIcon">⭐</small> <span id="balanceProfile">0</span>
+      <div class="profile-balance">
+        <span id="profileCurrencyIcon">⭐</span> <span id="balanceProfile">0</span>
       </div>
     </div>
+
+    <!-- Кнопки перенесенные из меню -->
+    <div class="action-grid">
+      <button class="action-btn-icon" onclick="openComingSoon()">
+        <span class="ic">🎁</span> Бонус дня
+      </button>
+      <button class="action-btn-icon" onclick="switchPage('history')">
+        <span class="ic">📊</span> История
+      </button>
+      <button class="action-btn-icon" onclick="openComingSoon()">
+        <span class="ic">🏆</span> Топ игроков
+      </button>
+    </div>
+
     <div class="action-row">
       <button class="action-btn" onclick="openModal('deposit')">＋ Пополнить</button>
       <button class="action-btn" onclick="openModal('withdraw')">↗ Вывести</button>
@@ -371,9 +342,9 @@
 const SYMBOLS = ['🍌','🎰','💎','🍒','⭐'];
 
 let STATE = {
-  balance: 1000,
-  currency: 'stars',
-  rubRate: 1.8,
+  balance: 1000,       // Внутренний баланс всегда в звездах
+  currency: 'stars',   // 'stars' или 'rub'
+  rubRate: 1.5,        // 1 звезда = 1.5 рубля
   xp: 0,
   level: 1,
   lastDaily: 0,
@@ -400,22 +371,29 @@ if (window.Telegram?.WebApp) {
   }
 }
 
+// КУРС: 1 звезда = 1.5 рубля. Округляем вниз.
 function formatMoney(starsAmount) {
-  if (STATE.currency === 'rub') return Math.floor(starsAmount / STATE.rubRate);
+  if (STATE.currency === 'rub') return Math.floor(starsAmount * STATE.rubRate);
   return Math.floor(starsAmount);
 }
+
 function getCurrencyIcon() { return STATE.currency === 'rub' ? '₽' : '⭐'; }
 
 function updateUI() {
   const displayBalance = formatMoney(STATE.balance);
   const icon = getCurrencyIcon();
   
+  // Шапка
   document.getElementById('balanceTop').textContent = displayBalance;
-  document.getElementById('balanceProfile').textContent = displayBalance;
   document.getElementById('currencyIcon').textContent = icon;
+  document.getElementById('btnCurrencyIcon').textContent = icon;
+
+  // Профиль
+  document.getElementById('balanceProfile').textContent = displayBalance;
   document.getElementById('profileCurrencyIcon').textContent = icon;
   document.getElementById('cashoutCurrency').textContent = icon;
 
+  // Ставки
   document.getElementById('slot-betInput').value = formatMoney(slotState.bet);
   document.getElementById('mine-betInput').value = formatMoney(mineState.bet);
   
@@ -424,6 +402,7 @@ function updateUI() {
     document.getElementById('cashoutAmount').textContent = formatMoney(amountStars);
   }
 
+  // XP
   document.getElementById('userLevel').textContent = STATE.level;
   document.getElementById('userXP').textContent = STATE.xp;
   document.getElementById('xpBar').style.width = Math.min((STATE.xp / 100) * 100, 100) + '%';
@@ -461,25 +440,19 @@ function renderHistory() {
   });
 }
 
-function claimDaily() {
-  const now = Date.now();
-  if (now - STATE.lastDaily < 24 * 60 * 60 * 1000) {
-    const hoursLeft = Math.ceil((24 * 60 * 60 * 1000 - (now - STATE.lastDaily)) / (1000 * 60 * 60));
-    showLoseModal(false, `Бонус уже получен! Возвращайся через ${hoursLeft} ч.`);
-    return;
-  }
-  STATE.balance += 50;
-  STATE.lastDaily = now;
-  updateUI();
-  showWinModal(formatMoney(50), getCurrencyIcon(), '🎁 БОНУС');
+function openComingSoon() {
+  showLoseModal(false, 'Эта функция появится в следующих обновлениях! Следите за новостями.');
 }
 
 function toggleCurrency() {
   STATE.currency = STATE.currency === 'stars' ? 'rub' : 'stars';
-  updateUI(); renderHistory();
-  const pill = document.querySelector('.balance-pill');
-  pill.style.transform = 'scale(0.9)';
-  setTimeout(() => { pill.style.transform = 'scale(1)'; }, 150);
+  updateUI(); 
+  renderHistory();
+  
+  // Анимация кнопки
+  const btn = document.querySelector('.currency-switch-btn');
+  btn.style.transform = 'scale(0.8)';
+  setTimeout(() => { btn.style.transform = 'scale(1)'; }, 150);
 }
 
 function showLoader(callback) {
@@ -497,7 +470,9 @@ function switchPage(name) {
   
   if(name === 'games' || name === 'profile') {
     const nav = document.getElementById('nav-' + name); if(nav) nav.classList.add('active');
-  } else { const nav = document.getElementById('nav-games'); if(nav) nav.classList.add('active'); }
+  } else if (name === 'history') {
+    const nav = document.getElementById('nav-profile'); if(nav) nav.classList.add('active');
+  }
   
   if(name === 'history') renderHistory();
   updateUI();
@@ -516,7 +491,7 @@ const SLOT_MODES = {
   medium: { cols: 4, mult: 2.0, winChance: 0.20, nearMissChance: 0.45 },
   hard: { cols: 5, mult: 4.0, winChance: 0.10, nearMissChance: 0.45 }
 };
-let slotState = { mode: 'easy', bet: 10, spinning: false };
+let slotState = { mode: 'easy', bet: 10, spinning: false }; // bet всегда в звездах
 
 function setSlotMode(mode) {
   if (slotState.spinning) return;
@@ -542,17 +517,29 @@ function setSlotMode(mode) {
 
 function changeSlotBet(d) {
   if (slotState.spinning) return;
-  let stepStars = STATE.currency === 'rub' ? STATE.rubRate : 1;
+  // Шаг: в звездах 1, в рублях 10 (чтобы не было копеек)
+  let stepStars = STATE.currency === 'rub' ? (10 / STATE.rubRate) : 1;
   let nb = slotState.bet + (d * stepStars);
-  if (nb >= stepStars && nb <= STATE.balance) { slotState.bet = nb; updateUI(); }
+  
+  let minBet = STATE.currency === 'rub' ? (10 / STATE.rubRate) : 1;
+  
+  if (nb >= minBet && nb <= STATE.balance) { 
+    slotState.bet = nb; 
+    updateUI(); 
+  }
 }
 
 function validateSlotBetInput() {
   if (slotState.spinning) return;
   let inputVal = parseFloat(document.getElementById('slot-betInput').value) || 1;
-  let starsVal = STATE.currency === 'rub' ? inputVal * STATE.rubRate : inputVal;
-  if (starsVal < STATE.rubRate) starsVal = STATE.rubRate;
+  // Конвертируем рубли в звезды
+  let starsVal = STATE.currency === 'rub' ? (inputVal / STATE.rubRate) : inputVal;
+  
+  let minBet = STATE.currency === 'rub' ? (10 / STATE.rubRate) : 1;
+  
+  if (starsVal < minBet) starsVal = minBet;
   if (starsVal > STATE.balance) starsVal = STATE.balance;
+  
   slotState.bet = starsVal;
   updateUI();
 }
@@ -668,7 +655,7 @@ function setMineMode(mode) {
 function resetMinesBoard() {
   const mode = MINE_MODES[mineState.mode];
   const grid = document.getElementById('minesGrid');
-  grid.style.setProperty('--size', mode.size); // Задаем размер для CSS Grid
+  grid.style.setProperty('--size', mode.size);
   grid.innerHTML = '';
   
   mineState.active = false; mineState.grid = []; mineState.opened = 0; mineState.currentMult = 1.0;
@@ -690,16 +677,20 @@ function resetMinesBoard() {
 
 function changeMineBet(d) { 
   if (mineState.active) return; 
-  let stepStars = STATE.currency === 'rub' ? STATE.rubRate : 1;
+  let stepStars = STATE.currency === 'rub' ? (10 / STATE.rubRate) : 1;
   let nb = mineState.bet + (d * stepStars); 
-  if (nb >= stepStars && nb <= STATE.balance) { mineState.bet = nb; updateUI(); } 
+  let minBet = STATE.currency === 'rub' ? (10 / STATE.rubRate) : 1;
+  
+  if (nb >= minBet && nb <= STATE.balance) { mineState.bet = nb; updateUI(); } 
 }
 
 function validateMineBetInput() { 
   if (mineState.active) return; 
   let inputVal = parseFloat(document.getElementById('mine-betInput').value) || 1;
-  let starsVal = STATE.currency === 'rub' ? inputVal * STATE.rubRate : inputVal;
-  if (starsVal < STATE.rubRate) starsVal = STATE.rubRate; 
+  let starsVal = STATE.currency === 'rub' ? (inputVal / STATE.rubRate) : inputVal;
+  let minBet = STATE.currency === 'rub' ? (10 / STATE.rubRate) : 1;
+  
+  if (starsVal < minBet) starsVal = minBet; 
   if (starsVal > STATE.balance) starsVal = STATE.balance; 
   mineState.bet = starsVal; updateUI(); 
 }
@@ -730,9 +721,7 @@ function clickMineCell(index) {
   cellData.isOpened = true;
   
   if (mineState.opened === mineState.deadlyStep) {
-    // ВЗРЫВ
     cellData.el.classList.add('bomb'); 
-    // Убираем текстовый контент, так как CSS ::after рисует анимацию
     cellData.el.innerHTML = ''; 
     mineState.active = false;
     
@@ -753,16 +742,13 @@ function clickMineCell(index) {
       document.getElementById('minesBetPanel').style.display = 'flex';
       document.getElementById('multiplierDisplay').classList.remove('show');
       
-      addXP(5);
-      addHistory('Майнер', mineState.bet, 0);
+      addXP(5); addHistory('Майнер', mineState.bet, 0);
       showLoseModal(false, 'Вы наткнулись на мину!');
       resetMinesBoard();
     }, 1500);
 
   } else {
-    // ЗВЕЗДА
     cellData.el.classList.add('gem'); 
-    // Очищаем, чтобы анимация ::after сработала чисто
     cellData.el.innerHTML = '';
     mineState.opened++;
     
@@ -822,7 +808,7 @@ function showLoseModal(isNearMiss, customText = '') {
   const btn = document.getElementById('modalBtn');
   
   box.className = 'modal lose'; icon.className = 'icon-lose'; icon.innerHTML = '✕';
-  if (customText) { title.textContent = 'Бум! 💥'; text.innerHTML = customText; }
+  if (customText) { title.textContent = 'Внимание!'; text.innerHTML = customText; }
   else if (isNearMiss) { title.textContent = 'Ух, почти!'; text.innerHTML = `На центральной линии не хватило всего одного символа!<br>Попробуйте еще раз!`; }
   else { title.textContent = 'Очень жаль...'; text.innerHTML = 'В этот раз не повезло.<br>Попробуйте еще раз!'; }
   btn.className = 'modal-btn red'; btn.textContent = 'Ближе к делу';
