@@ -101,7 +101,7 @@
   .game-wrap{ display:flex; flex-direction:column; align-items:center; gap:12px; }
   
   /* Выбор режима */
-  .mode-selector { display: flex; gap: 6px; width: 100%; max-width: 400px; margin-bottom: 4px; }
+  .mode-selector { display: flex; gap: 6px; width: 100%; max-width: 400px; margin-bottom: 4px; z-index: 10; }
   .mode-btn {
     flex: 1; padding: 10px 0; border-radius: 12px; border: 1px solid var(--border);
     background: var(--card); color: var(--muted); font-weight: 800; font-size: 13px; cursor: pointer;
@@ -109,23 +109,67 @@
   }
   .mode-btn.active { background: rgba(0, 255, 157, 0.15); color: var(--neon); border-color: var(--neon); box-shadow: 0 0 10px rgba(0,255,157,0.2); }
 
+  /* Обертка для слотов */
+  .slots-wrapper {
+    position: relative;
+    width: 100%; 
+    max-width: 400px;
+    padding: 0 20px; 
+  }
+
   .slots{
     display:grid; 
-    /* Динамическое количество колонок задается через JS */
     grid-template-columns: repeat(var(--cols, 3), 1fr); 
     gap:8px;
-    width:100%; max-width:400px; background:var(--card);
+    width:100%; background:var(--card);
     border:1px solid var(--border); border-radius:24px; padding:14px;
     box-shadow: 0 0 30px rgba(0,255,157,0.05);
+    position: relative;
+    overflow: hidden;
   }
+
+  /* Затемнение верхнего и нижнего ряда */
+  .slots::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 33.33%;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.75), transparent);
+    pointer-events: none; z-index: 2; border-radius: 24px 24px 0 0;
+  }
+  .slots::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 33.33%;
+    background: linear-gradient(to top, rgba(0,0,0,0.75), transparent);
+    pointer-events: none; z-index: 2; border-radius: 0 0 24px 24px;
+  }
+
+  /* Красная рамка для среднего ряда */
+  .win-line-top, .win-line-bottom {
+    position: absolute; left: 10px; right: 10px; height: 2px;
+    background: rgba(255, 77, 109, 0.6);
+    box-shadow: 0 0 10px rgba(255, 77, 109, 0.8);
+    z-index: 3; pointer-events: none;
+  }
+  .win-line-top { top: 33.33%; transform: translateY(-50%); }
+  .win-line-bottom { top: 66.66%; transform: translateY(-50%); }
+
+  /* Красные стрелки */
+  .red-arrow {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    color: var(--red); font-size: 24px; z-index: 5;
+    text-shadow: 0 0 15px rgba(255, 77, 109, 0.9);
+    animation: pulseArrow 1s infinite alternate;
+    pointer-events: none;
+  }
+  .red-arrow.left { left: -4px; }
+  .red-arrow.right { right: -4px; }
+  @keyframes pulseArrow { from { opacity: 0.6; transform: translateY(-50%) scale(0.9); } to { opacity: 1; transform: translateY(-50%) scale(1.1); } }
+
   .cell{
     aspect-ratio:1; border-radius:12px; background:#0d1f18;
     border:1px solid var(--border); display:flex; align-items:center; justify-content:center;
-    /* Динамический шрифт, чтобы 5 барабанов влезали на экран */
     font-size: clamp(20px, 6vw, 32px); transition: all 0.2s;
+    position: relative; z-index: 1;
   }
   
-  /* Анимация прокрутки для одного барабана */
+  /* Анимация прокрутки */
   .cell.spinning { animation: blurSpin 0.1s linear infinite; }
   @keyframes blurSpin {
     0% { transform: translateY(-5px); opacity: 0.7; }
@@ -136,10 +180,11 @@
     border-color:var(--neon); 
     box-shadow: 0 0 20px rgba(0,255,157,0.8), inset 0 0 10px rgba(0,255,157,0.4); 
     background: rgba(0,255,157,0.1); transform: scale(1.05);
+    z-index: 4; 
   }
 
   /* Блок ввода ставки */
-  .bet-row{ display:flex; align-items:center; gap:10px; margin-top: 4px; }
+  .bet-row{ display:flex; align-items:center; gap:10px; margin-top: 4px; z-index: 10; }
   .bet-btn{
     width:44px; height:44px; border-radius:14px; background:var(--card);
     border:1px solid var(--border); color:var(--neon); font-size:20px; font-weight:800;
@@ -160,11 +205,11 @@
   .bet-input-wrap input:disabled { opacity: 0.5; }
 
   .spin-btn{
-    width:100%; max-width:400px; padding:16px; border:none; border-radius:20px;
+    width:100%; max-width:340px; padding:16px; border:none; border-radius:20px;
     font-size:17px; font-weight:900; color:#001a10;
     background:linear-gradient(135deg,#00ff9d,#5cbf4a);
     cursor:pointer; transition: all 0.2s; box-shadow: 0 5px 15px rgba(0,255,157,0.3);
-    margin-top: 4px;
+    margin-top: 4px; z-index: 10;
   }
   .spin-btn:active{ transform:scale(.97); }
   .spin-btn:disabled{ opacity:.5; box-shadow:none; cursor:not-allowed; }
@@ -256,8 +301,17 @@
         <button class="mode-btn" id="btn-hard" onclick="setMode('hard')">Сложный (x4)</button>
       </div>
 
-      <!-- Поле слотов (динамическое) -->
-      <div class="slots" id="slots"></div>
+      <!-- Обертка для слотов -->
+      <div class="slots-wrapper">
+        <!-- Красные прицелы и стрелки -->
+        <div class="win-line-top"></div>
+        <div class="win-line-bottom"></div>
+        <div class="red-arrow left">▶</div>
+        <div class="red-arrow right">◀</div>
+        
+        <!-- Поле слотов -->
+        <div class="slots" id="slots"></div>
+      </div>
       
       <!-- Ввод ставки -->
       <div class="bet-row">
@@ -342,7 +396,7 @@ function openGame() {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-slot').classList.add('active');
   document.getElementById('nav-games').classList.add('active');
-  setMode(currentMode); // Отрисовка сетки при входе
+  setMode(currentMode);
 }
 
 // --- РЕЖИМЫ И СЕТКА ---
@@ -350,11 +404,9 @@ function setMode(mode) {
   if (STATE.spinning) return;
   currentMode = mode;
   
-  // Обновляем активные кнопки
   document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('btn-' + mode).classList.add('active');
   
-  // Создаем сетку
   const cols = MODES[mode].cols;
   const slotsContainer = document.getElementById('slots');
   slotsContainer.style.setProperty('--cols', cols);
@@ -366,6 +418,7 @@ function setMode(mode) {
       let cell = document.createElement('div');
       cell.className = 'cell';
       cell.dataset.col = col;
+      cell.dataset.row = row;
       cell.textContent = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
       slotsContainer.appendChild(cell);
     }
@@ -416,38 +469,70 @@ function spin() {
   cells.forEach(c => c.classList.remove('win'));
 
   // Генерируем результат
-  let grid = []; // Плоский массив [ряд0кол0, ряд0кол1...]
+  let grid = []; 
   let isWin = Math.random() < mode.winChance;
   let isNearMiss = !isWin && Math.random() < mode.nearMissChance;
 
-  // Инициализация пустой сетки
   for(let i=0; i < 3 * mode.cols; i++) grid.push(null);
 
+  // Выигрывает ТОЛЬКО средний ряд (line = 1)
+  const WIN_LINE = 1;
+
   if (isWin) {
-    const line = Math.floor(Math.random() * 3); // 0, 1, 2 (ряды)
+    // Если настоящий выигрыш - заполняем весь средний ряд
     const sym = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
-    for(let c=0; c < mode.cols; c++) grid[line * mode.cols + c] = sym;
+    for(let c=0; c < mode.cols; c++) grid[WIN_LINE * mode.cols + c] = sym;
   } else if (isNearMiss) {
-    const line = Math.floor(Math.random() * 3);
+    // === НОВАЯ ЛОГИКА NEAR MISS ===
+    // Делаем так, чтобы не всегда не хватало именно последнего символа.
+    const cols = mode.cols;
     const sym = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
-    let failSym = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
-    while (failSym === sym) failSym = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
     
-    // Заполняем все кроме последней колонки
-    for(let c=0; c < mode.cols - 1; c++) grid[line * mode.cols + c] = sym;
-    // Последняя колонка - другой символ
-    grid[line * mode.cols + (mode.cols - 1)] = failSym;
+    // Выбираем, сколько символов совпадет (минимум 2, максимум cols-1)
+    const matchLen = Math.floor(Math.random() * (cols - 2 + 1)) + 2; 
+    
+    // Выбираем, с какого места начнется цепочка
+    const startIdx = Math.floor(Math.random() * (cols - matchLen + 1));
+    
+    // Заполняем цепочку одинаковых символов
+    for (let i = 0; i < matchLen; i++) {
+       grid[WIN_LINE * cols + startIdx + i] = sym;
+    }
+    
+    // Остальные ячейки в линии заполняем другими символами
+    for (let c = 0; c < cols; c++) {
+       if (grid[WIN_LINE * cols + c] === null) {
+          let failSym = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+          while (failSym === sym) failSym = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+          grid[WIN_LINE * cols + c] = failSym;
+       }
+    }
   }
 
-  // Заполняем оставшиеся пустые
+  // Заполняем оставшиеся пустые ячейки случайными
   for (let i = 0; i < grid.length; i++) {
     if (!grid[i]) grid[i] = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+  }
+
+  // Защита от случайного выигрыша, если isWin = false
+  if (!isWin) {
+      let fullMatch = true;
+      let firstSym = grid[WIN_LINE * mode.cols];
+      for (let c = 1; c < mode.cols; c++) {
+          if (grid[WIN_LINE * mode.cols + c] !== firstSym) {
+              fullMatch = false;
+              break;
+          }
+      }
+      // Если случайно собрали полный ряд - ломаем последний символ
+      if (fullMatch) {
+          grid[WIN_LINE * mode.cols + (mode.cols - 1)] = SYMBOLS[(SYMBOLS.indexOf(firstSym)+1)%SYMBOLS.length];
+      }
   }
 
   // Анимация
   const spinIntervals = [];
   for (let col = 0; col < mode.cols; col++) {
-    // Выбираем все ячейки в этой колонке
     const colCells = Array.from(cells).filter(c => parseInt(c.dataset.col) === col);
     colCells.forEach(c => c.classList.add('spinning'));
     
@@ -456,9 +541,9 @@ function spin() {
     }, 60);
   }
 
-  // Остановка колонок (по очереди)
+  // Остановка колонок
   for (let col = 0; col < mode.cols; col++) {
-    let stopTime = 800 + col * 500; // 800ms, 1300ms, 1800ms, 2300ms, 2800ms
+    let stopTime = 800 + col * 500; 
     
     setTimeout(() => {
       clearInterval(spinIntervals[col]);
@@ -473,36 +558,21 @@ function spin() {
       if (col === mode.cols - 1) {
         setTimeout(() => {
           if (isWin) {
-            // Округляем вниз, если х1.5 дает дробное число (например, ставка 15 -> выигрыш 22.5 -> 22)
             const winAmount = Math.floor(STATE.bet * mode.mult);
             STATE.balance += winAmount;
             updateUI();
             
-            // Подсветка выигрышной линии
-            const winLine = grid.findIndex((_, i) => i % mode.cols === 0); // грубый поиск начала линии, лучше найти через совпадения
-            // Найдем выигрышный ряд
-            let winningRow = -1;
-            for(let r=0; r<3; r++) {
-               let first = grid[r*mode.cols];
-               let allMatch = true;
-               for(let c=1; c<mode.cols; c++) {
-                 if(grid[r*mode.cols + c] !== first) { allMatch = false; break; }
-               }
-               if(allMatch) { winningRow = r; break; }
-            }
-
-            if (winningRow !== -1) {
-              for(let c=0; c<mode.cols; c++) {
-                cells[winningRow * mode.cols + c].classList.add('win');
-              }
+            // Подсветка выигрышной линии (только средний ряд)
+            for(let c=0; c<mode.cols; c++) {
+              cells[WIN_LINE * mode.cols + c].classList.add('win');
             }
             
             showWinModal(winAmount, mode.mult);
           } else {
-            showLoseModal(isNearMiss, mode.cols);
+            showLoseModal(isNearMiss);
           }
           lockControls(false);
-        }, 300); // Небольшая пауза после последнего барабана
+        }, 300); 
       }
     }, stopTime);
   }
@@ -531,7 +601,7 @@ function openModal(type) {
   mask.classList.add('show');
 }
 
-function showLoseModal(isNearMiss, cols) {
+function showLoseModal(isNearMiss) {
   const box = document.getElementById('modalBox');
   const icon = document.getElementById('modalIcon');
   const title = document.getElementById('modalTitle');
@@ -543,7 +613,7 @@ function showLoseModal(isNearMiss, cols) {
   
   if (isNearMiss) {
     title.textContent = 'Ух, почти!';
-    text.innerHTML = `Не хватило всего одного символа до победы!<br>Попробуйте еще раз!`;
+    text.innerHTML = `На центральной линии почти собралось комбо!<br>Попробуйте еще раз!`;
   } else {
     title.textContent = 'Очень жаль...';
     text.innerHTML = 'В этот раз не повезло.<br>Попробуйте еще раз!';
