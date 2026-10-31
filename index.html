@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Pepe Neon Casino</title>
+<title>GarisDrop</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; }
@@ -23,9 +23,7 @@
 
   html,body{ height:100%; background:var(--bg); color:var(--text); overflow:hidden; }
 
-  /* ============================================================
-     ФОН: чёрный + зелёные точки Telegram + NFT Pepe-карточки
-     ============================================================ */
+  /* ===== ФОН ===== */
   #bg{
     position:fixed; inset:0; z-index:0; overflow:hidden;
     background:
@@ -35,7 +33,6 @@
       #000;
   }
 
-  /* слой 1: крупные точки */
   #bg::before{
     content:""; position:absolute; inset:-50%;
     background-image:radial-gradient(var(--neon) 1.6px, transparent 1.6px);
@@ -45,7 +42,6 @@
     mask-image: radial-gradient(circle at 50% 40%, #000 30%, transparent 80%);
     -webkit-mask-image: radial-gradient(circle at 50% 40%, #000 30%, transparent 80%);
   }
-  /* слой 2: мелкие точки контр-движение */
   #bg::after{
     content:""; position:absolute; inset:-50%;
     background-image:radial-gradient(var(--neon) 1.2px, transparent 1.2px);
@@ -56,7 +52,7 @@
   @keyframes drift{ to{ transform:translate(38px,38px);} }
   @keyframes drift2{ to{ transform:translate(-22px,22px);} }
 
-  /* ===== Плавающие NFT Pepe-карточки ===== */
+  /* ===== NFT Pepe ===== */
   .nft-float{
     position:absolute;
     width:88px; height:108px;
@@ -81,13 +77,8 @@
     font-size:28px;
     filter:drop-shadow(0 0 6px rgba(0,255,157,.6));
   }
-  .nft-float .tag{
-    font-size:8px; font-weight:800; letter-spacing:.5px;
-    color:var(--neon); text-shadow:0 0 8px rgba(0,255,157,.7);
-  }
-  .nft-float .id{
-    font-size:7px; color:var(--muted);
-  }
+  .nft-float .tag{ font-size:8px; font-weight:800; letter-spacing:.5px; color:var(--neon); text-shadow:0 0 8px rgba(0,255,157,.7); }
+  .nft-float .id{ font-size:7px; color:var(--muted); }
 
   .nft-1{ top:8%;  left:-18px;  transform:rotate(-12deg); animation-delay:0s;   }
   .nft-2{ top:38%; right:-22px; transform:rotate(14deg);  animation-delay:-2.5s; }
@@ -95,14 +86,9 @@
   .nft-4{ top:22%; right:14%;   width:64px; height:80px; opacity:.28; animation-delay:-3.5s; }
   .nft-4 .pepe{ width:38px; height:38px; font-size:20px; }
 
-  @keyframes floatY{
-    0%,100%{ translate:0 0; }
-    50%    { translate:0 -18px; }
-  }
+  @keyframes floatY{ 0%,100%{ translate:0 0; } 50%{ translate:0 -18px; } }
 
-  /* ============================================================
-     APP
-     ============================================================ */
+  /* ===== APP ===== */
   #app{
     position:relative; z-index:1;
     height:100%; display:flex; flex-direction:column;
@@ -121,15 +107,26 @@
     text-shadow:0 0 26px rgba(0,255,157,.45);
     display:flex; align-items:center; gap:6px;
   }
-  .logo .frog{ font-size:20px; filter:drop-shadow(0 0 8px rgba(0,255,157,.7)); }
+  
+  .header-right{ display:flex; align-items:center; gap:8px; }
+  
   .balance-pill{
     background:var(--card);
     border:1px solid var(--border);
-    padding:8px 14px; border-radius:999px;
+    padding:8px 12px; border-radius:999px;
     font-size:14px; font-weight:800; color:var(--neon);
     box-shadow:0 0 18px rgba(0,255,157,.15), inset 0 0 12px rgba(0,255,157,.05);
     display:flex; align-items:center; gap:6px;
   }
+  
+  .deposit-btn-top{
+    background:linear-gradient(135deg,#00ff9d,#5cbf4a);
+    border:none; padding:8px 12px; border-radius:999px;
+    font-size:12px; font-weight:900; color:#001a10;
+    box-shadow:0 0 16px rgba(0,255,157,.4);
+    cursor:pointer; transition: 0.15s;
+  }
+  .deposit-btn-top:active{ transform:scale(.95); }
 
   /* ===== PAGES ===== */
   .page{ flex:1; overflow-y:auto; display:none; padding-bottom:12px; }
@@ -228,9 +225,7 @@
   .spin-btn:active{ transform:scale(.97); }
   .spin-btn:disabled{ opacity:.5; box-shadow:none; }
 
-  .result{
-    font-size:14px; font-weight:800; min-height:20px; text-align:center;
-  }
+  .result{ font-size:14px; font-weight:800; min-height:20px; text-align:center; }
   .result.win{ color:var(--neon); text-shadow:0 0 14px rgba(0,255,157,.7); }
   .result.lose{ color:#ff5b7f; }
 
@@ -374,9 +369,6 @@
 </head>
 <body>
 
-<!-- ============================================================
-     ФОН: точки + NFT Pepe
-     ============================================================ -->
 <div id="bg">
   <div class="nft-float nft-1">
     <div class="pepe">🐸</div>
@@ -402,11 +394,14 @@
 
 <div id="app">
   <div class="header">
-    <div class="logo"><span class="frog">🐸</span> PEPE CASINO</div>
-    <div class="balance-pill">💎 <span id="balanceTop">0</span></div>
+    <div class="logo">🐸 GARISDROP</div>
+    <div class="header-right">
+      <button class="deposit-btn-top" onclick="alert('Пополнение скоро будет доступно!')">+ Пополнить</button>
+      <div class="balance-pill">⭐ <span id="balanceTop">0</span></div>
+    </div>
   </div>
 
-  <!-- ============ СТРАНИЦА: ИГРЫ ============ -->
+  <!-- СТРАНИЦА: ИГРЫ -->
   <div class="page active" id="page-games">
     <div class="title">Игры <span>▸</span></div>
     <div class="games-grid">
@@ -434,7 +429,7 @@
     </div>
   </div>
 
-  <!-- ============ СТРАНИЦА: ИГРА 3 В РЯД ============ -->
+  <!-- СТРАНИЦА: ИГРА 3 В РЯД -->
   <div class="page" id="page-slot">
     <div class="title">🍌 3 в ряд</div>
     <div class="game-wrap">
@@ -456,7 +451,7 @@
     </div>
   </div>
 
-  <!-- ============ СТРАНИЦА: ПРОФИЛЬ ============ -->
+  <!-- СТРАНИЦА: ПРОФИЛЬ -->
   <div class="page" id="page-profile">
     <div class="title">Профиль <span>▸</span></div>
 
@@ -464,7 +459,7 @@
       <div class="avatar">🐸</div>
       <div class="profile-name" id="userName">Игрок</div>
       <div class="profile-id" id="userId">ID: —</div>
-      <div class="profile-balance"><small>💎</small> <span id="balanceProfile">0</span></div>
+      <div class="profile-balance"><small>⭐</small> <span id="balanceProfile">0</span></div>
     </div>
 
     <div class="action-row">
@@ -488,7 +483,7 @@
   </div>
 </div>
 
-<!-- ============ НИЖНЕЕ МЕНЮ ============ -->
+<!-- НИЖНЕЕ МЕНЮ -->
 <div class="nav">
   <button class="nav-btn active" id="nav-games" onclick="switchPage('games')">
     <span class="ni">🎮</span> Игры
@@ -498,7 +493,7 @@
   </button>
 </div>
 
-<!-- ============ МОДАЛКИ ============ -->
+<!-- МОДАЛКИ -->
 <div class="modal-mask" id="modalMask">
   <div class="modal modal-rel">
     <button class="close-x" onclick="closeModal()">×</button>
@@ -507,11 +502,6 @@
 </div>
 
 <script>
-/* =================== НАСТРОЙКИ ЭКОНОМИКИ ===================
-   WIN_CHANCE = 0.08 (8%)  — низкий шанс, владелец получает больше
-   WIN_MULTIPLIER = 3      — выигрыш ×3
-   Математическое преимущество заведения ≈ 76%
-   =========================================================== */
 const WIN_CHANCE = 0.08;
 const WIN_MULTIPLIER = 3;
 
@@ -523,7 +513,6 @@ const STATE = {
 };
 const SYMBOLS = ['🍌','🎰','💎','🍒','⭐'];
 
-/* =================== TELEGRAM =================== */
 const tg = window.Telegram?.WebApp;
 if (tg) {
   tg.ready(); tg.expand();
@@ -533,7 +522,6 @@ if (tg) {
   }
 }
 
-/* =================== UI =================== */
 function fmt(n){ return n.toLocaleString('ru-RU'); }
 
 function updateUI(){
@@ -544,13 +532,13 @@ function updateUI(){
   document.getElementById('userId').textContent = 'ID: ' + STATE.user.id;
 }
 
-/* =================== НАВИГАЦИЯ =================== */
 function switchPage(name){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
   document.getElementById('nav-'+name).classList.add('active');
 }
+
 function openGame(){
   switchPage('games');
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -558,7 +546,6 @@ function openGame(){
   document.getElementById('nav-games').classList.add('active');
 }
 
-/* =================== ИГРА =================== */
 function changeBet(delta){
   if (STATE.spinning) return;
   const next = STATE.bet + delta;
@@ -588,11 +575,9 @@ function spin(){
 
   setTimeout(()=>{
     clearInterval(interval);
-
     const grid = [];
     for (let i=0;i<9;i++) grid.push(randomSymbol());
 
-    // НИЗКИЙ ШАНС ВЫИГРЫША (~8%)
     const forceWin = Math.random() < WIN_CHANCE;
     let winLines = [];
 
@@ -612,9 +597,9 @@ function spin(){
       winLines.flat().forEach(i=> cells[i].classList.add('win'));
       const win = STATE.bet * WIN_MULTIPLIER;
       STATE.balance += win;
-      showResult(`🎉 Выигрыш +${fmt(win)} 💎`, true);
+      showResult(`🎉 Выигрыш +${fmt(win)} ⭐`, true);
     } else {
-      showResult(`−${fmt(STATE.bet)} 💎`, false);
+      showResult(`−${fmt(STATE.bet)} ⭐`, false);
     }
 
     updateUI();
@@ -629,7 +614,6 @@ function showResult(text, win){
   el.className = 'result ' + (win ? 'win' : 'lose');
 }
 
-/* =================== МОДАЛКИ =================== */
 function openModal(type){
   const mask = document.getElementById('modalMask');
   const content = document.getElementById('modalContent');
@@ -672,6 +656,10 @@ function closeModal(){
   document.getElementById('modalMask').classList.remove('show');
 }
 
-/* =================== ВЫВОД НА КАРТУ =================== */
 function withdrawCard(){
-  const content = document.getElementById('
+  const content = document.getElementById('modalContent');
+  content.innerHTML = `
+    <h3>💳 Вывод на карту</h3>
+    <div class="sub">Минимум 1100 ₽ • комиссия 5%</div>
+    <input class="input-field" id="cardAmount" type="number" placeholder="Сумма (₽)" inputmode="numeric">
+    <div class="hint">Мин. 1100 ₽. Комиссия 5%. К выводу: <b id="cardPreview" style
