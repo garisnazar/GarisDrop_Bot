@@ -78,9 +78,10 @@
   .deposit-btn-top{ background:linear-gradient(135deg,#00ff9d,#5cbf4a); border:none; padding:8px 12px; border-radius:999px; font-size:12px; font-weight:900; color:#001a10; cursor:pointer; }
 
   /* ===== PAGES ===== */
-  .page{ flex:1; overflow-y:auto; display:none; padding-bottom:12px; }
-  .page.active{ display:block; animation:fade .3s ease; }
-  @keyframes fade{ from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;} }
+  /* Убрали анимацию, которая скрывала контент, добавили min-height: 0 */
+  .page{ flex:1; min-height: 0; overflow-y:auto; display:none; padding-bottom:12px; color: var(--text); }
+  .page.active{ display:block; }
+  
   .title{ font-size:22px; font-weight:900; margin-bottom:14px; }
   .title span{ color:var(--neon); }
 
@@ -136,42 +137,29 @@
   .cell.win{ border-color:var(--neon); box-shadow: 0 0 20px rgba(0,255,157,0.8), inset 0 0 10px rgba(0,255,157,0.4); background: rgba(0,255,157,0.1); transform: scale(1.05); z-index: 4; }
 
   /* ===== MINES ===== */
-  .mines-grid-wrap {
-    position: relative; width: 100%; max-width: 340px; margin: 0 auto;
-  }
+  .mines-grid-wrap { position: relative; width: 100%; max-width: 340px; margin: 0 auto; }
   .mines-grid {
     display: grid; gap: 8px; padding: 12px; background: var(--card); border: 1px solid var(--border);
-    border-radius: 24px; box-shadow: 0 0 30px rgba(0,255,157,0.05); width: 100%;
-    aspect-ratio: 1; /* Делаем квадратным */
+    border-radius: 24px; box-shadow: 0 0 30px rgba(0,255,157,0.05); width: 100%; aspect-ratio: 1;
   }
   .mine-cell {
     background: #0d1f18; border: 1px solid var(--border); border-radius: 12px;
     display: flex; align-items: center; justify-content: center; font-size: 24px;
-    cursor: pointer; transition: all 0.2s; user-select: none;
-    box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+    cursor: pointer; transition: all 0.2s; user-select: none; box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
   }
   .mine-cell:active { transform: scale(0.95); }
-  .mine-cell.gem {
-    background: rgba(0,255,157,0.1); border-color: var(--neon);
-    box-shadow: 0 0 15px rgba(0,255,157,0.6), inset 0 0 10px rgba(0,255,157,0.3);
-    animation: popGem 0.3s ease;
-  }
-  .mine-cell.bomb {
-    background: rgba(255,77,109,0.2); border-color: var(--red);
-    box-shadow: 0 0 15px rgba(255,77,109,0.8), inset 0 0 10px rgba(255,77,109,0.5);
-    animation: shake 0.4s ease;
-  }
+  .mine-cell.gem { background: rgba(0,255,157,0.1); border-color: var(--neon); box-shadow: 0 0 15px rgba(0,255,157,0.6), inset 0 0 10px rgba(0,255,157,0.3); animation: popGem 0.3s ease; }
+  .mine-cell.bomb { background: rgba(255,77,109,0.2); border-color: var(--red); box-shadow: 0 0 15px rgba(255,77,109,0.8), inset 0 0 10px rgba(255,77,109,0.5); animation: shake 0.4s ease; }
   @keyframes popGem { 0% { transform: scale(0.5); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
   @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
 
-  /* Кнопка Cashout (Забрать) */
   .cashout-btn {
     width: 100%; padding: 16px; border-radius: 20px; font-size: 17px; font-weight: 900;
     color: #001a10; background: linear-gradient(135deg, #00ff9d, #5cbf4a);
     border: none; cursor: pointer; transition: all 0.2s; box-shadow: 0 5px 15px rgba(0,255,157,0.3);
     display: none; margin-top: 10px;
   }
-  .cashout-btn.show { display: block; animation: fade .3s; }
+  .cashout-btn.show { display: block; }
   .cashout-btn:active { transform: scale(0.97); }
 
   /* Блок ввода ставки */
@@ -222,11 +210,9 @@
 
   /* ===== МОДАЛЬНЫЕ ОКНА ===== */
   .modal-mask{ position:fixed; inset:0; z-index:50; display:none; background:rgba(0,0,0,.7); align-items:center; justify-content:center; backdrop-filter: blur(5px); }
-  .modal-mask.show{ display:flex; animation: fadeIn 0.3s; }
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-  .modal{ width:90%; max-width:340px; background:var(--card2); border-radius:28px; padding:30px 20px; position:relative; text-align:center; box-shadow: 0 10px 40px rgba(0,0,0,0.5); transform: scale(0.9); animation: popIn 0.3s forwards; }
-  @keyframes popIn { to { transform: scale(1); } }
+  .modal-mask.show{ display:flex; }
+  .modal{ width:90%; max-width:340px; background:var(--card2); border-radius:28px; padding:30px 20px; position:relative; text-align:center; box-shadow: 0 10px 40px rgba(0,0,0,0.5); animation: popIn 0.3s; }
+  @keyframes popIn { from { transform: scale(0.9); } to { transform: scale(1); } }
 
   .modal.lose { border: 1px solid rgba(255, 77, 109, 0.4); box-shadow: 0 0 30px rgba(255, 77, 109, 0.15); }
   .icon-lose { font-size: 50px; color: var(--red); margin-bottom: 15px; text-shadow: 0 0 15px rgba(255,77,109,0.5); }
@@ -322,16 +308,15 @@
     <div class="title" onclick="switchPage('games')" style="cursor:pointer; font-size:16px; margin-bottom:10px;">← Назад</div>
     <div class="game-wrap">
       <div class="mode-selector">
-        <button class="mode-btn active" id="btn-mine-easy" onclick="setMineMode('easy')">Легкий 3x3 (x5)</button>
-        <button class="mode-btn" id="btn-mine-medium" onclick="setMineMode('medium')">Средний 4x4 (x15)</button>
-        <button class="mode-btn" id="btn-mine-hard" onclick="setMineMode('hard')">Сложный 5x5 (x50)</button>
+        <button class="mode-btn active" id="btn-mine-easy" onclick="setMineMode('easy')">Легкий 3x3</button>
+        <button class="mode-btn" id="btn-mine-medium" onclick="setMineMode('medium')">Средний 4x4</button>
+        <button class="mode-btn" id="btn-mine-hard" onclick="setMineMode('hard')">Сложный 5x5</button>
       </div>
 
       <div class="mines-grid-wrap">
         <div class="mines-grid" id="minesGrid"></div>
       </div>
 
-      <!-- Панель ставок (показывается только до старта игры) -->
       <div class="bet-row" id="minesBetPanel">
         <button class="bet-btn" id="mine-betMinus" onclick="changeMineBet(-10)">−</button>
         <div class="bet-input-wrap">
@@ -341,10 +326,7 @@
         <button class="bet-btn" id="mine-betPlus" onclick="changeMineBet(10)">+</button>
       </div>
       
-      <!-- Кнопка Начать игру -->
       <button class="main-action-btn" id="mineStartBtn" onclick="startMines()">НАЧАТЬ ИГРУ 💣</button>
-      
-      <!-- Кнопка Забрать выигрыш (появляется во время игры) -->
       <button class="cashout-btn" id="mineCashoutBtn" onclick="cashoutMines()">ЗАБРАТЬ: <span id="cashoutAmount">0</span> ⭐</button>
     </div>
   </div>
@@ -372,7 +354,6 @@
   <button class="nav-btn" id="nav-profile" onclick="switchPage('profile')">👤 Профиль</button>
 </div>
 
-<!-- Модальное окно -->
 <div class="modal-mask" id="modalMask">
   <div class="modal" id="modalBox">
     <div id="modalIcon"></div>
@@ -383,11 +364,9 @@
 </div>
 
 <script>
-// --- ГЛОБАЛЬНЫЕ ДАННЫЕ ---
 const STATE = { balance: 1000 };
 const SYMBOLS = ['🍌','🎰','💎','🍒','⭐'];
 
-// --- TELEGRAM ---
 if (window.Telegram?.WebApp) {
   Telegram.WebApp.ready();
   Telegram.WebApp.expand();
@@ -410,15 +389,14 @@ function switchPage(name) {
   else document.getElementById('nav-games').classList.add('active');
 }
 
+// ИСПРАВЛЕНА ОШИБКА ЗДЕСЬ (было game + 's')
 function openGame(game) {
-  switchPage(game + 's'); // page-slots, page-mines
+  switchPage(game); 
   if (game === 'slots') setSlotMode(slotState.mode);
   if (game === 'mines') resetMinesBoard();
 }
 
-/* =========================================
-   ИГРА 1: СЛОТЫ (Отлаженный код)
-   ========================================= */
+/* ================= СЛОТЫ ================= */
 const SLOT_MODES = {
   easy: { cols: 3, mult: 1.5, winChance: 0.20, nearMissChance: 0.50 },
   medium: { cols: 4, mult: 2.0, winChance: 0.08, nearMissChance: 0.50 },
@@ -473,7 +451,7 @@ function spinSlots() {
   let isWin = Math.random() < mode.winChance;
   let isNearMiss = !isWin && Math.random() < mode.nearMissChance;
   for(let i=0; i < 3 * mode.cols; i++) grid.push(null);
-  const WIN_LINE = 1; // Центр
+  const WIN_LINE = 1;
 
   if (isWin) {
     const sym = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
@@ -534,28 +512,19 @@ function spinSlots() {
   }
 }
 
-
-/* =========================================
-   ИГРА 2: МИНЕР (Новая игра)
-   ========================================= */
+/* ================= МИНЕР ================= */
 const MINE_MODES = {
   easy: { size: 3, mines: 1, maxMult: 5.0 },
   medium: { size: 4, mines: 3, maxMult: 15.0 },
   hard: { size: 5, mines: 5, maxMult: 50.0 }
 };
-let mineState = { 
-  mode: 'easy', bet: 10, active: false, 
-  grid: [], opened: 0, safeCount: 0,
-  currentMult: 1.0 
-};
+let mineState = { mode: 'easy', bet: 10, active: false, grid: [], opened: 0, safeCount: 0, currentMult: 1.0 };
 
 function setMineMode(mode) {
   if (mineState.active) return;
   mineState.mode = mode;
-  
   document.querySelectorAll('[id^="btn-mine-"]').forEach(b => b.classList.remove('active'));
   document.getElementById('btn-mine-' + mode).classList.add('active');
-  
   resetMinesBoard();
 }
 
@@ -570,12 +539,10 @@ function resetMinesBoard() {
   mineState.opened = 0;
   mineState.currentMult = 1.0;
   
-  // Показываем ставку, прячем кнопку Cashout
   document.getElementById('minesBetPanel').style.display = 'flex';
   document.getElementById('mineStartBtn').style.display = 'block';
   document.getElementById('mineCashoutBtn').classList.remove('show');
 
-  // Генерируем пустое поле
   const totalCells = mode.size * mode.size;
   for (let i = 0; i < totalCells; i++) {
     let cell = document.createElement('div');
@@ -599,13 +566,11 @@ function startMines() {
   updateUI();
   mineState.active = true;
   
-  // Прячем панель ставки, показываем Cashout (с начальным х1)
   document.getElementById('minesBetPanel').style.display = 'none';
   document.getElementById('mineStartBtn').style.display = 'none';
   document.getElementById('mineCashoutBtn').classList.add('show');
   updateCashoutBtn();
 
-  // Рандомно раскидываем мины
   const totalCells = mode.size * mode.size;
   let minesPlaced = 0;
   while (minesPlaced < mode.mines) {
@@ -622,18 +587,10 @@ function updateCashoutBtn() {
   document.getElementById('cashoutAmount').textContent = amount;
 }
 
-// Динамический расчет множителя (упрощенная формула для казино)
 function getMineMultiplier(opened, size, mines) {
   if (opened === 0) return 1.0;
-  const total = size * size;
-  const safe = total - mines;
-  // Простая прогрессия для аркады
   let mult = 1.0;
-  for (let i = 0; i < opened; i++) {
-    // Чем больше открыто, тем сильнее растет множитель
-    mult += (i * 0.2) + 0.3; 
-  }
-  // Ограничиваем максимумом режима
+  for (let i = 0; i < opened; i++) { mult += (i * 0.2) + 0.3; }
   return Math.min(mult, MINE_MODES[mineState.mode].maxMult);
 }
 
@@ -646,12 +603,10 @@ function clickMineCell(index) {
   const mode = MINE_MODES[mineState.mode];
   
   if (cellData.isMine) {
-    // БУМ! Проигрыш
     cellData.el.classList.add('bomb');
     cellData.el.textContent = '💣';
     mineState.active = false;
     
-    // Открываем все остальные мины
     mineState.grid.forEach(c => {
       if (c.isMine && !c.isOpened) {
         c.el.classList.add('bomb');
@@ -665,11 +620,10 @@ function clickMineCell(index) {
       document.getElementById('mineStartBtn').style.display = 'block';
       document.getElementById('minesBetPanel').style.display = 'flex';
       showLoseModal(false, 'Вы наткнулись на мину!');
-      resetMinesBoard(); // Сбрасываем поле после закрытия модалки
+      resetMinesBoard();
     }, 1000);
 
   } else {
-    // БЕЗОПАСНО! Звезда
     cellData.el.classList.add('gem');
     cellData.el.textContent = '⭐';
     mineState.opened++;
@@ -677,7 +631,6 @@ function clickMineCell(index) {
     mineState.currentMult = getMineMultiplier(mineState.opened, mode.size, mode.mines);
     updateCashoutBtn();
 
-    // Если открыли все безопасные ячейки - автоматический кэшаут
     if (mineState.opened === (mode.size * mode.size - mode.mines)) {
       cashoutMines();
     }
@@ -700,9 +653,7 @@ function cashoutMines() {
   resetMinesBoard();
 }
 
-/* =========================================
-   МОДАЛЬНЫЕ ОКНА (Общие)
-   ========================================= */
+/* ================= МОДАЛКИ ================= */
 function openModal(type) {
   const mask = document.getElementById('modalMask');
   const box = document.getElementById('modalBox');
