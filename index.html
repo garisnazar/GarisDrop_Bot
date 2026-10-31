@@ -10,7 +10,6 @@
 
   :root{
     --neon:#00ff9d;
-    --neon-dim:#00c97a;
     --bg:#000;
     --card:#0a1410;
     --card2:#0f1f18;
@@ -28,50 +27,35 @@
     background:
       radial-gradient(circle at 20% 15%, rgba(0,255,157,.10), transparent 42%),
       radial-gradient(circle at 85% 75%, rgba(92,191,74,.08), transparent 45%),
-      radial-gradient(circle at 50% 50%, rgba(0,255,157,.03), transparent 70%),
       #000;
   }
   #bg::before{
     content:""; position:absolute; inset:-50%;
     background-image:radial-gradient(var(--neon) 1.6px, transparent 1.6px);
-    background-size:38px 38px;
-    opacity:.28;
-    animation: drift 24s linear infinite;
+    background-size:38px 38px; opacity:.28; animation: drift 24s linear infinite;
   }
   #bg::after{
     content:""; position:absolute; inset:-50%;
     background-image:radial-gradient(var(--neon) 1.2px, transparent 1.2px);
-    background-size:22px 22px;
-    opacity:.12;
-    animation: drift2 40s linear infinite reverse;
+    background-size:22px 22px; opacity:.12; animation: drift2 40s linear infinite reverse;
   }
   @keyframes drift{ to{ transform:translate(38px,38px);} }
   @keyframes drift2{ to{ transform:translate(-22px,22px);} }
 
   /* ===== NFT Pepe ===== */
   .nft-float{
-    position:absolute;
-    width:88px; height:108px;
-    border-radius:16px;
+    position:absolute; width:88px; height:108px; border-radius:16px;
     background:linear-gradient(160deg, rgba(12,32,24,.9), rgba(5,15,10,.9));
-    border:1px solid rgba(0,255,157,.35);
-    box-shadow:0 0 24px rgba(0,255,157,.25), inset 0 0 18px rgba(0,255,157,.08);
-    display:flex; flex-direction:column;
-    align-items:center; justify-content:center;
-    gap:4px; backdrop-filter:blur(4px);
-    animation: floatY 9s ease-in-out infinite;
+    border:1px solid rgba(0,255,157,.35); box-shadow:0 0 24px rgba(0,255,157,.25);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:4px; backdrop-filter:blur(4px); animation: floatY 9s ease-in-out infinite;
     opacity:.5; pointer-events:none;
   }
   .nft-float .pepe{
-    width:52px; height:52px;
-    display:flex; align-items:center; justify-content:center;
-    border-radius:50%;
-    background:radial-gradient(circle at 35% 30%, #7de86a, #2f7d24 70%, #1a4a14);
-    box-shadow:0 0 16px rgba(0,255,157,.45), inset 0 -4px 8px rgba(0,0,0,.4);
-    font-size:28px;
+    width:52px; height:52px; display:flex; align-items:center; justify-content:center;
+    border-radius:50%; background:radial-gradient(circle at 35% 30%, #7de86a, #2f7d24 70%, #1a4a14);
+    box-shadow:0 0 16px rgba(0,255,157,.45); font-size:28px;
   }
-  .nft-float .tag{ font-size:8px; font-weight:800; color:var(--neon); }
-  .nft-float .id{ font-size:7px; color:var(--muted); }
   .nft-1{ top:8%; left:-18px; transform:rotate(-12deg); }
   .nft-2{ top:38%; right:-22px; transform:rotate(14deg); animation-delay:-2.5s; }
   .nft-3{ top:66%; left:-14px; transform:rotate(-8deg); animation-delay:-5s; }
@@ -79,37 +63,23 @@
 
   /* ===== APP ===== */
   #app{
-    position:relative; z-index:1;
-    height:100%; display:flex; flex-direction:column;
-    padding:16px 16px calc(92px + env(safe-area-inset-bottom));
-    overflow:hidden;
+    position:relative; z-index:1; height:100%; display:flex; flex-direction:column;
+    padding:16px 16px calc(92px + env(safe-area-inset-bottom)); overflow:hidden;
   }
 
   .header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
-  .logo{
-    font-weight:900; font-size:19px;
-    background:linear-gradient(90deg,#00ff9d,#5cbf4a,#00ff9d);
-    -webkit-background-clip:text; background-clip:text; color:transparent;
-  }
+  .logo{ font-weight:900; font-size:19px; background:linear-gradient(90deg,#00ff9d,#5cbf4a,#00ff9d); -webkit-background-clip:text; background-clip:text; color:transparent; }
   .header-right{ display:flex; align-items:center; gap:8px; }
   .balance-pill{
-    background:var(--card); border:1px solid var(--border);
-    padding:8px 12px; border-radius:999px;
-    font-size:14px; font-weight:800; color:var(--neon);
-    display:flex; align-items:center; gap:6px;
-    transition: transform 0.1s;
+    background:var(--card); border:1px solid var(--border); padding:8px 12px; border-radius:999px;
+    font-size:14px; font-weight:800; color:var(--neon); display:flex; align-items:center; gap:6px; transition: transform 0.1s;
   }
-  .deposit-btn-top{
-    background:linear-gradient(135deg,#00ff9d,#5cbf4a);
-    border:none; padding:8px 12px; border-radius:999px;
-    font-size:12px; font-weight:900; color:#001a10; cursor:pointer;
-  }
+  .deposit-btn-top{ background:linear-gradient(135deg,#00ff9d,#5cbf4a); border:none; padding:8px 12px; border-radius:999px; font-size:12px; font-weight:900; color:#001a10; cursor:pointer; }
 
   /* ===== PAGES ===== */
   .page{ flex:1; overflow-y:auto; display:none; padding-bottom:12px; }
   .page.active{ display:block; animation:fade .3s ease; }
   @keyframes fade{ from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;} }
-  .page::-webkit-scrollbar{ display:none; }
   .title{ font-size:22px; font-weight:900; margin-bottom:14px; }
   .title span{ color:var(--neon); }
 
@@ -117,149 +87,125 @@
   .games-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
   .game-card{
     position:relative; background:var(--card2); border:1px solid var(--border);
-    border-radius:22px; padding:18px 14px;
-    display:flex; flex-direction:column; align-items:center; gap:10px;
-    cursor:pointer; transition: transform 0.1s;
+    border-radius:22px; padding:18px 14px; display:flex; flex-direction:column;
+    align-items:center; gap:10px; cursor:pointer; transition: transform 0.1s;
   }
   .game-card:active{ transform:scale(.96); }
   .game-card .emoji{ font-size:34px; }
   .game-card .name{ font-size:14px; font-weight:800; }
   .game-card .tag{ font-size:10px; color:var(--muted); }
   .game-card.coming{ opacity:.42; cursor:default; border-style:dashed; justify-content:center; min-height:110px; }
-  .game-card .nft-badge{
-    position:absolute; top:8px; right:8px; font-size:8px; font-weight:900;
-    padding:3px 7px; border-radius:999px; background:var(--neon); color:#001a10;
-  }
+  .game-card .nft-badge{ position:absolute; top:8px; right:8px; font-size:8px; font-weight:900; padding:3px 7px; border-radius:999px; background:var(--neon); color:#001a10; }
 
   /* ===== SLOTS ===== */
-  .game-wrap{ display:flex; flex-direction:column; align-items:center; gap:16px; }
+  .game-wrap{ display:flex; flex-direction:column; align-items:center; gap:12px; }
+  
+  /* Выбор режима */
+  .mode-selector { display: flex; gap: 6px; width: 100%; max-width: 400px; margin-bottom: 4px; }
+  .mode-btn {
+    flex: 1; padding: 10px 0; border-radius: 12px; border: 1px solid var(--border);
+    background: var(--card); color: var(--muted); font-weight: 800; font-size: 13px; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .mode-btn.active { background: rgba(0, 255, 157, 0.15); color: var(--neon); border-color: var(--neon); box-shadow: 0 0 10px rgba(0,255,157,0.2); }
+
   .slots{
-    display:grid; grid-template-columns:repeat(3,1fr); gap:10px;
-    width:100%; max-width:340px; background:var(--card);
+    display:grid; 
+    /* Динамическое количество колонок задается через JS */
+    grid-template-columns: repeat(var(--cols, 3), 1fr); 
+    gap:8px;
+    width:100%; max-width:400px; background:var(--card);
     border:1px solid var(--border); border-radius:24px; padding:14px;
     box-shadow: 0 0 30px rgba(0,255,157,0.05);
   }
   .cell{
-    aspect-ratio:1; border-radius:16px; background:#0d1f18;
+    aspect-ratio:1; border-radius:12px; background:#0d1f18;
     border:1px solid var(--border); display:flex; align-items:center; justify-content:center;
-    font-size:32px; transition: all 0.2s;
+    /* Динамический шрифт, чтобы 5 барабанов влезали на экран */
+    font-size: clamp(20px, 6vw, 32px); transition: all 0.2s;
   }
   
-  /* Анимация прокрутки */
-  .cell.spinning { animation: spinBlur 0.15s linear infinite; }
-  @keyframes spinBlur {
-    0% { transform: translateY(0); opacity: 1; }
-    50% { transform: translateY(-5px); opacity: 0.7; filter: blur(1px); }
-    100% { transform: translateY(0); opacity: 1; }
+  /* Анимация прокрутки для одного барабана */
+  .cell.spinning { animation: blurSpin 0.1s linear infinite; }
+  @keyframes blurSpin {
+    0% { transform: translateY(-5px); opacity: 0.7; }
+    100% { transform: translateY(5px); opacity: 1; }
   }
   
   .cell.win{ 
     border-color:var(--neon); 
     box-shadow: 0 0 20px rgba(0,255,157,0.8), inset 0 0 10px rgba(0,255,157,0.4); 
-    background: rgba(0,255,157,0.1);
-    transform: scale(1.05);
-    animation: winPulse 1s infinite alternate;
-  }
-  @keyframes winPulse {
-    from { box-shadow: 0 0 10px rgba(0,255,157,0.5); }
-    to { box-shadow: 0 0 25px rgba(0,255,157,1); }
+    background: rgba(0,255,157,0.1); transform: scale(1.05);
   }
 
-  .bet-row{ display:flex; align-items:center; gap:10px; }
+  /* Блок ввода ставки */
+  .bet-row{ display:flex; align-items:center; gap:10px; margin-top: 4px; }
   .bet-btn{
     width:44px; height:44px; border-radius:14px; background:var(--card);
     border:1px solid var(--border); color:var(--neon); font-size:20px; font-weight:800;
     cursor:pointer; transition: transform 0.1s;
   }
   .bet-btn:active{ transform:scale(0.9); }
-  .bet-val{
-    min-width:90px; text-align:center; background:var(--card);
-    border:1px solid var(--border); border-radius:14px; padding:12px;
-    font-weight:800; color:var(--neon);
+  .bet-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  
+  .bet-input-wrap {
+    background:var(--card); border:1px solid var(--border); border-radius:14px;
+    padding:0 10px; display:flex; align-items:center; height:44px;
   }
+  .bet-input-wrap span { color:var(--muted); font-size:14px; margin-right:5px; }
+  .bet-input-wrap input {
+    width: 60px; background: transparent; border: none; outline: none;
+    color: var(--neon); font-size: 16px; font-weight: 800; text-align: center;
+  }
+  .bet-input-wrap input:disabled { opacity: 0.5; }
+
   .spin-btn{
-    width:100%; max-width:340px; padding:18px; border:none; border-radius:20px;
+    width:100%; max-width:400px; padding:16px; border:none; border-radius:20px;
     font-size:17px; font-weight:900; color:#001a10;
     background:linear-gradient(135deg,#00ff9d,#5cbf4a);
-    cursor:pointer; transition: all 0.2s;
-    box-shadow: 0 5px 15px rgba(0,255,157,0.3);
+    cursor:pointer; transition: all 0.2s; box-shadow: 0 5px 15px rgba(0,255,157,0.3);
+    margin-top: 4px;
   }
   .spin-btn:active{ transform:scale(.97); }
   .spin-btn:disabled{ opacity:.5; box-shadow:none; cursor:not-allowed; }
 
   /* ===== PROFILE ===== */
-  .profile-card{
-    background:var(--card2); border:1px solid var(--border);
-    border-radius:24px; padding:22px; text-align:center; margin-bottom:14px;
-  }
-  .avatar{
-    width:78px; height:78px; border-radius:50%; margin:0 auto 12px;
-    background:radial-gradient(circle, #7de86a, #2f7d24);
-    display:flex; align-items:center; justify-content:center; font-size:36px;
-  }
+  .profile-card{ background:var(--card2); border:1px solid var(--border); border-radius:24px; padding:22px; text-align:center; margin-bottom:14px; }
+  .avatar{ width:78px; height:78px; border-radius:50%; margin:0 auto 12px; background:radial-gradient(circle, #7de86a, #2f7d24); display:flex; align-items:center; justify-content:center; font-size:36px; }
   .profile-name{ font-size:18px; font-weight:900; }
   .profile-id{ font-size:12px; color:var(--muted); }
   .profile-balance{ font-size:34px; font-weight:900; color:var(--neon); margin-top:16px; }
   .action-row{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px; }
-  .action-btn{
-    padding:18px; border-radius:20px; border:1px solid var(--border);
-    background:var(--card2); color:white; font-weight:800; cursor:pointer;
-  }
-  .info-block{
-    background:var(--card); border:1px solid var(--border);
-    border-radius:18px; padding:16px; margin-bottom:12px;
-  }
+  .action-btn{ padding:18px; border-radius:20px; border:1px solid var(--border); background:var(--card2); color:white; font-weight:800; cursor:pointer; }
+  .info-block{ background:var(--card); border:1px solid var(--border); border-radius:18px; padding:16px; margin-bottom:12px; }
   .info-block h4{ font-size:13px; color:var(--neon); margin-bottom:8px; }
   .info-block p{ font-size:12px; color:var(--muted); line-height:1.5; }
 
   /* ===== NAV ===== */
-  .nav{
-    position:fixed; left:12px; right:12px; bottom:calc(12px + env(safe-area-inset-bottom));
-    background:rgba(8,20,16,.85); border:1px solid var(--border);
-    border-radius:24px; display:flex; padding:8px; z-index:10;
-    backdrop-filter: blur(10px);
-  }
-  .nav-btn{
-    flex:1; padding:12px; border-radius:18px; border:none;
-    background:transparent; color:var(--muted); font-weight:800; cursor:pointer;
-    transition: all 0.2s;
-  }
+  .nav{ position:fixed; left:12px; right:12px; bottom:calc(12px + env(safe-area-inset-bottom)); background:rgba(8,20,16,.85); border:1px solid var(--border); border-radius:24px; display:flex; padding:8px; z-index:10; backdrop-filter: blur(10px); }
+  .nav-btn{ flex:1; padding:12px; border-radius:18px; border:none; background:transparent; color:var(--muted); font-weight:800; cursor:pointer; transition: all 0.2s; }
   .nav-btn.active{ background:rgba(0,255,157,.15); color:var(--neon); }
 
   /* ===== МОДАЛЬНЫЕ ОКНА ===== */
-  .modal-mask{
-    position:fixed; inset:0; z-index:50; display:none;
-    background:rgba(0,0,0,.7); align-items:center; justify-content:center;
-    backdrop-filter: blur(5px);
-  }
+  .modal-mask{ position:fixed; inset:0; z-index:50; display:none; background:rgba(0,0,0,.7); align-items:center; justify-content:center; backdrop-filter: blur(5px); }
   .modal-mask.show{ display:flex; animation: fadeIn 0.3s; }
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-  .modal{
-    width:90%; max-width:340px; background:var(--card2); 
-    border-radius:28px; padding:30px 20px; position:relative;
-    text-align:center; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-    transform: scale(0.9); animation: popIn 0.3s forwards;
-  }
+  .modal{ width:90%; max-width:340px; background:var(--card2); border-radius:28px; padding:30px 20px; position:relative; text-align:center; box-shadow: 0 10px 40px rgba(0,0,0,0.5); transform: scale(0.9); animation: popIn 0.3s forwards; }
   @keyframes popIn { to { transform: scale(1); } }
 
-  /* Окно проигрыша */
   .modal.lose { border: 1px solid rgba(255, 77, 109, 0.4); box-shadow: 0 0 30px rgba(255, 77, 109, 0.15); }
   .icon-lose { font-size: 50px; color: var(--red); margin-bottom: 15px; text-shadow: 0 0 15px rgba(255,77,109,0.5); }
   .modal.lose h3 { color: var(--red); margin-bottom: 10px; font-size: 20px; }
   .modal.lose p { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
 
-  /* Окно выигрыша */
   .modal.win { border: 1px solid rgba(0, 255, 157, 0.5); box-shadow: 0 0 30px rgba(0, 255, 157, 0.2); }
   .icon-win { font-size: 50px; color: var(--neon); margin-bottom: 15px; text-shadow: 0 0 15px rgba(0,255,157,0.6); }
   .modal.win h3 { color: var(--neon); margin-bottom: 10px; font-size: 20px; }
   .modal.win p { color: white; font-size: 15px; margin-bottom: 20px; }
   .win-amount { font-size: 24px; font-weight: 900; color: var(--neon); display: block; margin-top: 10px; }
 
-  .modal-btn {
-    width: 100%; padding: 16px; border-radius: 16px; border: none;
-    font-weight: 900; font-size: 15px; cursor: pointer; transition: transform 0.1s;
-  }
+  .modal-btn { width: 100%; padding: 16px; border-radius: 16px; border: none; font-weight: 900; font-size: 15px; cursor: pointer; transition: transform 0.1s; }
   .modal-btn:active { transform: scale(0.95); }
   .modal-btn.red { background: rgba(255,77,109,0.15); color: var(--red); }
   .modal-btn.green { background: var(--neon); color: #001a10; box-shadow: 0 0 15px rgba(0,255,157,0.4); }
@@ -289,8 +235,8 @@
       <div class="game-card" onclick="openGame()">
         <div class="nft-badge">HOT</div>
         <div class="emoji">🍌🎰</div>
-        <div class="name">3 в ряд</div>
-        <div class="tag">x2</div>
+        <div class="name">Слоты</div>
+        <div class="tag">3 режима</div>
       </div>
       <div class="game-card coming"><div class="emoji">🎲</div><div class="name">Скоро</div></div>
       <div class="game-card coming"><div class="emoji">🃏</div><div class="name">Скоро</div></div>
@@ -301,17 +247,28 @@
   <!-- СЛОТЫ -->
   <div class="page" id="page-slot">
     <div class="title" onclick="switchPage('games')" style="cursor:pointer; font-size:16px; margin-bottom:10px;">← Назад</div>
+    
     <div class="game-wrap">
-      <div class="slots" id="slots">
-        <div class="cell">🍌</div><div class="cell">🎰</div><div class="cell">🍌</div>
-        <div class="cell">🎰</div><div class="cell">🍌</div><div class="cell">🎰</div>
-        <div class="cell">🍌</div><div class="cell">🎰</div><div class="cell">🍌</div>
+      <!-- Переключатель режимов -->
+      <div class="mode-selector">
+        <button class="mode-btn active" id="btn-easy" onclick="setMode('easy')">Легкий (x1.5)</button>
+        <button class="mode-btn" id="btn-medium" onclick="setMode('medium')">Средний (x2)</button>
+        <button class="mode-btn" id="btn-hard" onclick="setMode('hard')">Сложный (x4)</button>
       </div>
+
+      <!-- Поле слотов (динамическое) -->
+      <div class="slots" id="slots"></div>
+      
+      <!-- Ввод ставки -->
       <div class="bet-row">
-        <button class="bet-btn" onclick="changeBet(-10)">−</button>
-        <div class="bet-val">Ставка <span id="betVal">10</span></div>
-        <button class="bet-btn" onclick="changeBet(10)">+</button>
+        <button class="bet-btn" id="betMinus" onclick="changeBet(-10)">−</button>
+        <div class="bet-input-wrap">
+          <span>Ставка:</span>
+          <input type="number" id="betInput" value="10" min="10" max="10000" onchange="validateBetInput()">
+        </div>
+        <button class="bet-btn" id="betPlus" onclick="changeBet(10)">+</button>
       </div>
+      
       <button class="spin-btn" id="spinBtn" onclick="spin()">КРУТИТЬ 🎰</button>
     </div>
   </div>
@@ -329,14 +286,8 @@
       <button class="action-btn" onclick="openModal('deposit')">＋ Пополнить</button>
       <button class="action-btn" onclick="openModal('withdraw')">↗ Вывести</button>
     </div>
-    <div class="info-block">
-      <h4>💳 Карта</h4>
-      <p>Мин. <b>1100 ₽</b>, комиссия <b>5%</b>.</p>
-    </div>
-    <div class="info-block">
-      <h4>⭐ Звезды</h4>
-      <p>Мин. <b>500 ⭐</b>, сумма кратна <b>100</b>.</p>
-    </div>
+    <div class="info-block"><h4>💳 Карта</h4><p>Мин. <b>1100 ₽</b>, комиссия <b>5%</b>.</p></div>
+    <div class="info-block"><h4>⭐ Звезды</h4><p>Мин. <b>500 ⭐</b>, сумма кратна <b>100</b>.</p></div>
   </div>
 </div>
 
@@ -356,6 +307,14 @@
 </div>
 
 <script>
+// --- КОНФИГУРАЦИЯ РЕЖИМОВ ---
+const MODES = {
+  easy: { cols: 3, mult: 1.5, winChance: 0.20, nearMissChance: 0.50 },
+  medium: { cols: 4, mult: 2.0, winChance: 0.08, nearMissChance: 0.50 },
+  hard: { cols: 5, mult: 4.0, winChance: 0.03, nearMissChance: 0.50 }
+};
+let currentMode = 'easy';
+
 // --- ДАННЫЕ ---
 const STATE = { balance: 1000, bet: 10, spinning: false };
 const SYMBOLS = ['🍌','🎰','💎','🍒','⭐'];
@@ -379,16 +338,45 @@ function switchPage(name) {
 }
 
 function openGame() {
+  switchPage('games');
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-slot').classList.add('active');
   document.getElementById('nav-games').classList.add('active');
+  setMode(currentMode); // Отрисовка сетки при входе
+}
+
+// --- РЕЖИМЫ И СЕТКА ---
+function setMode(mode) {
+  if (STATE.spinning) return;
+  currentMode = mode;
+  
+  // Обновляем активные кнопки
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('btn-' + mode).classList.add('active');
+  
+  // Создаем сетку
+  const cols = MODES[mode].cols;
+  const slotsContainer = document.getElementById('slots');
+  slotsContainer.style.setProperty('--cols', cols);
+  slotsContainer.innerHTML = '';
+  
+  // 3 ряда, cols колонок
+  for (let row = 0; row < 3; row++) {
+    for (let col = 0; col < cols; col++) {
+      let cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.dataset.col = col;
+      cell.textContent = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+      slotsContainer.appendChild(cell);
+    }
+  }
 }
 
 // --- ИГРА ---
 function updateUI() {
   document.getElementById('balanceTop').textContent = STATE.balance;
   document.getElementById('balanceProfile').textContent = STATE.balance;
-  document.getElementById('betVal').textContent = STATE.bet;
+  document.getElementById('betInput').value = STATE.bet;
 }
 
 function changeBet(d) {
@@ -397,70 +385,127 @@ function changeBet(d) {
   if (nb >= 10 && nb <= STATE.balance) { STATE.bet = nb; updateUI(); }
 }
 
+function validateBetInput() {
+  if (STATE.spinning) return;
+  let input = document.getElementById('betInput');
+  let val = parseInt(input.value) || 10;
+  if (val < 10) val = 10;
+  if (val > STATE.balance) val = STATE.balance;
+  STATE.bet = val;
+  updateUI();
+}
+
+function lockControls(isLocked) {
+  STATE.spinning = isLocked;
+  document.getElementById('spinBtn').disabled = isLocked;
+  document.getElementById('betInput').disabled = isLocked;
+  document.getElementById('betPlus').disabled = isLocked;
+  document.getElementById('betMinus').disabled = isLocked;
+  document.querySelectorAll('.mode-btn').forEach(b => b.disabled = isLocked);
+}
+
 function spin() {
   if (STATE.spinning || STATE.balance < STATE.bet) return;
-  STATE.spinning = true;
+  
+  const mode = MODES[currentMode];
   STATE.balance -= STATE.bet;
   updateUI();
+  lockControls(true);
   
-  const btn = document.getElementById('spinBtn');
-  btn.disabled = true;
-  
-  const cells = document.querySelectorAll('#slots .cell');
-  cells.forEach(c => { c.classList.add('spinning'); c.classList.remove('win'); });
+  const cells = document.querySelectorAll('.cell');
+  cells.forEach(c => c.classList.remove('win'));
 
-  // Имитация красивой прокрутки
-  let ticks = 0;
-  const interval = setInterval(() => {
-    cells.forEach((c, i) => {
-      // Останавливаем по очереди, чтобы было красиво
-      if (ticks < 10 + i * 2) {
-        c.textContent = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
-      }
-    });
-    ticks++;
-  }, 50);
+  // Генерируем результат
+  let grid = []; // Плоский массив [ряд0кол0, ряд0кол1...]
+  let isWin = Math.random() < mode.winChance;
+  let isNearMiss = !isWin && Math.random() < mode.nearMissChance;
 
-  setTimeout(() => {
-    clearInterval(interval);
+  // Инициализация пустой сетки
+  for(let i=0; i < 3 * mode.cols; i++) grid.push(null);
+
+  if (isWin) {
+    const line = Math.floor(Math.random() * 3); // 0, 1, 2 (ряды)
+    const sym = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+    for(let c=0; c < mode.cols; c++) grid[line * mode.cols + c] = sym;
+  } else if (isNearMiss) {
+    const line = Math.floor(Math.random() * 3);
+    const sym = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+    let failSym = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+    while (failSym === sym) failSym = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
     
-    // Генерируем результат с шансом 15%
-    let grid = [];
-    let isWin = Math.random() < 0.15; // Шанс выигрыша 15%
+    // Заполняем все кроме последней колонки
+    for(let c=0; c < mode.cols - 1; c++) grid[line * mode.cols + c] = sym;
+    // Последняя колонка - другой символ
+    grid[line * mode.cols + (mode.cols - 1)] = failSym;
+  }
+
+  // Заполняем оставшиеся пустые
+  for (let i = 0; i < grid.length; i++) {
+    if (!grid[i]) grid[i] = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+  }
+
+  // Анимация
+  const spinIntervals = [];
+  for (let col = 0; col < mode.cols; col++) {
+    // Выбираем все ячейки в этой колонке
+    const colCells = Array.from(cells).filter(c => parseInt(c.dataset.col) === col);
+    colCells.forEach(c => c.classList.add('spinning'));
     
-    if (isWin) {
-      const sym = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
-      const line = Math.floor(Math.random() * 3);
-      // Заполняем выигрышную линию одинаковыми
-      grid[line*3] = sym; grid[line*3+1] = sym; grid[line*3+2] = sym;
-      // Остальные рандом
-      for(let i=0; i<9; i++) if(!grid[i]) grid[i] = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
-    } else {
-      for (let i = 0; i < 9; i++) grid.push(SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)]);
-      // Защита от случайного выигрыша в проигрышном раунде
-      if(grid[3]===grid[4] && grid[4]===grid[5]) grid[5] = grid[0]; 
-    }
+    spinIntervals[col] = setInterval(() => {
+      colCells.forEach(c => c.textContent = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)]);
+    }, 60);
+  }
 
-    cells.forEach((c, i) => {
-      c.classList.remove('spinning');
-      c.textContent = grid[i];
-      if (isWin && Math.floor(i/3) === Math.floor((i%3===0?i:0)/3)) { // Грубая подсветка, если выигрыш
-          if((i>=0&&i<=2) || (i>=3&&i<=5) || (i>=6&&i<=8)) c.classList.add('win'); 
+  // Остановка колонок (по очереди)
+  for (let col = 0; col < mode.cols; col++) {
+    let stopTime = 800 + col * 500; // 800ms, 1300ms, 1800ms, 2300ms, 2800ms
+    
+    setTimeout(() => {
+      clearInterval(spinIntervals[col]);
+      const colCells = Array.from(cells).filter(c => parseInt(c.dataset.col) === col);
+      
+      colCells.forEach((c, rowIndex) => {
+        c.classList.remove('spinning');
+        c.textContent = grid[rowIndex * mode.cols + col];
+      });
+
+      // Если это была последняя колонка - подводим итог
+      if (col === mode.cols - 1) {
+        setTimeout(() => {
+          if (isWin) {
+            // Округляем вниз, если х1.5 дает дробное число (например, ставка 15 -> выигрыш 22.5 -> 22)
+            const winAmount = Math.floor(STATE.bet * mode.mult);
+            STATE.balance += winAmount;
+            updateUI();
+            
+            // Подсветка выигрышной линии
+            const winLine = grid.findIndex((_, i) => i % mode.cols === 0); // грубый поиск начала линии, лучше найти через совпадения
+            // Найдем выигрышный ряд
+            let winningRow = -1;
+            for(let r=0; r<3; r++) {
+               let first = grid[r*mode.cols];
+               let allMatch = true;
+               for(let c=1; c<mode.cols; c++) {
+                 if(grid[r*mode.cols + c] !== first) { allMatch = false; break; }
+               }
+               if(allMatch) { winningRow = r; break; }
+            }
+
+            if (winningRow !== -1) {
+              for(let c=0; c<mode.cols; c++) {
+                cells[winningRow * mode.cols + c].classList.add('win');
+              }
+            }
+            
+            showWinModal(winAmount, mode.mult);
+          } else {
+            showLoseModal(isNearMiss, mode.cols);
+          }
+          lockControls(false);
+        }, 300); // Небольшая пауза после последнего барабана
       }
-    });
-
-    if (isWin) {
-      const winAmount = STATE.bet * 2; // х2
-      STATE.balance += winAmount;
-      updateUI();
-      showWinModal(winAmount);
-    } else {
-      showLoseModal();
-    }
-
-    STATE.spinning = false;
-    btn.disabled = false;
-  }, 1500);
+    }, stopTime);
+  }
 }
 
 // --- МОДАЛКИ ---
@@ -473,24 +518,20 @@ function openModal(type) {
   const btn = document.getElementById('modalBtn');
 
   if (type === 'deposit') {
-    box.className = 'modal';
-    icon.className = ''; icon.innerHTML = '';
+    box.className = 'modal'; icon.className = ''; icon.innerHTML = '';
     title.textContent = 'Пополнение';
     text.innerHTML = 'Функция пополнения скоро будет доступна!';
-    btn.className = 'modal-btn green';
-    btn.textContent = 'ОК';
+    btn.className = 'modal-btn green'; btn.textContent = 'ОК';
   } else if (type === 'withdraw') {
-    box.className = 'modal';
-    icon.className = ''; icon.innerHTML = '';
+    box.className = 'modal'; icon.className = ''; icon.innerHTML = '';
     title.textContent = 'Вывод';
     text.innerHTML = 'Вывод на карту: мин. 1100₽ (5%)<br>Вывод звезд: мин. 500⭐ (кратно 100)';
-    btn.className = 'modal-btn green';
-    btn.textContent = 'Понятно';
+    btn.className = 'modal-btn green'; btn.textContent = 'Понятно';
   }
   mask.classList.add('show');
 }
 
-function showLoseModal() {
+function showLoseModal(isNearMiss, cols) {
   const box = document.getElementById('modalBox');
   const icon = document.getElementById('modalIcon');
   const title = document.getElementById('modalTitle');
@@ -499,15 +540,20 @@ function showLoseModal() {
   
   box.className = 'modal lose';
   icon.className = 'icon-lose'; icon.innerHTML = '✕';
-  title.textContent = 'Очень жаль...';
-  text.innerHTML = 'В этот раз не повезло.<br>Попробуйте еще раз! 🍀';
-  btn.className = 'modal-btn red';
-  btn.textContent = 'Ближе к делу';
   
+  if (isNearMiss) {
+    title.textContent = 'Ух, почти!';
+    text.innerHTML = `Не хватило всего одного символа до победы!<br>Попробуйте еще раз!`;
+  } else {
+    title.textContent = 'Очень жаль...';
+    text.innerHTML = 'В этот раз не повезло.<br>Попробуйте еще раз!';
+  }
+  
+  btn.className = 'modal-btn red'; btn.textContent = 'Ближе к делу';
   document.getElementById('modalMask').classList.add('show');
 }
 
-function showWinModal(amount) {
+function showWinModal(amount, mult) {
   const box = document.getElementById('modalBox');
   const icon = document.getElementById('modalIcon');
   const title = document.getElementById('modalTitle');
@@ -517,10 +563,8 @@ function showWinModal(amount) {
   box.className = 'modal win';
   icon.className = 'icon-win'; icon.innerHTML = '★';
   title.textContent = 'Поздравляем!';
-  text.innerHTML = `Вы выиграли!<span class="win-amount">+${amount} ⭐</span>`;
-  btn.className = 'modal-btn green';
-  btn.textContent = 'Забрать';
-  
+  text.innerHTML = `Вы выиграли (x${mult})!<span class="win-amount">+${amount} ⭐</span>`;
+  btn.className = 'modal-btn green'; btn.textContent = 'Забрать';
   document.getElementById('modalMask').classList.add('show');
 }
 
@@ -528,8 +572,9 @@ function closeModal() {
   document.getElementById('modalMask').classList.remove('show');
 }
 
-// Запуск
+// Инициализация
 updateUI();
+setMode('easy');
 </script>
 </body>
 </html>
