@@ -17,6 +17,7 @@
     --text:#e6fff5;
     --muted:#5f8a78;
     --red:#ff4d6d;
+    --yellow:#ffd700;
   }
 
   html,body{ height:100%; background:var(--bg); color:var(--text); overflow:hidden; }
@@ -100,91 +101,81 @@
   /* ===== SLOTS ===== */
   .game-wrap{ display:flex; flex-direction:column; align-items:center; gap:12px; }
   
-  /* Выбор режима */
   .mode-selector { display: flex; gap: 6px; width: 100%; max-width: 400px; margin-bottom: 4px; z-index: 10; }
   .mode-btn {
     flex: 1; padding: 10px 0; border-radius: 12px; border: 1px solid var(--border);
-    background: var(--card); color: var(--muted); font-weight: 800; font-size: 13px; cursor: pointer;
-    transition: all 0.2s;
+    background: var(--card); color: var(--muted); font-weight: 800; font-size: 13px; cursor: pointer; transition: all 0.2s;
   }
   .mode-btn.active { background: rgba(0, 255, 157, 0.15); color: var(--neon); border-color: var(--neon); box-shadow: 0 0 10px rgba(0,255,157,0.2); }
 
-  /* Обертка для слотов */
-  .slots-wrapper {
-    position: relative;
-    width: 100%; 
-    max-width: 400px;
-    padding: 0 20px; 
-  }
-
+  .slots-wrapper { position: relative; width: 100%; max-width: 400px; padding: 0 20px; }
   .slots{
-    display:grid; 
-    grid-template-columns: repeat(var(--cols, 3), 1fr); 
-    gap:8px;
-    width:100%; background:var(--card);
-    border:1px solid var(--border); border-radius:24px; padding:14px;
-    box-shadow: 0 0 30px rgba(0,255,157,0.05);
-    position: relative;
-    overflow: hidden;
+    display:grid; grid-template-columns: repeat(var(--cols, 3), 1fr); gap:8px;
+    width:100%; background:var(--card); border:1px solid var(--border); border-radius:24px; padding:14px;
+    box-shadow: 0 0 30px rgba(0,255,157,0.05); position: relative; overflow: hidden;
   }
+  .slots::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 33.33%; background: linear-gradient(to bottom, rgba(0,0,0,0.75), transparent); pointer-events: none; z-index: 2; border-radius: 24px 24px 0 0; }
+  .slots::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 33.33%; background: linear-gradient(to top, rgba(0,0,0,0.75), transparent); pointer-events: none; z-index: 2; border-radius: 0 0 24px 24px; }
 
-  /* Затемнение верхнего и нижнего ряда */
-  .slots::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 33.33%;
-    background: linear-gradient(to bottom, rgba(0,0,0,0.75), transparent);
-    pointer-events: none; z-index: 2; border-radius: 24px 24px 0 0;
-  }
-  .slots::after {
-    content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 33.33%;
-    background: linear-gradient(to top, rgba(0,0,0,0.75), transparent);
-    pointer-events: none; z-index: 2; border-radius: 0 0 24px 24px;
-  }
-
-  /* Красная рамка для среднего ряда */
-  .win-line-top, .win-line-bottom {
-    position: absolute; left: 10px; right: 10px; height: 2px;
-    background: rgba(255, 77, 109, 0.6);
-    box-shadow: 0 0 10px rgba(255, 77, 109, 0.8);
-    z-index: 3; pointer-events: none;
-  }
+  .win-line-top, .win-line-bottom { position: absolute; left: 10px; right: 10px; height: 2px; background: rgba(255, 77, 109, 0.6); box-shadow: 0 0 10px rgba(255, 77, 109, 0.8); z-index: 3; pointer-events: none; }
   .win-line-top { top: 33.33%; transform: translateY(-50%); }
   .win-line-bottom { top: 66.66%; transform: translateY(-50%); }
 
-  /* Красные стрелки */
-  .red-arrow {
-    position: absolute; top: 50%; transform: translateY(-50%);
-    color: var(--red); font-size: 24px; z-index: 5;
-    text-shadow: 0 0 15px rgba(255, 77, 109, 0.9);
-    animation: pulseArrow 1s infinite alternate;
-    pointer-events: none;
-  }
+  .red-arrow { position: absolute; top: 50%; transform: translateY(-50%); color: var(--red); font-size: 24px; z-index: 5; text-shadow: 0 0 15px rgba(255, 77, 109, 0.9); animation: pulseArrow 1s infinite alternate; pointer-events: none; }
   .red-arrow.left { left: -4px; }
   .red-arrow.right { right: -4px; }
   @keyframes pulseArrow { from { opacity: 0.6; transform: translateY(-50%) scale(0.9); } to { opacity: 1; transform: translateY(-50%) scale(1.1); } }
 
   .cell{
-    aspect-ratio:1; border-radius:12px; background:#0d1f18;
-    border:1px solid var(--border); display:flex; align-items:center; justify-content:center;
-    font-size: clamp(20px, 6vw, 32px); transition: all 0.2s;
-    position: relative; z-index: 1;
+    aspect-ratio:1; border-radius:12px; background:#0d1f18; border:1px solid var(--border);
+    display:flex; align-items:center; justify-content:center; font-size: clamp(20px, 6vw, 32px);
+    transition: all 0.2s; position: relative; z-index: 1;
   }
-  
-  /* Анимация прокрутки */
   .cell.spinning { animation: blurSpin 0.1s linear infinite; }
-  @keyframes blurSpin {
-    0% { transform: translateY(-5px); opacity: 0.7; }
-    100% { transform: translateY(5px); opacity: 1; }
+  @keyframes blurSpin { 0% { transform: translateY(-5px); opacity: 0.7; } 100% { transform: translateY(5px); opacity: 1; } }
+  .cell.win{ border-color:var(--neon); box-shadow: 0 0 20px rgba(0,255,157,0.8), inset 0 0 10px rgba(0,255,157,0.4); background: rgba(0,255,157,0.1); transform: scale(1.05); z-index: 4; }
+
+  /* ===== MINES ===== */
+  .mines-grid-wrap {
+    position: relative; width: 100%; max-width: 340px; margin: 0 auto;
   }
-  
-  .cell.win{ 
-    border-color:var(--neon); 
-    box-shadow: 0 0 20px rgba(0,255,157,0.8), inset 0 0 10px rgba(0,255,157,0.4); 
-    background: rgba(0,255,157,0.1); transform: scale(1.05);
-    z-index: 4; 
+  .mines-grid {
+    display: grid; gap: 8px; padding: 12px; background: var(--card); border: 1px solid var(--border);
+    border-radius: 24px; box-shadow: 0 0 30px rgba(0,255,157,0.05); width: 100%;
+    aspect-ratio: 1; /* Делаем квадратным */
   }
+  .mine-cell {
+    background: #0d1f18; border: 1px solid var(--border); border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; font-size: 24px;
+    cursor: pointer; transition: all 0.2s; user-select: none;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+  }
+  .mine-cell:active { transform: scale(0.95); }
+  .mine-cell.gem {
+    background: rgba(0,255,157,0.1); border-color: var(--neon);
+    box-shadow: 0 0 15px rgba(0,255,157,0.6), inset 0 0 10px rgba(0,255,157,0.3);
+    animation: popGem 0.3s ease;
+  }
+  .mine-cell.bomb {
+    background: rgba(255,77,109,0.2); border-color: var(--red);
+    box-shadow: 0 0 15px rgba(255,77,109,0.8), inset 0 0 10px rgba(255,77,109,0.5);
+    animation: shake 0.4s ease;
+  }
+  @keyframes popGem { 0% { transform: scale(0.5); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+  @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+
+  /* Кнопка Cashout (Забрать) */
+  .cashout-btn {
+    width: 100%; padding: 16px; border-radius: 20px; font-size: 17px; font-weight: 900;
+    color: #001a10; background: linear-gradient(135deg, #00ff9d, #5cbf4a);
+    border: none; cursor: pointer; transition: all 0.2s; box-shadow: 0 5px 15px rgba(0,255,157,0.3);
+    display: none; margin-top: 10px;
+  }
+  .cashout-btn.show { display: block; animation: fade .3s; }
+  .cashout-btn:active { transform: scale(0.97); }
 
   /* Блок ввода ставки */
-  .bet-row{ display:flex; align-items:center; gap:10px; margin-top: 4px; z-index: 10; }
+  .bet-row{ display:flex; align-items:center; gap:10px; margin-top: 10px; z-index: 10; justify-content: center; width: 100%; }
   .bet-btn{
     width:44px; height:44px; border-radius:14px; background:var(--card);
     border:1px solid var(--border); color:var(--neon); font-size:20px; font-weight:800;
@@ -204,15 +195,13 @@
   }
   .bet-input-wrap input:disabled { opacity: 0.5; }
 
-  .spin-btn{
+  .main-action-btn{
     width:100%; max-width:340px; padding:16px; border:none; border-radius:20px;
-    font-size:17px; font-weight:900; color:#001a10;
-    background:linear-gradient(135deg,#00ff9d,#5cbf4a);
-    cursor:pointer; transition: all 0.2s; box-shadow: 0 5px 15px rgba(0,255,157,0.3);
-    margin-top: 4px; z-index: 10;
+    font-size:17px; font-weight:900; color:#001a10; background:linear-gradient(135deg,#00ff9d,#5cbf4a);
+    cursor:pointer; transition: all 0.2s; box-shadow: 0 5px 15px rgba(0,255,157,0.3); margin-top: 10px;
   }
-  .spin-btn:active{ transform:scale(.97); }
-  .spin-btn:disabled{ opacity:.5; box-shadow:none; cursor:not-allowed; }
+  .main-action-btn:active{ transform:scale(.97); }
+  .main-action-btn:disabled{ opacity:.5; box-shadow:none; cursor:not-allowed; }
 
   /* ===== PROFILE ===== */
   .profile-card{ background:var(--card2); border:1px solid var(--border); border-radius:24px; padding:22px; text-align:center; margin-bottom:14px; }
@@ -273,57 +262,90 @@
     </div>
   </div>
 
-  <!-- ИГРЫ -->
+  <!-- ГЛАВНОЕ МЕНЮ ИГР -->
   <div class="page active" id="page-games">
     <div class="title">Игры <span>▸</span></div>
     <div class="games-grid">
-      <div class="game-card" onclick="openGame()">
+      <!-- Слоты -->
+      <div class="game-card" onclick="openGame('slots')">
         <div class="nft-badge">HOT</div>
         <div class="emoji">🍌🎰</div>
         <div class="name">Слоты</div>
         <div class="tag">3 режима</div>
       </div>
+      <!-- Минер (Новинка!) -->
+      <div class="game-card" onclick="openGame('mines')">
+        <div class="nft-badge" style="background:var(--yellow); color:#000; box-shadow: 0 0 10px rgba(255,215,0,0.6);">NEW</div>
+        <div class="emoji">💣💎</div>
+        <div class="name">Минер</div>
+        <div class="tag">Играй и забирай</div>
+      </div>
+      
       <div class="game-card coming"><div class="emoji">🎲</div><div class="name">Скоро</div></div>
       <div class="game-card coming"><div class="emoji">🃏</div><div class="name">Скоро</div></div>
-      <div class="game-card coming"><div class="emoji">🐸</div><div class="name">Скоро</div></div>
     </div>
   </div>
 
-  <!-- СЛОТЫ -->
-  <div class="page" id="page-slot">
+  <!-- ИГРА СЛОТЫ -->
+  <div class="page" id="page-slots">
     <div class="title" onclick="switchPage('games')" style="cursor:pointer; font-size:16px; margin-bottom:10px;">← Назад</div>
-    
     <div class="game-wrap">
-      <!-- Переключатель режимов -->
       <div class="mode-selector">
-        <button class="mode-btn active" id="btn-easy" onclick="setMode('easy')">Легкий (x1.5)</button>
-        <button class="mode-btn" id="btn-medium" onclick="setMode('medium')">Средний (x2)</button>
-        <button class="mode-btn" id="btn-hard" onclick="setMode('hard')">Сложный (x4)</button>
+        <button class="mode-btn active" id="btn-slot-easy" onclick="setSlotMode('easy')">Легкий (x1.5)</button>
+        <button class="mode-btn" id="btn-slot-medium" onclick="setSlotMode('medium')">Средний (x2)</button>
+        <button class="mode-btn" id="btn-slot-hard" onclick="setSlotMode('hard')">Сложный (x4)</button>
       </div>
 
-      <!-- Обертка для слотов -->
       <div class="slots-wrapper">
-        <!-- Красные прицелы и стрелки -->
         <div class="win-line-top"></div>
         <div class="win-line-bottom"></div>
         <div class="red-arrow left">▶</div>
         <div class="red-arrow right">◀</div>
-        
-        <!-- Поле слотов -->
         <div class="slots" id="slots"></div>
       </div>
       
-      <!-- Ввод ставки -->
       <div class="bet-row">
-        <button class="bet-btn" id="betMinus" onclick="changeBet(-10)">−</button>
+        <button class="bet-btn" id="slot-betMinus" onclick="changeSlotBet(-10)">−</button>
         <div class="bet-input-wrap">
           <span>Ставка:</span>
-          <input type="number" id="betInput" value="10" min="10" max="10000" onchange="validateBetInput()">
+          <input type="number" id="slot-betInput" value="10" min="10" max="10000" onchange="validateSlotBetInput()">
         </div>
-        <button class="bet-btn" id="betPlus" onclick="changeBet(10)">+</button>
+        <button class="bet-btn" id="slot-betPlus" onclick="changeSlotBet(10)">+</button>
       </div>
       
-      <button class="spin-btn" id="spinBtn" onclick="spin()">КРУТИТЬ 🎰</button>
+      <button class="main-action-btn" id="spinBtn" onclick="spinSlots()">КРУТИТЬ 🎰</button>
+    </div>
+  </div>
+
+  <!-- ИГРА МИНЕР -->
+  <div class="page" id="page-mines">
+    <div class="title" onclick="switchPage('games')" style="cursor:pointer; font-size:16px; margin-bottom:10px;">← Назад</div>
+    <div class="game-wrap">
+      <div class="mode-selector">
+        <button class="mode-btn active" id="btn-mine-easy" onclick="setMineMode('easy')">Легкий 3x3 (x5)</button>
+        <button class="mode-btn" id="btn-mine-medium" onclick="setMineMode('medium')">Средний 4x4 (x15)</button>
+        <button class="mode-btn" id="btn-mine-hard" onclick="setMineMode('hard')">Сложный 5x5 (x50)</button>
+      </div>
+
+      <div class="mines-grid-wrap">
+        <div class="mines-grid" id="minesGrid"></div>
+      </div>
+
+      <!-- Панель ставок (показывается только до старта игры) -->
+      <div class="bet-row" id="minesBetPanel">
+        <button class="bet-btn" id="mine-betMinus" onclick="changeMineBet(-10)">−</button>
+        <div class="bet-input-wrap">
+          <span>Ставка:</span>
+          <input type="number" id="mine-betInput" value="10" min="10" max="10000" onchange="validateMineBetInput()">
+        </div>
+        <button class="bet-btn" id="mine-betPlus" onclick="changeMineBet(10)">+</button>
+      </div>
+      
+      <!-- Кнопка Начать игру -->
+      <button class="main-action-btn" id="mineStartBtn" onclick="startMines()">НАЧАТЬ ИГРУ 💣</button>
+      
+      <!-- Кнопка Забрать выигрыш (появляется во время игры) -->
+      <button class="cashout-btn" id="mineCashoutBtn" onclick="cashoutMines()">ЗАБРАТЬ: <span id="cashoutAmount">0</span> ⭐</button>
     </div>
   </div>
 
@@ -361,16 +383,8 @@
 </div>
 
 <script>
-// --- КОНФИГУРАЦИЯ РЕЖИМОВ ---
-const MODES = {
-  easy: { cols: 3, mult: 1.5, winChance: 0.20, nearMissChance: 0.50 },
-  medium: { cols: 4, mult: 2.0, winChance: 0.08, nearMissChance: 0.50 },
-  hard: { cols: 5, mult: 4.0, winChance: 0.03, nearMissChance: 0.50 }
-};
-let currentMode = 'easy';
-
-// --- ДАННЫЕ ---
-const STATE = { balance: 1000, bet: 10, spinning: false };
+// --- ГЛОБАЛЬНЫЕ ДАННЫЕ ---
+const STATE = { balance: 1000 };
 const SYMBOLS = ['🍌','🎰','💎','🍒','⭐'];
 
 // --- TELEGRAM ---
@@ -383,123 +397,94 @@ if (window.Telegram?.WebApp) {
   }
 }
 
-// --- НАВИГАЦИЯ ---
+function updateUI() {
+  document.getElementById('balanceTop').textContent = STATE.balance;
+  document.getElementById('balanceProfile').textContent = STATE.balance;
+}
+
 function switchPage(name) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + name).classList.add('active');
-  document.getElementById('nav-' + name).classList.add('active');
+  if(name === 'games' || name === 'profile') document.getElementById('nav-' + name).classList.add('active');
+  else document.getElementById('nav-games').classList.add('active');
 }
 
-function openGame() {
-  switchPage('games');
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-slot').classList.add('active');
-  document.getElementById('nav-games').classList.add('active');
-  setMode(currentMode);
+function openGame(game) {
+  switchPage(game + 's'); // page-slots, page-mines
+  if (game === 'slots') setSlotMode(slotState.mode);
+  if (game === 'mines') resetMinesBoard();
 }
 
-// --- РЕЖИМЫ И СЕТКА ---
-function setMode(mode) {
-  if (STATE.spinning) return;
-  currentMode = mode;
+/* =========================================
+   ИГРА 1: СЛОТЫ (Отлаженный код)
+   ========================================= */
+const SLOT_MODES = {
+  easy: { cols: 3, mult: 1.5, winChance: 0.20, nearMissChance: 0.50 },
+  medium: { cols: 4, mult: 2.0, winChance: 0.08, nearMissChance: 0.50 },
+  hard: { cols: 5, mult: 4.0, winChance: 0.03, nearMissChance: 0.50 }
+};
+let slotState = { mode: 'easy', bet: 10, spinning: false };
+
+function setSlotMode(mode) {
+  if (slotState.spinning) return;
+  slotState.mode = mode;
   
-  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('btn-' + mode).classList.add('active');
+  document.querySelectorAll('[id^="btn-slot-"]').forEach(b => b.classList.remove('active'));
+  document.getElementById('btn-slot-' + mode).classList.add('active');
   
-  const cols = MODES[mode].cols;
+  const cols = SLOT_MODES[mode].cols;
   const slotsContainer = document.getElementById('slots');
   slotsContainer.style.setProperty('--cols', cols);
   slotsContainer.innerHTML = '';
   
-  // 3 ряда, cols колонок
   for (let row = 0; row < 3; row++) {
     for (let col = 0; col < cols; col++) {
       let cell = document.createElement('div');
-      cell.className = 'cell';
-      cell.dataset.col = col;
-      cell.dataset.row = row;
+      cell.className = 'cell'; cell.dataset.col = col; cell.dataset.row = row;
       cell.textContent = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
       slotsContainer.appendChild(cell);
     }
   }
 }
 
-// --- ИГРА ---
-function updateUI() {
-  document.getElementById('balanceTop').textContent = STATE.balance;
-  document.getElementById('balanceProfile').textContent = STATE.balance;
-  document.getElementById('betInput').value = STATE.bet;
-}
+function updateSlotUI() { document.getElementById('slot-betInput').value = slotState.bet; }
+function changeSlotBet(d) { if (slotState.spinning) return; let nb = slotState.bet + d; if (nb >= 10 && nb <= STATE.balance) { slotState.bet = nb; updateSlotUI(); } }
+function validateSlotBetInput() { if (slotState.spinning) return; let val = parseInt(document.getElementById('slot-betInput').value) || 10; if (val < 10) val = 10; if (val > STATE.balance) val = STATE.balance; slotState.bet = val; updateSlotUI(); }
 
-function changeBet(d) {
-  if (STATE.spinning) return;
-  let nb = STATE.bet + d;
-  if (nb >= 10 && nb <= STATE.balance) { STATE.bet = nb; updateUI(); }
-}
-
-function validateBetInput() {
-  if (STATE.spinning) return;
-  let input = document.getElementById('betInput');
-  let val = parseInt(input.value) || 10;
-  if (val < 10) val = 10;
-  if (val > STATE.balance) val = STATE.balance;
-  STATE.bet = val;
-  updateUI();
-}
-
-function lockControls(isLocked) {
-  STATE.spinning = isLocked;
+function lockSlotControls(isLocked) {
+  slotState.spinning = isLocked;
   document.getElementById('spinBtn').disabled = isLocked;
-  document.getElementById('betInput').disabled = isLocked;
-  document.getElementById('betPlus').disabled = isLocked;
-  document.getElementById('betMinus').disabled = isLocked;
-  document.querySelectorAll('.mode-btn').forEach(b => b.disabled = isLocked);
+  document.getElementById('slot-betInput').disabled = isLocked;
+  document.getElementById('slot-betPlus').disabled = isLocked;
+  document.getElementById('slot-betMinus').disabled = isLocked;
+  document.querySelectorAll('[id^="btn-slot-"]').forEach(b => b.disabled = isLocked);
 }
 
-function spin() {
-  if (STATE.spinning || STATE.balance < STATE.bet) return;
+function spinSlots() {
+  if (slotState.spinning || STATE.balance < slotState.bet) return;
+  const mode = SLOT_MODES[slotState.mode];
+  STATE.balance -= slotState.bet; updateUI(); lockSlotControls(true);
   
-  const mode = MODES[currentMode];
-  STATE.balance -= STATE.bet;
-  updateUI();
-  lockControls(true);
-  
-  const cells = document.querySelectorAll('.cell');
+  const cells = document.querySelectorAll('#slots .cell');
   cells.forEach(c => c.classList.remove('win'));
 
-  // Генерируем результат
   let grid = []; 
   let isWin = Math.random() < mode.winChance;
   let isNearMiss = !isWin && Math.random() < mode.nearMissChance;
-
   for(let i=0; i < 3 * mode.cols; i++) grid.push(null);
-
-  // Выигрывает ТОЛЬКО средний ряд (line = 1)
-  const WIN_LINE = 1;
+  const WIN_LINE = 1; // Центр
 
   if (isWin) {
-    // Если настоящий выигрыш - заполняем весь средний ряд
     const sym = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
     for(let c=0; c < mode.cols; c++) grid[WIN_LINE * mode.cols + c] = sym;
   } else if (isNearMiss) {
-    // === НОВАЯ ЛОГИКА NEAR MISS ===
-    // Делаем так, чтобы не всегда не хватало именно последнего символа.
     const cols = mode.cols;
     const sym = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
-    
-    // Выбираем, сколько символов совпадет (минимум 2, максимум cols-1)
     const matchLen = Math.floor(Math.random() * (cols - 2 + 1)) + 2; 
-    
-    // Выбираем, с какого места начнется цепочка
     const startIdx = Math.floor(Math.random() * (cols - matchLen + 1));
     
-    // Заполняем цепочку одинаковых символов
-    for (let i = 0; i < matchLen; i++) {
-       grid[WIN_LINE * cols + startIdx + i] = sym;
-    }
-    
-    // Остальные ячейки в линии заполняем другими символами
+    for (let i = 0; i < matchLen; i++) grid[WIN_LINE * cols + startIdx + i] = sym;
     for (let c = 0; c < cols; c++) {
        if (grid[WIN_LINE * cols + c] === null) {
           let failSym = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
@@ -509,76 +494,215 @@ function spin() {
     }
   }
 
-  // Заполняем оставшиеся пустые ячейки случайными
-  for (let i = 0; i < grid.length; i++) {
-    if (!grid[i]) grid[i] = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
-  }
-
-  // Защита от случайного выигрыша, если isWin = false
+  for (let i = 0; i < grid.length; i++) { if (!grid[i]) grid[i] = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)]; }
   if (!isWin) {
-      let fullMatch = true;
-      let firstSym = grid[WIN_LINE * mode.cols];
-      for (let c = 1; c < mode.cols; c++) {
-          if (grid[WIN_LINE * mode.cols + c] !== firstSym) {
-              fullMatch = false;
-              break;
-          }
-      }
-      // Если случайно собрали полный ряд - ломаем последний символ
-      if (fullMatch) {
-          grid[WIN_LINE * mode.cols + (mode.cols - 1)] = SYMBOLS[(SYMBOLS.indexOf(firstSym)+1)%SYMBOLS.length];
-      }
+      let fullMatch = true; let firstSym = grid[WIN_LINE * mode.cols];
+      for (let c = 1; c < mode.cols; c++) { if (grid[WIN_LINE * mode.cols + c] !== firstSym) { fullMatch = false; break; } }
+      if (fullMatch) grid[WIN_LINE * mode.cols + (mode.cols - 1)] = SYMBOLS[(SYMBOLS.indexOf(firstSym)+1)%SYMBOLS.length];
   }
 
-  // Анимация
   const spinIntervals = [];
   for (let col = 0; col < mode.cols; col++) {
     const colCells = Array.from(cells).filter(c => parseInt(c.dataset.col) === col);
     colCells.forEach(c => c.classList.add('spinning'));
-    
-    spinIntervals[col] = setInterval(() => {
-      colCells.forEach(c => c.textContent = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)]);
-    }, 60);
+    spinIntervals[col] = setInterval(() => { colCells.forEach(c => c.textContent = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)]); }, 60);
   }
 
-  // Остановка колонок
   for (let col = 0; col < mode.cols; col++) {
-    let stopTime = 800 + col * 500; 
-    
     setTimeout(() => {
       clearInterval(spinIntervals[col]);
       const colCells = Array.from(cells).filter(c => parseInt(c.dataset.col) === col);
-      
       colCells.forEach((c, rowIndex) => {
         c.classList.remove('spinning');
         c.textContent = grid[rowIndex * mode.cols + col];
       });
 
-      // Если это была последняя колонка - подводим итог
       if (col === mode.cols - 1) {
         setTimeout(() => {
           if (isWin) {
-            const winAmount = Math.floor(STATE.bet * mode.mult);
-            STATE.balance += winAmount;
-            updateUI();
-            
-            // Подсветка выигрышной линии (только средний ряд)
-            for(let c=0; c<mode.cols; c++) {
-              cells[WIN_LINE * mode.cols + c].classList.add('win');
-            }
-            
+            const winAmount = Math.floor(slotState.bet * mode.mult);
+            STATE.balance += winAmount; updateUI();
+            for(let c=0; c<mode.cols; c++) cells[WIN_LINE * mode.cols + c].classList.add('win');
             showWinModal(winAmount, mode.mult);
           } else {
             showLoseModal(isNearMiss);
           }
-          lockControls(false);
+          lockSlotControls(false);
         }, 300); 
       }
-    }, stopTime);
+    }, 800 + col * 500);
   }
 }
 
-// --- МОДАЛКИ ---
+
+/* =========================================
+   ИГРА 2: МИНЕР (Новая игра)
+   ========================================= */
+const MINE_MODES = {
+  easy: { size: 3, mines: 1, maxMult: 5.0 },
+  medium: { size: 4, mines: 3, maxMult: 15.0 },
+  hard: { size: 5, mines: 5, maxMult: 50.0 }
+};
+let mineState = { 
+  mode: 'easy', bet: 10, active: false, 
+  grid: [], opened: 0, safeCount: 0,
+  currentMult: 1.0 
+};
+
+function setMineMode(mode) {
+  if (mineState.active) return;
+  mineState.mode = mode;
+  
+  document.querySelectorAll('[id^="btn-mine-"]').forEach(b => b.classList.remove('active'));
+  document.getElementById('btn-mine-' + mode).classList.add('active');
+  
+  resetMinesBoard();
+}
+
+function resetMinesBoard() {
+  const mode = MINE_MODES[mineState.mode];
+  const grid = document.getElementById('minesGrid');
+  grid.style.gridTemplateColumns = `repeat(${mode.size}, 1fr)`;
+  grid.innerHTML = '';
+  
+  mineState.active = false;
+  mineState.grid = [];
+  mineState.opened = 0;
+  mineState.currentMult = 1.0;
+  
+  // Показываем ставку, прячем кнопку Cashout
+  document.getElementById('minesBetPanel').style.display = 'flex';
+  document.getElementById('mineStartBtn').style.display = 'block';
+  document.getElementById('mineCashoutBtn').classList.remove('show');
+
+  // Генерируем пустое поле
+  const totalCells = mode.size * mode.size;
+  for (let i = 0; i < totalCells; i++) {
+    let cell = document.createElement('div');
+    cell.className = 'mine-cell';
+    cell.dataset.index = i;
+    cell.onclick = () => clickMineCell(i);
+    grid.appendChild(cell);
+    mineState.grid.push({ isMine: false, isOpened: false, el: cell });
+  }
+}
+
+function updateMineUI() { document.getElementById('mine-betInput').value = mineState.bet; }
+function changeMineBet(d) { if (mineState.active) return; let nb = mineState.bet + d; if (nb >= 10 && nb <= STATE.balance) { mineState.bet = nb; updateMineUI(); } }
+function validateMineBetInput() { if (mineState.active) return; let val = parseInt(document.getElementById('mine-betInput').value) || 10; if (val < 10) val = 10; if (val > STATE.balance) val = STATE.balance; mineState.bet = val; updateMineUI(); }
+
+function startMines() {
+  if (mineState.active || STATE.balance < mineState.bet) return;
+  
+  const mode = MINE_MODES[mineState.mode];
+  STATE.balance -= mineState.bet;
+  updateUI();
+  mineState.active = true;
+  
+  // Прячем панель ставки, показываем Cashout (с начальным х1)
+  document.getElementById('minesBetPanel').style.display = 'none';
+  document.getElementById('mineStartBtn').style.display = 'none';
+  document.getElementById('mineCashoutBtn').classList.add('show');
+  updateCashoutBtn();
+
+  // Рандомно раскидываем мины
+  const totalCells = mode.size * mode.size;
+  let minesPlaced = 0;
+  while (minesPlaced < mode.mines) {
+    let rIdx = Math.floor(Math.random() * totalCells);
+    if (!mineState.grid[rIdx].isMine) {
+      mineState.grid[rIdx].isMine = true;
+      minesPlaced++;
+    }
+  }
+}
+
+function updateCashoutBtn() {
+  const amount = Math.floor(mineState.bet * mineState.currentMult);
+  document.getElementById('cashoutAmount').textContent = amount;
+}
+
+// Динамический расчет множителя (упрощенная формула для казино)
+function getMineMultiplier(opened, size, mines) {
+  if (opened === 0) return 1.0;
+  const total = size * size;
+  const safe = total - mines;
+  // Простая прогрессия для аркады
+  let mult = 1.0;
+  for (let i = 0; i < opened; i++) {
+    // Чем больше открыто, тем сильнее растет множитель
+    mult += (i * 0.2) + 0.3; 
+  }
+  // Ограничиваем максимумом режима
+  return Math.min(mult, MINE_MODES[mineState.mode].maxMult);
+}
+
+function clickMineCell(index) {
+  if (!mineState.active) return;
+  const cellData = mineState.grid[index];
+  if (cellData.isOpened) return;
+  
+  cellData.isOpened = true;
+  const mode = MINE_MODES[mineState.mode];
+  
+  if (cellData.isMine) {
+    // БУМ! Проигрыш
+    cellData.el.classList.add('bomb');
+    cellData.el.textContent = '💣';
+    mineState.active = false;
+    
+    // Открываем все остальные мины
+    mineState.grid.forEach(c => {
+      if (c.isMine && !c.isOpened) {
+        c.el.classList.add('bomb');
+        c.el.textContent = '💣';
+        c.el.style.opacity = '0.5';
+      }
+    });
+
+    setTimeout(() => {
+      document.getElementById('mineCashoutBtn').classList.remove('show');
+      document.getElementById('mineStartBtn').style.display = 'block';
+      document.getElementById('minesBetPanel').style.display = 'flex';
+      showLoseModal(false, 'Вы наткнулись на мину!');
+      resetMinesBoard(); // Сбрасываем поле после закрытия модалки
+    }, 1000);
+
+  } else {
+    // БЕЗОПАСНО! Звезда
+    cellData.el.classList.add('gem');
+    cellData.el.textContent = '⭐';
+    mineState.opened++;
+    
+    mineState.currentMult = getMineMultiplier(mineState.opened, mode.size, mode.mines);
+    updateCashoutBtn();
+
+    // Если открыли все безопасные ячейки - автоматический кэшаут
+    if (mineState.opened === (mode.size * mode.size - mode.mines)) {
+      cashoutMines();
+    }
+  }
+}
+
+function cashoutMines() {
+  if (!mineState.active || mineState.opened === 0) return;
+  
+  const winAmount = Math.floor(mineState.bet * mineState.currentMult);
+  STATE.balance += winAmount;
+  updateUI();
+  mineState.active = false;
+  
+  document.getElementById('mineCashoutBtn').classList.remove('show');
+  document.getElementById('mineStartBtn').style.display = 'block';
+  document.getElementById('minesBetPanel').style.display = 'flex';
+  
+  showWinModal(winAmount, mineState.currentMult.toFixed(1));
+  resetMinesBoard();
+}
+
+/* =========================================
+   МОДАЛЬНЫЕ ОКНА (Общие)
+   ========================================= */
 function openModal(type) {
   const mask = document.getElementById('modalMask');
   const box = document.getElementById('modalBox');
@@ -601,7 +725,7 @@ function openModal(type) {
   mask.classList.add('show');
 }
 
-function showLoseModal(isNearMiss) {
+function showLoseModal(isNearMiss, customText = '') {
   const box = document.getElementById('modalBox');
   const icon = document.getElementById('modalIcon');
   const title = document.getElementById('modalTitle');
@@ -611,9 +735,12 @@ function showLoseModal(isNearMiss) {
   box.className = 'modal lose';
   icon.className = 'icon-lose'; icon.innerHTML = '✕';
   
-  if (isNearMiss) {
+  if (customText) {
+    title.textContent = 'Бум! 💥';
+    text.innerHTML = customText;
+  } else if (isNearMiss) {
     title.textContent = 'Ух, почти!';
-    text.innerHTML = `На центральной линии почти собралось комбо!<br>Попробуйте еще раз!`;
+    text.innerHTML = `На центральной линии не хватило всего одного символа!<br>Попробуйте еще раз!`;
   } else {
     title.textContent = 'Очень жаль...';
     text.innerHTML = 'В этот раз не повезло.<br>Попробуйте еще раз!';
@@ -633,7 +760,7 @@ function showWinModal(amount, mult) {
   box.className = 'modal win';
   icon.className = 'icon-win'; icon.innerHTML = '★';
   title.textContent = 'Поздравляем!';
-  text.innerHTML = `Вы выиграли (x${mult})!<span class="win-amount">+${amount} ⭐</span>`;
+  text.innerHTML = `Вы забрали выигрыш (x${mult})!<span class="win-amount">+${amount} ⭐</span>`;
   btn.className = 'modal-btn green'; btn.textContent = 'Забрать';
   document.getElementById('modalMask').classList.add('show');
 }
@@ -644,7 +771,7 @@ function closeModal() {
 
 // Инициализация
 updateUI();
-setMode('easy');
+setSlotMode('easy');
 </script>
 </body>
 </html>
