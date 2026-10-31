@@ -43,6 +43,20 @@
   @keyframes drift{ to{ transform:translate(38px,38px);} }
   @keyframes drift2{ to{ transform:translate(-22px,22px);} }
 
+  /* ===== ЛОАДЕР ===== */
+  .loader-overlay {
+    position: fixed; inset: 0; z-index: 999; background: rgba(0,0,0,0.8);
+    display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px);
+  }
+  .loader-overlay.show { display: flex; }
+  .spinner {
+    width: 50px; height: 50px; border: 4px solid rgba(0, 255, 157, 0.2);
+    border-top-color: var(--neon); border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    box-shadow: 0 0 15px rgba(0,255,157,0.3);
+  }
+  @keyframes spin { 100% { transform: rotate(360deg); } }
+
   /* ===== NFT Pepe ===== */
   .nft-float{
     position:absolute; width:88px; height:108px; border-radius:16px;
@@ -64,11 +78,11 @@
 
   /* ===== APP ===== */
   #app{
-    position:relative; z-index:1; height:100%; display:flex; flex-direction:column;
+    position:fixed; inset:0; z-index:1; display:flex; flex-direction:column;
     padding:16px 16px calc(92px + env(safe-area-inset-bottom)); overflow:hidden;
   }
 
-  .header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+  .header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; flex-shrink: 0; }
   .logo{ font-weight:900; font-size:19px; background:linear-gradient(90deg,#00ff9d,#5cbf4a,#00ff9d); -webkit-background-clip:text; background-clip:text; color:transparent; }
   .header-right{ display:flex; align-items:center; gap:8px; }
   .balance-pill{
@@ -78,29 +92,29 @@
   .deposit-btn-top{ background:linear-gradient(135deg,#00ff9d,#5cbf4a); border:none; padding:8px 12px; border-radius:999px; font-size:12px; font-weight:900; color:#001a10; cursor:pointer; }
 
   /* ===== PAGES ===== */
-  /* Убрали анимацию, которая скрывала контент, добавили min-height: 0 */
-  .page{ flex:1; min-height: 0; overflow-y:auto; display:none; padding-bottom:12px; color: var(--text); }
-  .page.active{ display:block; }
+  .page{ flex:1; min-height: 0; overflow-y:auto; display:none; flex-direction: column; padding-bottom:12px; color: var(--text); }
+  .page.active{ display:flex; }
   
-  .title{ font-size:22px; font-weight:900; margin-bottom:14px; }
+  .title{ font-size:22px; font-weight:900; margin-bottom:14px; flex-shrink: 0; }
   .title span{ color:var(--neon); }
 
   /* ===== GAMES ===== */
-  .games-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .games-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; align-content: start; }
   .game-card{
     position:relative; background:var(--card2); border:1px solid var(--border);
     border-radius:22px; padding:18px 14px; display:flex; flex-direction:column;
-    align-items:center; gap:10px; cursor:pointer; transition: transform 0.1s;
+    align-items:center; justify-content:center; gap:10px; cursor:pointer; transition: transform 0.1s;
+    min-height: 120px;
   }
   .game-card:active{ transform:scale(.96); }
   .game-card .emoji{ font-size:34px; }
-  .game-card .name{ font-size:14px; font-weight:800; }
-  .game-card .tag{ font-size:10px; color:var(--muted); }
-  .game-card.coming{ opacity:.42; cursor:default; border-style:dashed; justify-content:center; min-height:110px; }
+  .game-card .name{ font-size:14px; font-weight:800; text-align: center; }
+  .game-card .tag{ font-size:10px; color:var(--muted); text-align: center; }
+  .game-card.coming{ opacity:.42; cursor:default; border-style:dashed; }
   .game-card .nft-badge{ position:absolute; top:8px; right:8px; font-size:8px; font-weight:900; padding:3px 7px; border-radius:999px; background:var(--neon); color:#001a10; }
 
   /* ===== SLOTS ===== */
-  .game-wrap{ display:flex; flex-direction:column; align-items:center; gap:12px; }
+  .game-wrap{ display:flex; flex-direction:column; align-items:center; gap:12px; width: 100%; }
   
   .mode-selector { display: flex; gap: 6px; width: 100%; max-width: 400px; margin-bottom: 4px; z-index: 10; }
   .mode-btn {
@@ -136,7 +150,7 @@
   @keyframes blurSpin { 0% { transform: translateY(-5px); opacity: 0.7; } 100% { transform: translateY(5px); opacity: 1; } }
   .cell.win{ border-color:var(--neon); box-shadow: 0 0 20px rgba(0,255,157,0.8), inset 0 0 10px rgba(0,255,157,0.4); background: rgba(0,255,157,0.1); transform: scale(1.05); z-index: 4; }
 
-  /* ===== MINES ===== */
+  /* ===== MINES (MAINER) ===== */
   .mines-grid-wrap { position: relative; width: 100%; max-width: 340px; margin: 0 auto; }
   .mines-grid {
     display: grid; gap: 8px; padding: 12px; background: var(--card); border: 1px solid var(--border);
@@ -153,8 +167,16 @@
   @keyframes popGem { 0% { transform: scale(0.5); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
   @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
 
+  /* Индикатор множителя */
+  .multiplier-display {
+    font-size: 16px; font-weight: 900; color: var(--yellow); text-align: center; margin: 10px 0;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    display: none;
+  }
+  .multiplier-display.show { display: block; }
+
   .cashout-btn {
-    width: 100%; padding: 16px; border-radius: 20px; font-size: 17px; font-weight: 900;
+    width: 100%; max-width: 340px; padding: 16px; border-radius: 20px; font-size: 17px; font-weight: 900;
     color: #001a10; background: linear-gradient(135deg, #00ff9d, #5cbf4a);
     border: none; cursor: pointer; transition: all 0.2s; box-shadow: 0 5px 15px rgba(0,255,157,0.3);
     display: none; margin-top: 10px;
@@ -211,16 +233,20 @@
   /* ===== МОДАЛЬНЫЕ ОКНА ===== */
   .modal-mask{ position:fixed; inset:0; z-index:50; display:none; background:rgba(0,0,0,.7); align-items:center; justify-content:center; backdrop-filter: blur(5px); }
   .modal-mask.show{ display:flex; }
-  .modal{ width:90%; max-width:340px; background:var(--card2); border-radius:28px; padding:30px 20px; position:relative; text-align:center; box-shadow: 0 10px 40px rgba(0,0,0,0.5); animation: popIn 0.3s; }
+  .modal{ width:90%; max-width:340px; background:var(--card2); border-radius:28px; padding:25px 20px; position:relative; text-align:center; box-shadow: 0 10px 40px rgba(0,0,0,0.5); animation: popIn 0.3s; display: flex; flex-direction: column; align-items: center; }
   @keyframes popIn { from { transform: scale(0.9); } to { transform: scale(1); } }
 
+  /* Брендинг внутри модалки */
+  .modal-brand-top { font-size: 22px; font-weight: 900; color: var(--neon); margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 0 10px rgba(0,255,157,0.4); }
+  .modal-brand-bottom { font-size: 12px; font-weight: 700; color: var(--muted); margin-top: 20px; }
+
   .modal.lose { border: 1px solid rgba(255, 77, 109, 0.4); box-shadow: 0 0 30px rgba(255, 77, 109, 0.15); }
-  .icon-lose { font-size: 50px; color: var(--red); margin-bottom: 15px; text-shadow: 0 0 15px rgba(255,77,109,0.5); }
+  .icon-lose { font-size: 46px; color: var(--red); margin-bottom: 10px; text-shadow: 0 0 15px rgba(255,77,109,0.5); }
   .modal.lose h3 { color: var(--red); margin-bottom: 10px; font-size: 20px; }
   .modal.lose p { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
 
   .modal.win { border: 1px solid rgba(0, 255, 157, 0.5); box-shadow: 0 0 30px rgba(0, 255, 157, 0.2); }
-  .icon-win { font-size: 50px; color: var(--neon); margin-bottom: 15px; text-shadow: 0 0 15px rgba(0,255,157,0.6); }
+  .icon-win { font-size: 46px; color: var(--neon); margin-bottom: 10px; text-shadow: 0 0 15px rgba(0,255,157,0.6); }
   .modal.win h3 { color: var(--neon); margin-bottom: 10px; font-size: 20px; }
   .modal.win p { color: white; font-size: 15px; margin-bottom: 20px; }
   .win-amount { font-size: 24px; font-weight: 900; color: var(--neon); display: block; margin-top: 10px; }
@@ -232,6 +258,11 @@
 </style>
 </head>
 <body>
+
+<!-- Лоадер -->
+<div id="loader" class="loader-overlay">
+  <div class="spinner"></div>
+</div>
 
 <div id="bg">
   <div class="nft-float nft-1"><div class="pepe">🐸</div><div class="tag">PEPE</div><div class="id">#0421</div></div>
@@ -259,11 +290,11 @@
         <div class="name">Слоты</div>
         <div class="tag">3 режима</div>
       </div>
-      <!-- Минер (Новинка!) -->
+      <!-- Майнер (Новинка!) -->
       <div class="game-card" onclick="openGame('mines')">
         <div class="nft-badge" style="background:var(--yellow); color:#000; box-shadow: 0 0 10px rgba(255,215,0,0.6);">NEW</div>
         <div class="emoji">💣💎</div>
-        <div class="name">Минер</div>
+        <div class="name">Майнер</div>
         <div class="tag">Играй и забирай</div>
       </div>
       
@@ -303,7 +334,7 @@
     </div>
   </div>
 
-  <!-- ИГРА МИНЕР -->
+  <!-- ИГРА МАЙНЕР -->
   <div class="page" id="page-mines">
     <div class="title" onclick="switchPage('games')" style="cursor:pointer; font-size:16px; margin-bottom:10px;">← Назад</div>
     <div class="game-wrap">
@@ -316,6 +347,9 @@
       <div class="mines-grid-wrap">
         <div class="mines-grid" id="minesGrid"></div>
       </div>
+
+      <!-- Множитель -->
+      <div class="multiplier-display" id="multiplierDisplay">Текущий кэф: x1.0</div>
 
       <div class="bet-row" id="minesBetPanel">
         <button class="bet-btn" id="mine-betMinus" onclick="changeMineBet(-10)">−</button>
@@ -354,12 +388,15 @@
   <button class="nav-btn" id="nav-profile" onclick="switchPage('profile')">👤 Профиль</button>
 </div>
 
+<!-- Модальное окно с брендингом -->
 <div class="modal-mask" id="modalMask">
   <div class="modal" id="modalBox">
+    <div class="modal-brand-top">GarisDrop</div>
     <div id="modalIcon"></div>
     <h3 id="modalTitle"></h3>
     <p id="modalText"></p>
     <button class="modal-btn" id="modalBtn" onclick="closeModal()"></button>
+    <div class="modal-brand-bottom">@GarisDrop_Bot</div>
   </div>
 </div>
 
@@ -381,19 +418,49 @@ function updateUI() {
   document.getElementById('balanceProfile').textContent = STATE.balance;
 }
 
-function switchPage(name) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('page-' + name).classList.add('active');
-  if(name === 'games' || name === 'profile') document.getElementById('nav-' + name).classList.add('active');
-  else document.getElementById('nav-games').classList.add('active');
+// Функция Лоадера
+function showLoader(callback) {
+  const loader = document.getElementById('loader');
+  loader.classList.add('show');
+  setTimeout(() => {
+    loader.classList.remove('show');
+    if(callback) callback();
+  }, 600); // 600мс загрузки
 }
 
-// ИСПРАВЛЕНА ОШИБКА ЗДЕСЬ (было game + 's')
+function switchPage(name) {
+  document.querySelectorAll('.page').forEach(p => {
+    p.classList.remove('active');
+    p.style.display = 'none';
+  });
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  
+  const targetPage = document.getElementById('page-' + name);
+  if (targetPage) {
+    targetPage.classList.add('active');
+    targetPage.style.display = 'flex';
+  }
+  
+  if(name === 'games' || name === 'profile') {
+    const nav = document.getElementById('nav-' + name);
+    if(nav) nav.classList.add('active');
+  } else {
+    const nav = document.getElementById('nav-games');
+    if(nav) nav.classList.add('active');
+  }
+}
+
+// Обновленный openGame с лоадером
 function openGame(game) {
-  switchPage(game); 
-  if (game === 'slots') setSlotMode(slotState.mode);
-  if (game === 'mines') resetMinesBoard();
+  showLoader(() => {
+    if (game === 'slots') {
+      switchPage('slots');
+      setSlotMode(slotState.mode);
+    } else if (game === 'mines') {
+      switchPage('mines');
+      resetMinesBoard();
+    }
+  });
 }
 
 /* ================= СЛОТЫ ================= */
@@ -512,13 +579,24 @@ function spinSlots() {
   }
 }
 
-/* ================= МИНЕР ================= */
+/* ================= МАЙНЕР ================= */
 const MINE_MODES = {
-  easy: { size: 3, mines: 1, maxMult: 5.0 },
-  medium: { size: 4, mines: 3, maxMult: 15.0 },
-  hard: { size: 5, mines: 5, maxMult: 50.0 }
+  easy: { size: 3 }, 
+  medium: { size: 4 },
+  hard: { size: 5 }
 };
-let mineState = { mode: 'easy', bet: 10, active: false, grid: [], opened: 0, safeCount: 0, currentMult: 1.0 };
+
+// СНИЖЕННЫЕ КОЭФФИЦИЕНТЫ
+const MULT_TABLES = {
+  easy: [1.1, 1.2, 1.4, 1.6, 1.9, 2.3, 2.8, 3.5],
+  medium: [1.2, 1.4, 1.6, 1.9, 2.2, 2.6, 3.1, 3.7, 4.4, 5.3, 6.4, 7.8, 9.5],
+  hard: [1.3, 1.5, 1.8, 2.1, 2.5, 3.0, 3.6, 4.3, 5.1, 6.1, 7.3, 8.7, 10.4, 12.4, 14.8, 17.7, 21.2, 25.4, 30.5, 36.6]
+};
+
+let mineState = { 
+  mode: 'easy', bet: 10, active: false, grid: [], 
+  opened: 0, currentMult: 1.0, deadlyStep: -1 
+};
 
 function setMineMode(mode) {
   if (mineState.active) return;
@@ -542,6 +620,7 @@ function resetMinesBoard() {
   document.getElementById('minesBetPanel').style.display = 'flex';
   document.getElementById('mineStartBtn').style.display = 'block';
   document.getElementById('mineCashoutBtn').classList.remove('show');
+  document.getElementById('multiplierDisplay').classList.remove('show');
 
   const totalCells = mode.size * mode.size;
   for (let i = 0; i < totalCells; i++) {
@@ -550,7 +629,7 @@ function resetMinesBoard() {
     cell.dataset.index = i;
     cell.onclick = () => clickMineCell(i);
     grid.appendChild(cell);
-    mineState.grid.push({ isMine: false, isOpened: false, el: cell });
+    mineState.grid.push({ isOpened: false, el: cell });
   }
 }
 
@@ -560,38 +639,32 @@ function validateMineBetInput() { if (mineState.active) return; let val = parseI
 
 function startMines() {
   if (mineState.active || STATE.balance < mineState.bet) return;
-  
   const mode = MINE_MODES[mineState.mode];
+  
   STATE.balance -= mineState.bet;
   updateUI();
   mineState.active = true;
+  mineState.opened = 0;
+  mineState.currentMult = 1.0;
   
+  let stepsPool;
+  if (mineState.mode === 'easy') { stepsPool = [0, 1, 1, 2, 2, 3, 4, 5]; }
+  else if (mineState.mode === 'medium') { stepsPool = [1, 2, 2, 3, 3, 4, 5, 6, 7, 8, 10]; }
+  else { stepsPool = [2, 3, 3, 4, 4, 5, 6, 7, 8, 10, 12, 15]; }
+  mineState.deadlyStep = stepsPool[Math.floor(Math.random() * stepsPool.length)];
+
   document.getElementById('minesBetPanel').style.display = 'none';
   document.getElementById('mineStartBtn').style.display = 'none';
   document.getElementById('mineCashoutBtn').classList.add('show');
+  document.getElementById('multiplierDisplay').classList.add('show');
+  
   updateCashoutBtn();
-
-  const totalCells = mode.size * mode.size;
-  let minesPlaced = 0;
-  while (minesPlaced < mode.mines) {
-    let rIdx = Math.floor(Math.random() * totalCells);
-    if (!mineState.grid[rIdx].isMine) {
-      mineState.grid[rIdx].isMine = true;
-      minesPlaced++;
-    }
-  }
 }
 
 function updateCashoutBtn() {
   const amount = Math.floor(mineState.bet * mineState.currentMult);
   document.getElementById('cashoutAmount').textContent = amount;
-}
-
-function getMineMultiplier(opened, size, mines) {
-  if (opened === 0) return 1.0;
-  let mult = 1.0;
-  for (let i = 0; i < opened; i++) { mult += (i * 0.2) + 0.3; }
-  return Math.min(mult, MINE_MODES[mineState.mode].maxMult);
+  document.getElementById('multiplierDisplay').textContent = `Текущий кэф: x${mineState.currentMult.toFixed(1)}`;
 }
 
 function clickMineCell(index) {
@@ -602,36 +675,43 @@ function clickMineCell(index) {
   cellData.isOpened = true;
   const mode = MINE_MODES[mineState.mode];
   
-  if (cellData.isMine) {
+  if (mineState.opened === mineState.deadlyStep) {
     cellData.el.classList.add('bomb');
     cellData.el.textContent = '💣';
     mineState.active = false;
     
-    mineState.grid.forEach(c => {
-      if (c.isMine && !c.isOpened) {
-        c.el.classList.add('bomb');
-        c.el.textContent = '💣';
-        c.el.style.opacity = '0.5';
-      }
-    });
+    let bombsToShow = mineState.mode === 'easy' ? 1 : (mineState.mode === 'medium' ? 3 : 5);
+    bombsToShow--;
+    
+    let unopened = mineState.grid.filter(c => !c.isOpened);
+    while(bombsToShow > 0 && unopened.length > 0) {
+      let r = Math.floor(Math.random() * unopened.length);
+      unopened[r].el.classList.add('bomb');
+      unopened[r].el.textContent = '💣';
+      unopened[r].el.style.opacity = '0.5';
+      unopened.splice(r, 1);
+      bombsToShow--;
+    }
 
     setTimeout(() => {
       document.getElementById('mineCashoutBtn').classList.remove('show');
       document.getElementById('mineStartBtn').style.display = 'block';
       document.getElementById('minesBetPanel').style.display = 'flex';
+      document.getElementById('multiplierDisplay').classList.remove('show');
       showLoseModal(false, 'Вы наткнулись на мину!');
       resetMinesBoard();
-    }, 1000);
+    }, 1200);
 
   } else {
     cellData.el.classList.add('gem');
     cellData.el.textContent = '⭐';
     mineState.opened++;
     
-    mineState.currentMult = getMineMultiplier(mineState.opened, mode.size, mode.mines);
+    const multTable = MULT_TABLES[mineState.mode];
+    mineState.currentMult = multTable[Math.min(mineState.opened - 1, multTable.length - 1)];
     updateCashoutBtn();
 
-    if (mineState.opened === (mode.size * mode.size - mode.mines)) {
+    if (mineState.opened === multTable.length) {
       cashoutMines();
     }
   }
@@ -648,6 +728,7 @@ function cashoutMines() {
   document.getElementById('mineCashoutBtn').classList.remove('show');
   document.getElementById('mineStartBtn').style.display = 'block';
   document.getElementById('minesBetPanel').style.display = 'flex';
+  document.getElementById('multiplierDisplay').classList.remove('show');
   
   showWinModal(winAmount, mineState.currentMult.toFixed(1));
   resetMinesBoard();
