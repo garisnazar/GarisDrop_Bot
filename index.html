@@ -53,7 +53,6 @@
   
   .header-right{ display:flex; align-items:center; gap:8px; }
   
-  /* Кнопка переключения валюты */
   .currency-switch-btn {
     background: var(--card); border: 1px solid var(--border); color: var(--neon);
     width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
@@ -154,7 +153,6 @@
 
   .profile-balance{ font-size:34px; font-weight:900; color:var(--neon); margin-top:10px; }
   
-  /* Сетка кнопок в профиле */
   .action-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:14px; }
   .action-btn-icon { padding:14px 5px; border-radius:18px; border:1px solid var(--border); background:var(--card2); color:white; font-weight:800; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:6px; font-size:11px;}
   .action-btn-icon .ic { font-size: 22px; }
@@ -200,7 +198,6 @@
   <div class="header">
     <div class="logo">🐸 GARISDROP</div>
     <div class="header-right">
-      <!-- Кнопка переключения валюты -->
       <div class="currency-switch-btn" onclick="toggleCurrency()">
         <span id="btnCurrencyIcon">⭐</span>
       </div>
@@ -210,7 +207,7 @@
     </div>
   </div>
 
-  <!-- ГЛАВНОЕ МЕНЮ (ТОЛЬКО ИГРЫ) -->
+  <!-- ГЛАВНОЕ МЕНЮ -->
   <div class="page active" id="page-games">
     <div class="title">Игры <span>▸</span></div>
     <div class="games-grid">
@@ -300,7 +297,6 @@
       </div>
     </div>
 
-    <!-- Кнопки перенесенные из меню -->
     <div class="action-grid">
       <button class="action-btn-icon" onclick="openComingSoon()">
         <span class="ic">🎁</span> Бонус дня
@@ -339,16 +335,93 @@
 </div>
 
 <script>
+// ==========================================
+// СИСТЕМА ЗВУКОВ (Web Audio API)
+// ==========================================
+const AudioContext = window.AudioContext || window.webkitAudioContext;
+let audioCtx;
+
+// Инициализация при первом клике (требование браузеров)
+document.body.addEventListener('click', () => {
+  if (!audioCtx) {
+    audioCtx = new AudioContext();
+  }
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+}, { once: true });
+
+function playTone(freq, type, duration, vol = 0.1) {
+  if (!audioCtx) return;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+  gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.start();
+  osc.stop(audioCtx.currentTime + duration);
+}
+
+function playNoise(duration, vol = 0.1) {
+  if (!audioCtx) return;
+  const bufferSize = audioCtx.sampleRate * duration;
+  const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < bufferSize; i++) {
+    data[i] = Math.random() * 2 - 1;
+  }
+  const noise = audioCtx.createBufferSource();
+  noise.buffer = buffer;
+  const gain = audioCtx.createGain();
+  gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+  noise.connect(gain);
+  gain.connect(audioCtx.destination);
+  noise.start();
+}
+
+// Звуки
+const SOUNDS = {
+  click: () => playTone(600, 'sine', 0.05, 0.05),
+  win: () => {
+    playTone(523.25, 'square', 0.1, 0.08); // C5
+    setTimeout(() => playTone(659.25, 'square', 0.1, 0.08), 100); // E5
+    setTimeout(() => playTone(783.99, 'square', 0.15, 0.08), 200); // G5
+    setTimeout(() => playTone(1046.50, 'square', 0.3, 0.1), 300); // C6
+  },
+  lose: () => {
+    playTone(300, 'sawtooth', 0.2, 0.08);
+    setTimeout(() => playTone(250, 'sawtooth', 0.2, 0.08), 150);
+    setTimeout(() => playTone(200, 'sawtooth', 0.3, 0.08), 300);
+  },
+  spinTick: () => playTone(800, 'triangle', 0.03, 0.02),
+  gem: () => playTone(1200, 'sine', 0.1, 0.1),
+  bomb: () => {
+    playNoise(0.3, 0.2);
+    playTone(100, 'sawtooth', 0.3, 0.15);
+  },
+  cashout: () => {
+    playTone(1000, 'square', 0.05, 0.05);
+    setTimeout(() => playTone(1200, 'square', 0.05, 0.05), 50);
+    setTimeout(() => playTone(1400, 'square', 0.1, 0.05), 100);
+  }
+};
+
+// Автоматический звук клика для всех кнопок
+document.querySelectorAll('button, .game-card, .nav-btn, .currency-switch-btn').forEach(el => {
+  el.addEventListener('click', () => SOUNDS.click());
+});
+
+// ==========================================
+// ЛОГИКА ПРИЛОЖЕНИЯ
+// ==========================================
 const SYMBOLS = ['🍌','🎰','💎','🍒','⭐'];
 
 let STATE = {
-  balance: 1000,       // Внутренний баланс всегда в звездах
-  currency: 'stars',   // 'stars' или 'rub'
-  rubRate: 1.5,        // 1 звезда = 1.5 рубля
-  xp: 0,
-  level: 1,
-  lastDaily: 0,
-  history: []
+  balance: 1000, currency: 'stars', rubRate: 1.5, xp: 0, level: 1, lastDaily: 0, history: []
 };
 
 function loadState() {
@@ -357,43 +430,31 @@ function loadState() {
     try { const parsed = JSON.parse(saved); STATE = { ...STATE, ...parsed }; } catch(e) {}
   }
 }
-
-function saveState() {
-  localStorage.setItem('garisDropData', JSON.stringify(STATE));
-}
+function saveState() { localStorage.setItem('garisDropData', JSON.stringify(STATE)); }
 
 if (window.Telegram?.WebApp) {
-  Telegram.WebApp.ready();
-  Telegram.WebApp.expand();
+  Telegram.WebApp.ready(); Telegram.WebApp.expand();
   if (Telegram.WebApp.initDataUnsafe?.user) {
     document.getElementById('userName').textContent = Telegram.WebApp.initDataUnsafe.user.first_name;
     document.getElementById('userId').textContent = 'ID: ' + Telegram.WebApp.initDataUnsafe.user.id;
   }
 }
 
-// КУРС: 1 звезда = 1.5 рубля. Округляем вниз.
-function formatMoney(starsAmount) {
-  if (STATE.currency === 'rub') return Math.floor(starsAmount * STATE.rubRate);
-  return Math.floor(starsAmount);
-}
-
+function formatMoney(starsAmount) { return STATE.currency === 'rub' ? Math.floor(starsAmount * STATE.rubRate) : Math.floor(starsAmount); }
 function getCurrencyIcon() { return STATE.currency === 'rub' ? '₽' : '⭐'; }
 
 function updateUI() {
   const displayBalance = formatMoney(STATE.balance);
   const icon = getCurrencyIcon();
   
-  // Шапка
   document.getElementById('balanceTop').textContent = displayBalance;
   document.getElementById('currencyIcon').textContent = icon;
   document.getElementById('btnCurrencyIcon').textContent = icon;
 
-  // Профиль
   document.getElementById('balanceProfile').textContent = displayBalance;
   document.getElementById('profileCurrencyIcon').textContent = icon;
   document.getElementById('cashoutCurrency').textContent = icon;
 
-  // Ставки
   document.getElementById('slot-betInput').value = formatMoney(slotState.bet);
   document.getElementById('mine-betInput').value = formatMoney(mineState.bet);
   
@@ -402,7 +463,6 @@ function updateUI() {
     document.getElementById('cashoutAmount').textContent = formatMoney(amountStars);
   }
 
-  // XP
   document.getElementById('userLevel').textContent = STATE.level;
   document.getElementById('userXP').textContent = STATE.xp;
   document.getElementById('xpBar').style.width = Math.min((STATE.xp / 100) * 100, 100) + '%';
@@ -419,8 +479,7 @@ function addXP(amount) {
 function addHistory(game, betStars, winStars) {
   STATE.history.unshift({ game, betStars, winStars, isWin: winStars > 0 });
   if (STATE.history.length > 10) STATE.history.pop();
-  renderHistory();
-  saveState();
+  renderHistory(); saveState();
 }
 
 function renderHistory() {
@@ -446,10 +505,7 @@ function openComingSoon() {
 
 function toggleCurrency() {
   STATE.currency = STATE.currency === 'stars' ? 'rub' : 'stars';
-  updateUI(); 
-  renderHistory();
-  
-  // Анимация кнопки
+  updateUI(); renderHistory();
   const btn = document.querySelector('.currency-switch-btn');
   btn.style.transform = 'scale(0.8)';
   setTimeout(() => { btn.style.transform = 'scale(1)'; }, 150);
@@ -491,7 +547,7 @@ const SLOT_MODES = {
   medium: { cols: 4, mult: 2.0, winChance: 0.20, nearMissChance: 0.45 },
   hard: { cols: 5, mult: 4.0, winChance: 0.10, nearMissChance: 0.45 }
 };
-let slotState = { mode: 'easy', bet: 10, spinning: false }; // bet всегда в звездах
+let slotState = { mode: 'easy', bet: 10, spinning: false };
 
 function setSlotMode(mode) {
   if (slotState.spinning) return;
@@ -517,29 +573,19 @@ function setSlotMode(mode) {
 
 function changeSlotBet(d) {
   if (slotState.spinning) return;
-  // Шаг: в звездах 1, в рублях 10 (чтобы не было копеек)
   let stepStars = STATE.currency === 'rub' ? (10 / STATE.rubRate) : 1;
   let nb = slotState.bet + (d * stepStars);
-  
   let minBet = STATE.currency === 'rub' ? (10 / STATE.rubRate) : 1;
-  
-  if (nb >= minBet && nb <= STATE.balance) { 
-    slotState.bet = nb; 
-    updateUI(); 
-  }
+  if (nb >= minBet && nb <= STATE.balance) { slotState.bet = nb; updateUI(); }
 }
 
 function validateSlotBetInput() {
   if (slotState.spinning) return;
   let inputVal = parseFloat(document.getElementById('slot-betInput').value) || 1;
-  // Конвертируем рубли в звезды
   let starsVal = STATE.currency === 'rub' ? (inputVal / STATE.rubRate) : inputVal;
-  
   let minBet = STATE.currency === 'rub' ? (10 / STATE.rubRate) : 1;
-  
   if (starsVal < minBet) starsVal = minBet;
   if (starsVal > STATE.balance) starsVal = STATE.balance;
-  
   slotState.bet = starsVal;
   updateUI();
 }
@@ -604,7 +650,11 @@ function spinSlots() {
   for (let col = 0; col < mode.cols; col++) {
     const colCells = Array.from(cells).filter(c => parseInt(c.dataset.col) === col);
     colCells.forEach(c => c.classList.add('spinning'));
-    spinIntervals[col] = setInterval(() => { colCells.forEach(c => c.textContent = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)]); }, 60);
+    
+    spinIntervals[col] = setInterval(() => { 
+        colCells.forEach(c => c.textContent = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)]); 
+        if (Math.random() < 0.2) SOUNDS.spinTick(); // Рандомный стук во время прокрутки
+    }, 60);
   }
 
   for (let col = 0; col < mode.cols; col++) {
@@ -615,6 +665,8 @@ function spinSlots() {
         c.classList.remove('spinning');
         c.textContent = grid[rowIndex * mode.cols + col];
       });
+      
+      SOUNDS.spinTick(); // Звук остановки барабана
 
       if (col === mode.cols - 1) {
         setTimeout(() => {
@@ -623,9 +675,11 @@ function spinSlots() {
             STATE.balance += winAmountStars; 
             addXP(15); addHistory('Слоты', slotState.bet, winAmountStars); updateUI();
             for(let c=0; c<mode.cols; c++) cells[WIN_LINE * mode.cols + c].classList.add('win');
+            SOUNDS.win();
             showWinModal(formatMoney(winAmountStars), getCurrencyIcon(), mode.mult);
           } else {
             addXP(5); addHistory('Слоты', slotState.bet, 0);
+            SOUNDS.lose();
             showLoseModal(isNearMiss);
           }
           lockSlotControls(false);
@@ -680,7 +734,6 @@ function changeMineBet(d) {
   let stepStars = STATE.currency === 'rub' ? (10 / STATE.rubRate) : 1;
   let nb = mineState.bet + (d * stepStars); 
   let minBet = STATE.currency === 'rub' ? (10 / STATE.rubRate) : 1;
-  
   if (nb >= minBet && nb <= STATE.balance) { mineState.bet = nb; updateUI(); } 
 }
 
@@ -689,7 +742,6 @@ function validateMineBetInput() {
   let inputVal = parseFloat(document.getElementById('mine-betInput').value) || 1;
   let starsVal = STATE.currency === 'rub' ? (inputVal / STATE.rubRate) : inputVal;
   let minBet = STATE.currency === 'rub' ? (10 / STATE.rubRate) : 1;
-  
   if (starsVal < minBet) starsVal = minBet; 
   if (starsVal > STATE.balance) starsVal = STATE.balance; 
   mineState.bet = starsVal; updateUI(); 
@@ -736,6 +788,8 @@ function clickMineCell(index) {
       unopened.splice(r, 1); bombsToShow--;
     }
 
+    SOUNDS.bomb(); // Звук взрыва
+
     setTimeout(() => {
       document.getElementById('mineCashoutBtn').classList.remove('show');
       document.getElementById('mineStartBtn').style.display = 'block';
@@ -752,6 +806,8 @@ function clickMineCell(index) {
     cellData.el.innerHTML = '';
     mineState.opened++;
     
+    SOUNDS.gem(); // Звук кристалла
+
     const multTable = MULT_TABLES[mineState.mode];
     mineState.currentMult = multTable[Math.min(mineState.opened - 1, multTable.length - 1)];
     updateUI();
@@ -773,6 +829,7 @@ function cashoutMines() {
   document.getElementById('minesBetPanel').style.display = 'flex';
   document.getElementById('multiplierDisplay').classList.remove('show');
   
+  SOUNDS.cashout(); // Звук монет
   showWinModal(formatMoney(winAmountStars), getCurrencyIcon(), mineState.currentMult.toFixed(1));
   resetMinesBoard();
 }
