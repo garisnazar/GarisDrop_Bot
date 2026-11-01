@@ -41,19 +41,20 @@
   /* ===== APP ===== */
   #app{ position:fixed; inset:0; z-index:1; display:flex; flex-direction:column; padding:16px 16px calc(92px + env(safe-area-inset-bottom)); overflow:hidden; }
   
-  .header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; flex-shrink: 0; }
-  .logo{ font-weight:900; font-size:18px; background:linear-gradient(90deg,#00ff9d,#5cbf4a,#00ff9d); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; flex-shrink: 0; gap: 5px;}
+  .logo{ font-weight:900; font-size:18px; background:linear-gradient(90deg,#00ff9d,#5cbf4a,#00ff9d); -webkit-background-clip:text; background-clip:text; color:transparent; white-space: nowrap;}
   
   .header-right{ display:flex; align-items:center; gap:6px; }
   
-  .deposit-btn-large { background: linear-gradient(135deg, #00ff9d, #5cbf4a); border: none; color: #001a10; padding: 8px 12px; border-radius: 999px; font-size: 13px; font-weight: 900; cursor: pointer; box-shadow: 0 0 15px rgba(0,255,157,0.4); transition: transform 0.1s; }
+  .deposit-btn-large { background: linear-gradient(135deg, #00ff9d, #5cbf4a); border: none; color: #001a10; height: 36px; padding: 0 12px; border-radius: 999px; font-size: 12px; font-weight: 900; cursor: pointer; box-shadow: 0 0 15px rgba(0,255,157,0.4); display: flex; align-items: center; justify-content: center; transition: transform 0.1s; white-space: nowrap;}
   .deposit-btn-large:active { transform: scale(0.9); }
 
-  .currency-switch-btn { background: var(--card); border: 1px solid var(--border); color: var(--neon); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 900; cursor: pointer; transition: transform 0.1s; }
+  .currency-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 46px; margin-top: -5px; }
+  .currency-switch-btn { background: var(--card); border: 1px solid var(--border); color: var(--neon); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 900; cursor: pointer; transition: transform 0.1s; }
   .currency-switch-btn:active { transform: scale(0.9); }
+  .currency-label { font-size: 7px; color: var(--muted); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
 
-  /* УВЕЛИЧЕННЫЙ БАЛАНС */
-  .balance-pill{ background:var(--card); border:1px solid var(--border); padding:6px 12px; border-radius:999px; font-size:18px; font-weight:900; color:var(--neon); display:flex; align-items:center; gap:4px; box-shadow: 0 0 10px rgba(0,255,157,0.1);}
+  .balance-pill{ background:var(--card); border:1px solid var(--border); height: 36px; padding: 0 10px; border-radius:999px; font-size:16px; font-weight:900; color:var(--neon); display:flex; align-items:center; gap:4px; box-shadow: 0 0 10px rgba(0,255,157,0.1); }
 
   /* ===== PAGES ===== */
   .page{ flex:1; min-height: 0; overflow-y:auto; display:none; flex-direction: column; padding-bottom:12px; color: var(--text); }
@@ -118,28 +119,31 @@
   .cashout-btn { width: 100%; max-width: 340px; padding: 16px; border-radius: 20px; font-size: 17px; font-weight: 900; color: #001a10; background: linear-gradient(135deg, #00ff9d, #5cbf4a); border: none; cursor: pointer; transition: all 0.2s; box-shadow: 0 5px 15px rgba(0,255,157,0.3); display: none; margin-top: 10px; }
   .cashout-btn.show { display: block; } .cashout-btn:active { transform: scale(0.97); }
 
-  /* ===== WHEEL (ОБНОВЛЕННОЕ) ===== */
+  /* ===== WHEEL ===== */
   .wheel-wrap { position: relative; width: 100%; max-width: 320px; margin: 20px auto; display: flex; justify-content: center; align-items: center; aspect-ratio: 1; }
   
   .wheel-pointer { 
-    position: absolute; top: -16px; left: 50%; transform: translateX(-50%); 
-    font-size: 32px; z-index: 10; color: var(--neon); 
-    text-shadow: 0 0 20px rgba(0,255,157,0.8), 0 0 10px #000; 
+    position: absolute; top: -20px; left: 50%; transform: translateX(-50%); 
+    width: 0; height: 0; 
+    border-left: 12px solid transparent; 
+    border-right: 12px solid transparent; 
+    border-top: 20px solid var(--red); 
+    z-index: 10; 
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8)) drop-shadow(0 0 10px rgba(255,77,109,0.8));
   }
 
   .wheel-svg { 
     width: 100%; height: 100%; border-radius: 50%; 
-    box-shadow: 0 0 40px rgba(0,255,157,0.15), inset 0 0 20px #000; 
-    transform: rotate(0deg); border: 4px solid #0f1f18; /* Темный обод */
+    box-shadow: 0 0 50px rgba(0,255,157,0.15), inset 0 0 20px #000; 
+    transform: rotate(0deg); 
   }
   
-  /* Обертка для анимации (чтобы не дергать SVG напрямую) */
-  .wheel-spinner {
-    width: 100%; height: 100%; position: relative;
+  .wheel-spinner { 
+    width: 100%; height: 100%; position: relative; 
+    border-radius: 50%; border: 4px solid #050d0a; 
+    box-shadow: 0 0 20px rgba(0,0,0,0.9);
   }
 
-  .wheel-svg text { font-size: 14px; font-weight: 900; font-family: sans-serif; text-anchor: middle; dominant-baseline: middle; }
-  
   /* Блок ввода ставки */
   .bet-row{ display:flex; align-items:center; gap:10px; margin-top: 10px; z-index: 10; justify-content: center; width: 100%; }
   .bet-btn{ width:44px; height:44px; border-radius:14px; background:var(--card); border:1px solid var(--border); color:var(--neon); font-size:20px; font-weight:800; cursor:pointer; transition: transform 0.1s; }
@@ -153,7 +157,6 @@
 
   /* ===== PROFILE & BONUSES ===== */
   .profile-card{ background:var(--card2); border:1px solid var(--border); border-radius:24px; padding:22px; text-align:center; margin-bottom:14px; position: relative;}
-  
   .avatar{ width:78px; height:78px; border-radius:50%; margin:0 auto 12px; background:radial-gradient(circle, #7de86a, #2f7d24); display:flex; align-items:center; justify-content:center; font-size:36px; transition: all 0.3s; position: relative;}
   .frame-lvl-1 { border: 3px solid var(--neon); box-shadow: 0 0 20px var(--neon); }
   .frame-lvl-2 { border: 3px solid var(--purple); box-shadow: 0 0 20px var(--purple); }
@@ -221,9 +224,14 @@
     <div class="logo">🐸 GARISDROP</div>
     <div class="header-right">
       <button class="deposit-btn-large" onclick="openDepositModal()">+ Пополнить</button>
-      <div class="currency-switch-btn" onclick="toggleCurrency()">
-        <span id="btnCurrencyIcon">⭐</span>
+      
+      <div class="currency-wrapper">
+        <div class="currency-switch-btn" onclick="toggleCurrency()">
+          <span id="btnCurrencyIcon">⭐</span>
+        </div>
+        <div class="currency-label">ВАЛЮТА</div>
       </div>
+
       <div class="balance-pill" id="balancePillHeader">
         <span id="currencyIcon">⭐</span> <span id="balanceTop">0</span>
       </div>
@@ -330,45 +338,80 @@
     <button class="back-btn" onclick="switchPage('games')">← Назад в меню</button>
     <div class="game-wrap">
       <div class="wheel-wrap">
-        <div class="wheel-pointer">▼</div>
+        <div class="wheel-pointer"></div>
         <div class="wheel-spinner" id="wheelSpinner">
           <svg class="wheel-svg" viewBox="0 0 100 100">
-            <!-- Темный фон для объема -->
-            <circle cx="50" cy="50" r="48" fill="#050d0a" stroke="#0a1410" stroke-width="4" />
+            <defs>
+              <!-- Объемные градиенты -->
+              <linearGradient id="gradGreen" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#00ff9d" />
+                <stop offset="100%" stop-color="#007a4d" />
+              </linearGradient>
+              <linearGradient id="gradGold" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#ffd700" />
+                <stop offset="100%" stop-color="#b8860b" />
+              </linearGradient>
+              <linearGradient id="gradPurple" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#d8b4fe" />
+                <stop offset="100%" stop-color="#7e22ce" />
+              </linearGradient>
+              <linearGradient id="gradDark" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#1f2937" />
+                <stop offset="100%" stop-color="#0f172a" />
+              </linearGradient>
+              <radialGradient id="centerGrad" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#00ff9d" />
+                <stop offset="100%" stop-color="#005c38" />
+              </radialGradient>
+              <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                <feGaussianBlur stdDeviation="1.5" result="blur" />
+                <feComposite in="SourceGraphic" in2="blur" operator="over" />
+              </filter>
+            </defs>
+
+            <!-- Внешний темный обод -->
+            <circle cx="50" cy="50" r="49" fill="#050d0a" />
             
+            <!-- LED-точки по кругу -->
+            <circle cx="50" cy="50" r="47.5" fill="none" stroke="#00ff9d" stroke-width="1.5" stroke-dasharray="1 4.5" opacity="0.6" />
+
             <!-- Сектора -->
             <!-- 0: x1.5 (Зеленый) -->
-            <path d="M50 50 L50 2 A48 48 0 0 1 91.57 26 Z" fill="#00ff9d" />
+            <path d="M50 50 L50 2 A48 48 0 0 1 91.57 26 Z" fill="url(#gradGreen)" />
             <!-- 1: x0 (Темный) -->
-            <path d="M50 50 L91.57 26 A48 48 0 0 1 91.57 74 Z" fill="#0f1f18" />
+            <path d="M50 50 L91.57 26 A48 48 0 0 1 91.57 74 Z" fill="url(#gradDark)" />
             <!-- 2: x2.5 (Золотой) -->
-            <path d="M50 50 L91.57 74 A48 48 0 0 1 50 98 Z" fill="#ffd700" />
+            <path d="M50 50 L91.57 74 A48 48 0 0 1 50 98 Z" fill="url(#gradGold)" />
             <!-- 3: x0 (Темный) -->
-            <path d="M50 50 L50 98 A48 48 0 0 1 8.43 74 Z" fill="#0f1f18" />
+            <path d="M50 50 L50 98 A48 48 0 0 1 8.43 74 Z" fill="url(#gradDark)" />
             <!-- 4: x1.2 (Фиолетовый) -->
-            <path d="M50 50 L8.43 74 A48 48 0 0 1 8.43 26 Z" fill="#a855f7" />
+            <path d="M50 50 L8.43 74 A48 48 0 0 1 8.43 26 Z" fill="url(#gradPurple)" />
             <!-- 5: x0 (Темный) -->
-            <path d="M50 50 L8.43 26 A48 48 0 0 1 50 2 Z" fill="#0f1f18" />
+            <path d="M50 50 L8.43 26 A48 48 0 0 1 50 2 Z" fill="url(#gradDark)" />
 
-            <!-- Внутренние линии (разделители) -->
-            <line x1="50" y1="50" x2="50" y2="2" stroke="#000" stroke-width="1" opacity="0.3" />
-            <line x1="50" y1="50" x2="91.57" y2="26" stroke="#000" stroke-width="1" opacity="0.3" />
-            <line x1="50" y1="50" x2="91.57" y2="74" stroke="#000" stroke-width="1" opacity="0.3" />
-            <line x1="50" y1="50" x2="50" y2="98" stroke="#000" stroke-width="1" opacity="0.3" />
-            <line x1="50" y1="50" x2="8.43" y2="74" stroke="#000" stroke-width="1" opacity="0.3" />
-            <line x1="50" y1="50" x2="8.43" y2="26" stroke="#000" stroke-width="1" opacity="0.3" />
+            <!-- Разделители секторов -->
+            <line x1="50" y1="50" x2="50" y2="2" stroke="#ffffff" stroke-width="0.5" opacity="0.4" />
+            <line x1="50" y1="50" x2="91.57" y2="26" stroke="#ffffff" stroke-width="0.5" opacity="0.4" />
+            <line x1="50" y1="50" x2="91.57" y2="74" stroke="#ffffff" stroke-width="0.5" opacity="0.4" />
+            <line x1="50" y1="50" x2="50" y2="98" stroke="#ffffff" stroke-width="0.5" opacity="0.4" />
+            <line x1="50" y1="50" x2="8.43" y2="74" stroke="#ffffff" stroke-width="0.5" opacity="0.4" />
+            <line x1="50" y1="50" x2="8.43" y2="26" stroke="#ffffff" stroke-width="0.5" opacity="0.4" />
 
-            <!-- Текст -->
-            <text x="50" y="22" transform="rotate(30 50 50)" fill="#001a10">x1.5</text>
-            <text x="50" y="22" transform="rotate(90 50 50)" fill="#e6fff5">x0</text>
-            <text x="50" y="22" transform="rotate(150 50 50)" fill="#001a10">x2.5</text>
-            <text x="50" y="22" transform="rotate(210 50 50)" fill="#e6fff5">x0</text>
-            <text x="50" y="22" transform="rotate(270 50 50)" fill="#fff">x1.2</text>
-            <text x="50" y="22" transform="rotate(330 50 50)" fill="#e6fff5">x0</text>
+            <!-- Стеклянный блик сверху (эффект объема) -->
+            <path d="M50 2 A48 48 0 0 1 91.57 26 A48 48 0 0 1 50 50 A48 48 0 0 1 8.43 26 A48 48 0 0 1 50 2 Z" fill="rgba(255,255,255,0.1)" />
 
-            <!-- Центральный куб -->
-            <circle cx="50" cy="50" r="8" fill="#0a1410" stroke="#00ff9d" stroke-width="2" />
-            <text x="50" y="50" fill="#00ff9d" font-size="8">SPIN</text>
+            <!-- Текст на колесе -->
+            <text x="50" y="24" transform="rotate(30 50 50)" fill="#fff" font-weight="900" font-size="10" filter="url(#glow)">x1.5</text>
+            <text x="50" y="24" transform="rotate(90 50 50)" fill="#8892b0" font-weight="900" font-size="10">x0</text>
+            <text x="50" y="24" transform="rotate(150 50 50)" fill="#fff" font-weight="900" font-size="10" filter="url(#glow)">x2.5</text>
+            <text x="50" y="24" transform="rotate(210 50 50)" fill="#8892b0" font-weight="900" font-size="10">x0</text>
+            <text x="50" y="24" transform="rotate(270 50 50)" fill="#fff" font-weight="900" font-size="10" filter="url(#glow)">x1.2</text>
+            <text x="50" y="24" transform="rotate(330 50 50)" fill="#8892b0" font-weight="900" font-size="10">x0</text>
+
+            <!-- Центральная кнопка (без надписи SPIN) -->
+            <circle cx="50" cy="50" r="10" fill="#0a1410" stroke="#00ff9d" stroke-width="1.5" filter="url(#glow)" />
+            <circle cx="50" cy="50" r="7" fill="url(#centerGrad)" />
+            <path d="M50 45 L52 49 L56 50 L52 51 L50 55 L48 51 L44 50 L48 49 Z" fill="#001a10" />
           </svg>
         </div>
       </div>
@@ -437,7 +480,7 @@
 
 <script>
 // ==========================================
-// СИСТЕМА ЗВУКОВ (Web Audio API)
+// СИСТЕМА ЗВУКОВ
 // ==========================================
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 let audioCtx;
@@ -472,11 +515,7 @@ const SOUNDS = {
   gem: () => playTone(1000, 'sine', 0.15, 0.04),
   bomb: () => { playNoise(0.4, 0.08); playTone(80, 'triangle', 0.3, 0.05); },
   cashout: () => { playTone(800, 'sine', 0.05, 0.03); setTimeout(() => playTone(1000, 'sine', 0.05, 0.03), 60); setTimeout(() => playTone(1200, 'sine', 0.1, 0.03), 120); },
-  // Улучшенный звук треска (щелчок)
-  wheelTick: () => {
-    playTone(1200, 'triangle', 0.02, 0.03);
-    playTone(800, 'square', 0.01, 0.01);
-  }
+  wheelTick: () => { playTone(1200, 'triangle', 0.02, 0.03); playTone(800, 'square', 0.01, 0.01); }
 };
 
 document.querySelectorAll('button, .game-card, .nav-btn, .currency-switch-btn, .back-btn, .bonus-btn').forEach(el => {
@@ -963,7 +1002,7 @@ function cashoutMines() {
   resetMinesBoard();
 }
 
-/* ================= КОЛЕСО (ФИЗИКА И ЗВУК) ================= */
+/* ================= КОЛЕСО ================= */
 let wheelState = { bet: 10, spinning: false, currentRotation: 0 };
 const WHEEL_MULTS = [1.5, 0, 0, 2.5, 0, 1.2];
 
@@ -1003,24 +1042,17 @@ function spinWheel() {
   const btn = document.getElementById('wheelSpinBtn');
   btn.disabled = true;
   
-  // 1. Выбираем выигрышный сектор (0-5)
   const targetSector = Math.floor(Math.random() * 6);
-  // Сектор 0: x1.5 (Зеленый), Сектор 2: x2.5 (Золотой), Сектор 4: x1.2 (Фиолетовый)
-  // Сектора 1, 3, 5 - это x0 (пустые)
   const actualMult = WHEEL_MULTS[targetSector];
   
-  // 2. Вычисляем финальный угол
-  // Каждый сектор по 60 градусов. Центр сектора 0 на 30 градусах.
-  // Чтобы сектор оказался под стрелкой (0 градусов), нужно повернуть колесо назад на его угол.
-  const extraDegrees = 360 * 5; // 5 полных оборотов для красоты
+  const extraDegrees = 360 * 5;
   const targetAngle = extraDegrees + (360 - (targetSector * 60 + 30));
-  const jitter = (Math.random() - 0.5) * 40; // Небольшой разброс, чтобы не вставало идеально в центр
+  const jitter = (Math.random() - 0.5) * 40;
   const finalRotation = wheelState.currentRotation + targetAngle + jitter;
   
   const wheel = document.getElementById('wheelSpinner');
-  // Мы используем кастомную JS анимацию вместо CSS transition, чтобы идеально синхронизировать звук
   const startRotation = wheelState.currentRotation;
-  const duration = 4500; // 4.5 секунды
+  const duration = 4500;
   const startTime = performance.now();
   let lastSector = Math.floor(startRotation / 60);
 
@@ -1028,15 +1060,12 @@ function spinWheel() {
     let elapsed = time - startTime;
     let progress = Math.min(elapsed / duration, 1);
     
-    // Функция плавного замедления (easeOutQuart)
     let easeOut = 1 - Math.pow(1 - progress, 4);
     let currentRot = startRotation + (finalRotation - startRotation) * easeOut;
     
     wheel.style.transform = `rotate(${currentRot}deg)`;
     
-    // 3. Треск при пересечении сектора
-    // Мы проверяем, изменился ли текущий сектор под указателем
-    let currentSector = Math.floor(currentRot / 60); // Каждые 60 градусов - новый сектор
+    let currentSector = Math.floor(currentRot / 60);
     if (currentSector !== lastSector) {
       SOUNDS.wheelTick();
       lastSector = currentSector;
@@ -1045,7 +1074,6 @@ function spinWheel() {
     if (progress < 1) {
       requestAnimationFrame(animateWheel);
     } else {
-      // 4. Конец вращения
       wheelState.currentRotation = finalRotation;
       
       if (actualMult > 0) {
@@ -1063,7 +1091,6 @@ function spinWheel() {
       updateUI();
       wheelState.spinning = false;
       btn.disabled = false;
-      // Не сбрасываем угол сразу, оставляем как есть до следующей игры
     }
   }
   
