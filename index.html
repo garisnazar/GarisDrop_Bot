@@ -43,7 +43,6 @@
   
   .header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; flex-shrink: 0; gap: 5px;}
   .logo{ font-weight:900; font-size:18px; background:linear-gradient(90deg,#00ff9d,#5cbf4a,#00ff9d); -webkit-background-clip:text; background-clip:text; color:transparent; white-space: nowrap;}
-  
   .header-right{ display:flex; align-items:center; gap:6px; }
   
   .deposit-btn-large { background: linear-gradient(135deg, #00ff9d, #5cbf4a); border: none; color: #001a10; height: 36px; padding: 0 12px; border-radius: 999px; font-size: 12px; font-weight: 900; cursor: pointer; box-shadow: 0 0 15px rgba(0,255,157,0.4); display: flex; align-items: center; justify-content: center; transition: transform 0.1s; white-space: nowrap;}
@@ -119,30 +118,48 @@
   .cashout-btn { width: 100%; max-width: 340px; padding: 16px; border-radius: 20px; font-size: 17px; font-weight: 900; color: #001a10; background: linear-gradient(135deg, #00ff9d, #5cbf4a); border: none; cursor: pointer; transition: all 0.2s; box-shadow: 0 5px 15px rgba(0,255,157,0.3); display: none; margin-top: 10px; }
   .cashout-btn.show { display: block; } .cashout-btn:active { transform: scale(0.97); }
 
-  /* ===== WHEEL ===== */
-  .wheel-wrap { position: relative; width: 100%; max-width: 320px; margin: 20px auto; display: flex; justify-content: center; align-items: center; aspect-ratio: 1; }
+  /* ===== WHEEL (СОВРЕМЕННОЕ, ОБЪЕМНОЕ) ===== */
+  .wheel-container { position: relative; width: 100%; max-width: 340px; margin: 20px auto; display: flex; justify-content: center; align-items: center; aspect-ratio: 1; }
   
   .wheel-pointer { 
-    position: absolute; top: -20px; left: 50%; transform: translateX(-50%); 
+    position: absolute; top: -15px; left: 50%; transform: translateX(-50%); 
     width: 0; height: 0; 
-    border-left: 12px solid transparent; 
-    border-right: 12px solid transparent; 
-    border-top: 20px solid var(--red); 
+    border-left: 15px solid transparent; 
+    border-right: 15px solid transparent; 
+    border-top: 25px solid var(--red); 
     z-index: 10; 
-    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8)) drop-shadow(0 0 10px rgba(255,77,109,0.8));
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.9)) drop-shadow(0 0 15px rgba(255,77,109,1));
   }
 
-  .wheel-svg { 
-    width: 100%; height: 100%; border-radius: 50%; 
-    box-shadow: 0 0 50px rgba(0,255,157,0.15), inset 0 0 20px #000; 
-    transform: rotate(0deg); 
+  /* Толстый внешний обод */
+  .wheel-rim {
+    width: 100%; height: 100%;
+    border-radius: 50%;
+    padding: 10px;
+    background: linear-gradient(135deg, #1f2937, #0a1410);
+    box-shadow: 
+      0 0 30px rgba(0,255,157,0.2),
+      inset 0 0 20px rgba(0,0,0,0.9),
+      0 10px 40px rgba(0,0,0,0.8);
+    position: relative;
   }
-  
-  .wheel-spinner { 
-    width: 100%; height: 100%; position: relative; 
-    border-radius: 50%; border: 4px solid #050d0a; 
-    box-shadow: 0 0 20px rgba(0,0,0,0.9);
+
+  /* Внутренний неоновый обод */
+  .wheel-rim::after {
+    content: ''; position: absolute; inset: 4px; border-radius: 50%;
+    border: 2px solid rgba(0, 255, 157, 0.4);
+    box-shadow: inset 0 0 15px rgba(0, 255, 157, 0.2);
+    pointer-events: none;
   }
+
+  .wheel-spinner {
+    width: 100%; height: 100%; position: relative;
+    border-radius: 50%;
+    overflow: hidden;
+    transform: rotate(0deg);
+  }
+
+  .wheel-svg { width: 100%; height: 100%; display: block; }
 
   /* Блок ввода ставки */
   .bet-row{ display:flex; align-items:center; gap:10px; margin-top: 10px; z-index: 10; justify-content: center; width: 100%; }
@@ -206,12 +223,21 @@
   .modal.win { border: 1px solid rgba(0, 255, 157, 0.5); } .icon-win { font-size: 46px; color: var(--neon); margin-bottom: 10px; }
   .modal.win h3 { color: var(--neon); margin-bottom: 10px; } .modal.win p { color: white; font-size: 15px; margin-bottom: 20px; }
   .win-amount { font-size: 24px; font-weight: 900; color: var(--neon); display: block; margin-top: 10px; }
-  .modal-btn { width: 100%; padding: 16px; border-radius: 16px; border: none; font-weight: 900; font-size: 15px; cursor: pointer; }
+  .modal-btn { width: 100%; padding: 16px; border-radius: 16px; border: none; font-weight: 900; font-size: 15px; cursor: pointer; margin-top: 10px;}
   .modal-btn.red { background: rgba(255,77,109,0.15); color: var(--red); } .modal-btn.green { background: var(--neon); color: #001a10; }
   
-  .deposit-amounts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; margin-top: 15px; }
-  .dep-opt { background: var(--card); border: 1px solid var(--border); color: white; padding: 10px; border-radius: 12px; font-weight: 800; cursor: pointer; transition: 0.2s;}
-  .dep-opt:active { background: var(--neon); color: #000; }
+  .dep-method { display: flex; flex-direction: column; gap: 10px; width: 100%; margin-top: 10px; }
+  .dep-option { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 14px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
+  .dep-option:active { background: rgba(0,255,157,0.1); border-color: var(--neon); }
+  .dep-option .icon { font-size: 24px; }
+  .dep-option .text { text-align: left; }
+  .dep-option .text b { display: block; font-size: 15px; color: white; }
+  .dep-option .text span { font-size: 11px; color: var(--muted); }
+
+  .input-group { display: flex; flex-direction: column; text-align: left; width: 100%; margin-top: 15px; gap: 5px; }
+  .input-group label { font-size: 12px; color: var(--muted); }
+  .input-group input { width: 100%; padding: 14px; background: var(--card); border: 1px solid var(--border); border-radius: 14px; color: white; font-size: 16px; font-weight: bold; outline: none; }
+  .input-group input:focus { border-color: var(--neon); }
 </style>
 </head>
 <body>
@@ -224,21 +250,18 @@
     <div class="logo">🐸 GARISDROP</div>
     <div class="header-right">
       <button class="deposit-btn-large" onclick="openDepositModal()">+ Пополнить</button>
-      
       <div class="currency-wrapper">
         <div class="currency-switch-btn" onclick="toggleCurrency()">
           <span id="btnCurrencyIcon">⭐</span>
         </div>
         <div class="currency-label">ВАЛЮТА</div>
       </div>
-
       <div class="balance-pill" id="balancePillHeader">
         <span id="currencyIcon">⭐</span> <span id="balanceTop">0</span>
       </div>
     </div>
   </div>
 
-  <!-- ГЛАВНОЕ МЕНЮ -->
   <div class="page active" id="page-games">
     <div class="live-wins-bar">
       <span id="liveWinsText">🍀 Здесь появятся ваши реальные выигрыши. Начните играть!</span>
@@ -266,7 +289,6 @@
     </div>
   </div>
 
-  <!-- ВКЛАДКА БОНУСЫ -->
   <div class="page" id="page-bonus">
     <div class="title">Бонусы <span>▸</span></div>
     
@@ -289,7 +311,6 @@
     </div>
   </div>
 
-  <!-- ИГРА СЛОТЫ -->
   <div class="page" id="page-slots">
     <button class="back-btn" onclick="switchPage('games')">← Назад в меню</button>
     <div class="game-wrap">
@@ -312,7 +333,6 @@
     </div>
   </div>
 
-  <!-- ИГРА МАЙНЕР -->
   <div class="page" id="page-mines">
     <button class="back-btn" onclick="switchPage('games')">← Назад в меню</button>
     <div class="game-wrap">
@@ -333,86 +353,60 @@
     </div>
   </div>
 
-  <!-- ИГРА КОЛЕСО -->
   <div class="page" id="page-wheel">
     <button class="back-btn" onclick="switchPage('games')">← Назад в меню</button>
     <div class="game-wrap">
-      <div class="wheel-wrap">
+      <div class="wheel-container">
         <div class="wheel-pointer"></div>
-        <div class="wheel-spinner" id="wheelSpinner">
-          <svg class="wheel-svg" viewBox="0 0 100 100">
-            <defs>
-              <!-- Объемные градиенты -->
-              <linearGradient id="gradGreen" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#00ff9d" />
-                <stop offset="100%" stop-color="#007a4d" />
-              </linearGradient>
-              <linearGradient id="gradGold" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#ffd700" />
-                <stop offset="100%" stop-color="#b8860b" />
-              </linearGradient>
-              <linearGradient id="gradPurple" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#d8b4fe" />
-                <stop offset="100%" stop-color="#7e22ce" />
-              </linearGradient>
-              <linearGradient id="gradDark" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#1f2937" />
-                <stop offset="100%" stop-color="#0f172a" />
-              </linearGradient>
-              <radialGradient id="centerGrad" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stop-color="#00ff9d" />
-                <stop offset="100%" stop-color="#005c38" />
-              </radialGradient>
-              <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-                <feGaussianBlur stdDeviation="1.5" result="blur" />
-                <feComposite in="SourceGraphic" in2="blur" operator="over" />
-              </filter>
-            </defs>
+        
+        <div class="wheel-rim">
+          <div class="wheel-spinner" id="wheelSpinner">
+            <svg class="wheel-svg" viewBox="0 0 100 100">
+              <defs>
+                <linearGradient id="gradGreen" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00ff9d" /><stop offset="100%" stop-color="#007a4d" /></linearGradient>
+                <linearGradient id="gradGold" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ffd700" /><stop offset="100%" stop-color="#b8860b" /></linearGradient>
+                <linearGradient id="gradPurple" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#d8b4fe" /><stop offset="100%" stop-color="#7e22ce" /></linearGradient>
+                <linearGradient id="gradDark" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#1f2937" /><stop offset="100%" stop-color="#0f172a" /></linearGradient>
+                <radialGradient id="centerGrad" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#00ff9d" /><stop offset="100%" stop-color="#005c38" /></radialGradient>
+                <filter id="glow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="1.5" result="blur" /><feComposite in="SourceGraphic" in2="blur" operator="over" /></filter>
+              </defs>
+              
+              <circle cx="50" cy="50" r="50" fill="#050d0a" />
+              <!-- LED-точки по краю -->
+              <circle cx="50" cy="50" r="47" fill="none" stroke="#00ff9d" stroke-width="1.5" stroke-dasharray="1 4" opacity="0.6" />
 
-            <!-- Внешний темный обод -->
-            <circle cx="50" cy="50" r="49" fill="#050d0a" />
-            
-            <!-- LED-точки по кругу -->
-            <circle cx="50" cy="50" r="47.5" fill="none" stroke="#00ff9d" stroke-width="1.5" stroke-dasharray="1 4.5" opacity="0.6" />
+              <!-- Сектора -->
+              <path d="M50 50 L50 0 A50 50 0 0 1 93.3 25 Z" fill="url(#gradGreen)" />
+              <path d="M50 50 L93.3 25 A50 50 0 0 1 93.3 75 Z" fill="url(#gradDark)" />
+              <path d="M50 50 L93.3 75 A50 50 0 0 1 50 100 Z" fill="url(#gradGold)" />
+              <path d="M50 50 L50 100 A50 50 0 0 1 6.7 75 Z" fill="url(#gradDark)" />
+              <path d="M50 50 L6.7 75 A50 50 0 0 1 6.7 25 Z" fill="url(#gradPurple)" />
+              <path d="M50 50 L6.7 25 A50 50 0 0 1 50 0 Z" fill="url(#gradDark)" />
 
-            <!-- Сектора -->
-            <!-- 0: x1.5 (Зеленый) -->
-            <path d="M50 50 L50 2 A48 48 0 0 1 91.57 26 Z" fill="url(#gradGreen)" />
-            <!-- 1: x0 (Темный) -->
-            <path d="M50 50 L91.57 26 A48 48 0 0 1 91.57 74 Z" fill="url(#gradDark)" />
-            <!-- 2: x2.5 (Золотой) -->
-            <path d="M50 50 L91.57 74 A48 48 0 0 1 50 98 Z" fill="url(#gradGold)" />
-            <!-- 3: x0 (Темный) -->
-            <path d="M50 50 L50 98 A48 48 0 0 1 8.43 74 Z" fill="url(#gradDark)" />
-            <!-- 4: x1.2 (Фиолетовый) -->
-            <path d="M50 50 L8.43 74 A48 48 0 0 1 8.43 26 Z" fill="url(#gradPurple)" />
-            <!-- 5: x0 (Темный) -->
-            <path d="M50 50 L8.43 26 A48 48 0 0 1 50 2 Z" fill="url(#gradDark)" />
+              <!-- Разделители -->
+              <line x1="50" y1="50" x2="50" y2="0" stroke="#fff" stroke-width="0.5" opacity="0.3" />
+              <line x1="50" y1="50" x2="93.3" y2="25" stroke="#fff" stroke-width="0.5" opacity="0.3" />
+              <line x1="50" y1="50" x2="93.3" y2="75" stroke="#fff" stroke-width="0.5" opacity="0.3" />
+              <line x1="50" y1="50" x2="50" y2="100" stroke="#fff" stroke-width="0.5" opacity="0.3" />
+              <line x1="50" y1="50" x2="6.7" y2="75" stroke="#fff" stroke-width="0.5" opacity="0.3" />
+              <line x1="50" y1="50" x2="6.7" y2="25" stroke="#fff" stroke-width="0.5" opacity="0.3" />
 
-            <!-- Разделители секторов -->
-            <line x1="50" y1="50" x2="50" y2="2" stroke="#ffffff" stroke-width="0.5" opacity="0.4" />
-            <line x1="50" y1="50" x2="91.57" y2="26" stroke="#ffffff" stroke-width="0.5" opacity="0.4" />
-            <line x1="50" y1="50" x2="91.57" y2="74" stroke="#ffffff" stroke-width="0.5" opacity="0.4" />
-            <line x1="50" y1="50" x2="50" y2="98" stroke="#ffffff" stroke-width="0.5" opacity="0.4" />
-            <line x1="50" y1="50" x2="8.43" y2="74" stroke="#ffffff" stroke-width="0.5" opacity="0.4" />
-            <line x1="50" y1="50" x2="8.43" y2="26" stroke="#ffffff" stroke-width="0.5" opacity="0.4" />
+              <!-- Стеклянный блик -->
+              <path d="M50 0 A50 50 0 0 1 93.3 25 A50 50 0 0 1 50 50 A50 50 0 0 1 6.7 25 A50 50 0 0 1 50 0 Z" fill="rgba(255,255,255,0.05)" />
 
-            <!-- Стеклянный блик сверху (эффект объема) -->
-            <path d="M50 2 A48 48 0 0 1 91.57 26 A48 48 0 0 1 50 50 A48 48 0 0 1 8.43 26 A48 48 0 0 1 50 2 Z" fill="rgba(255,255,255,0.1)" />
+              <!-- Текст (идеально ровный) -->
+              <text x="50" y="22" transform="rotate(30 50 50)" fill="#fff" font-weight="900" font-size="11" filter="url(#glow)">x1.5</text>
+              <text x="50" y="78" transform="rotate(90 50 50)" fill="#8892b0" font-weight="900" font-size="11">x0</text>
+              <text x="50" y="78" transform="rotate(150 50 50)" fill="#fff" font-weight="900" font-size="11" filter="url(#glow)">x2.5</text>
+              <text x="50" y="22" transform="rotate(210 50 50)" fill="#8892b0" font-weight="900" font-size="11">x0</text>
+              <text x="50" y="22" transform="rotate(270 50 50)" fill="#fff" font-weight="900" font-size="11" filter="url(#glow)">x1.2</text>
+              <text x="50" y="78" transform="rotate(330 50 50)" fill="#8892b0" font-weight="900" font-size="11">x0</text>
 
-            <!-- Текст на колесе -->
-            <text x="50" y="24" transform="rotate(30 50 50)" fill="#fff" font-weight="900" font-size="10" filter="url(#glow)">x1.5</text>
-            <text x="50" y="24" transform="rotate(90 50 50)" fill="#8892b0" font-weight="900" font-size="10">x0</text>
-            <text x="50" y="24" transform="rotate(150 50 50)" fill="#fff" font-weight="900" font-size="10" filter="url(#glow)">x2.5</text>
-            <text x="50" y="24" transform="rotate(210 50 50)" fill="#8892b0" font-weight="900" font-size="10">x0</text>
-            <text x="50" y="24" transform="rotate(270 50 50)" fill="#fff" font-weight="900" font-size="10" filter="url(#glow)">x1.2</text>
-            <text x="50" y="24" transform="rotate(330 50 50)" fill="#8892b0" font-weight="900" font-size="10">x0</text>
-
-            <!-- Центральная кнопка (без надписи SPIN) -->
-            <circle cx="50" cy="50" r="10" fill="#0a1410" stroke="#00ff9d" stroke-width="1.5" filter="url(#glow)" />
-            <circle cx="50" cy="50" r="7" fill="url(#centerGrad)" />
-            <path d="M50 45 L52 49 L56 50 L52 51 L50 55 L48 51 L44 50 L48 49 Z" fill="#001a10" />
-          </svg>
+              <!-- Центр -->
+              <circle cx="50" cy="50" r="8" fill="#0a1410" stroke="#00ff9d" stroke-width="2" filter="url(#glow)" />
+              <circle cx="50" cy="50" r="5" fill="url(#centerGrad)" />
+            </svg>
+          </div>
         </div>
       </div>
       
@@ -425,13 +419,11 @@
     </div>
   </div>
 
-  <!-- ИСТОРИЯ -->
   <div class="page" id="page-history">
     <button class="back-btn" onclick="switchPage('profile')">← Назад в профиль</button>
     <div id="historyList"></div>
   </div>
 
-  <!-- ПРОФИЛЬ -->
   <div class="page" id="page-profile">
     <div class="title">Профиль <span>▸</span></div>
     <div class="profile-card">
@@ -473,6 +465,7 @@
     <div id="modalIcon"></div>
     <h3 id="modalTitle"></h3>
     <p id="modalText"></p>
+    <div id="modalContent"></div>
     <button class="modal-btn" id="modalBtn" onclick="closeModal()"></button>
     <div class="modal-brand-bottom">@GarisDrop_Bot</div>
   </div>
@@ -484,7 +477,6 @@
 // ==========================================
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 let audioCtx;
-
 document.body.addEventListener('click', () => {
   if (!audioCtx) audioCtx = new AudioContext();
   if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -1042,13 +1034,18 @@ function spinWheel() {
   const btn = document.getElementById('wheelSpinBtn');
   btn.disabled = true;
   
+  // Выбираем сектор (0-5)
   const targetSector = Math.floor(Math.random() * 6);
   const actualMult = WHEEL_MULTS[targetSector];
   
+  // Каждый сектор по 60 градусов. Центр целевого сектора = targetSector * 60 + 30.
+  // Нам нужно повернуть колесо так, чтобы этот центр оказался на 0 градусов (под стрелкой).
+  // Добавляем 5 полных оборотов (1800 градусов).
   const extraDegrees = 360 * 5;
   const targetAngle = extraDegrees + (360 - (targetSector * 60 + 30));
-  const jitter = (Math.random() - 0.5) * 40;
-  const finalRotation = wheelState.currentRotation + targetAngle + jitter;
+  
+  // БЕЗ JITTER! Чтобы стрелка указывала ровно в центр.
+  const finalRotation = wheelState.currentRotation + targetAngle;
   
   const wheel = document.getElementById('wheelSpinner');
   const startRotation = wheelState.currentRotation;
@@ -1060,11 +1057,13 @@ function spinWheel() {
     let elapsed = time - startTime;
     let progress = Math.min(elapsed / duration, 1);
     
+    // easeOutQuart
     let easeOut = 1 - Math.pow(1 - progress, 4);
     let currentRot = startRotation + (finalRotation - startRotation) * easeOut;
     
     wheel.style.transform = `rotate(${currentRot}deg)`;
     
+    // Звук треска при пересечении сектора
     let currentSector = Math.floor(currentRot / 60);
     if (currentSector !== lastSector) {
       SOUNDS.wheelTick();
@@ -1076,6 +1075,7 @@ function spinWheel() {
     } else {
       wheelState.currentRotation = finalRotation;
       
+      // Выдаем выигрыш
       if (actualMult > 0) {
         const winAmountStars = Math.floor(wheelState.bet * actualMult);
         STATE.balance += winAmountStars;
@@ -1097,44 +1097,82 @@ function spinWheel() {
   requestAnimationFrame(animateWheel);
 }
 
-/* ================= МОДАЛКИ И ПОПОЛНЕНИЕ ================= */
+/* ================= МОДАЛКИ И СИСТЕМА ЗАЯВОК ================= */
 function openDepositModal() {
+  const mask = document.getElementById('modalMask');
   const box = document.getElementById('modalBox');
   const icon = document.getElementById('modalIcon');
   const title = document.getElementById('modalTitle');
   const text = document.getElementById('modalText');
+  const content = document.getElementById('modalContent');
   const btn = document.getElementById('modalBtn');
-  const mask = document.getElementById('modalMask');
 
   box.className = 'modal'; icon.className = ''; icon.innerHTML = '💳';
   title.textContent = 'Пополнение';
+  text.innerHTML = 'Выберите удобный способ:';
   
-  text.innerHTML = `
-    <div style="margin-bottom:10px;">Выберите сумму в рублях:</div>
-    <div class="deposit-amounts" id="depositOptions">
-      <div class="dep-opt" onclick="processDeposit(50)">50 ₽</div>
-      <div class="dep-opt" onclick="processDeposit(250)">250 ₽</div>
-      <div class="dep-opt" onclick="processDeposit(500)">500 ₽</div>
-      <div class="dep-opt" onclick="processDeposit(1500)">1500 ₽</div>
-      <div class="dep-opt" style="grid-column: span 2" onclick="processDeposit(2500)">2500 ₽</div>
+  content.innerHTML = `
+    <div class="dep-method">
+      <div class="dep-option" onclick="showDepositForm('stars')">
+        <div class="icon">⭐</div>
+        <div class="text"><b>Telegram Stars</b><span>Мгновенно и безопасно</span></div>
+      </div>
+      <div class="dep-option" onclick="showDepositForm('card')">
+        <div class="icon">💳</div>
+        <div class="text"><b>Банковская карта / СБП</b><span>От 100 ₽</span></div>
+      </div>
     </div>
-    <div style="font-size:11px; color:var(--muted); margin-top:15px;">1 ⭐ = 1.5 ₽</div>
   `;
   
-  btn.className = 'modal-btn red'; btn.textContent = 'Отмена';
+  btn.className = 'modal-btn red'; btn.textContent = 'Закрыть';
+  btn.onclick = closeModal;
   mask.classList.add('show');
 }
 
-function processDeposit(amountRub) {
-  const starsToAdd = Math.floor(amountRub / STATE.rubRate);
-  STATE.balance += starsToAdd;
-  STATE.totalDepositedRub += amountRub;
-  updateUI(); closeModal();
+function showDepositForm(type) {
+  const text = document.getElementById('modalText');
+  const content = document.getElementById('modalContent');
+  const btn = document.getElementById('modalBtn');
   
-  setTimeout(() => {
-    const { current } = getLevelData(STATE.totalDepositedRub);
-    showWinModal(starsToAdd, '⭐', `Пополнение успешно! Твой уровень: ${current.lvl}`);
-  }, 300);
+  if (type === 'stars') {
+    text.innerHTML = 'Введите количество звезд:';
+    content.innerHTML = `
+      <div class="input-group">
+        <input type="number" id="depStarsInput" placeholder="Например: 100" min="1">
+      </div>
+      <p style="font-size:10px; color:var(--muted); margin-top:10px;">*В реальной версии тут откроется окно оплаты Telegram</p>
+    `;
+    btn.textContent = 'Оплатить Stars';
+    btn.onclick = () => {
+      const val = parseInt(document.getElementById('depStarsInput').value) || 0;
+      if (val > 0) {
+        STATE.balance += val;
+        STATE.totalDepositedRub += (val * STATE.rubRate); 
+        updateUI(); closeModal(); SOUNDS.win();
+        showWinModal(val, '⭐', 'Пополнение Stars');
+      }
+    };
+  } else {
+    text.innerHTML = 'Введите сумму в рублях (Демо):';
+    content.innerHTML = `
+      <div class="input-group">
+        <input type="number" id="depCardInput" placeholder="Например: 500" min="100">
+      </div>
+      <p style="font-size:10px; color:var(--muted); margin-top:10px;">*В реальной версии тут откроется платежная форма</p>
+    `;
+    btn.textContent = 'Оплатить картой';
+    btn.onclick = () => {
+      const rub = parseInt(document.getElementById('depCardInput').value) || 0;
+      if (rub >= 100) {
+        const starsToAdd = Math.floor(rub / STATE.rubRate);
+        STATE.balance += starsToAdd;
+        STATE.totalDepositedRub += rub;
+        updateUI(); closeModal(); SOUNDS.win();
+        showWinModal(starsToAdd, '⭐', `Пополнение на ${rub}₽`);
+      }
+    };
+  }
+  btn.className = 'modal-btn green';
 }
 
 function openWithdrawModal() {
@@ -1143,18 +1181,115 @@ function openWithdrawModal() {
   const icon = document.getElementById('modalIcon');
   const title = document.getElementById('modalTitle');
   const text = document.getElementById('modalText');
+  const content = document.getElementById('modalContent');
   const btn = document.getElementById('modalBtn');
+
+  box.className = 'modal'; icon.className = ''; icon.innerHTML = '💸';
+  title.textContent = 'Вывод средств';
   
   const { current } = getLevelData(STATE.totalDepositedRub);
   let commission = 5;
   if (current.lvl >= 4) commission = 0;
   else if (current.lvl >= 3) commission = 3;
 
-  box.className = 'modal'; icon.className = ''; icon.innerHTML = '';
-  title.textContent = 'Вывод';
-  text.innerHTML = `Комиссия на вывод: <b>${commission}%</b><br><br>Вывод на карту: мин. 1100₽<br>Вывод звезд: мин. 500⭐ (кратно 100)`;
-  btn.className = 'modal-btn green'; btn.textContent = 'Понятно';
+  text.innerHTML = `Ваша комиссия на вывод: <b>${commission}%</b>`;
+  
+  content.innerHTML = `
+    <div class="dep-method">
+      <div class="dep-option" onclick="showWithdrawForm('card', ${commission})">
+        <div class="icon">💳</div>
+        <div class="text"><b>На карту (Рубли)</b><span>Мин. 1100 ₽</span></div>
+      </div>
+      <div class="dep-option" onclick="showWithdrawForm('stars', 0)">
+        <div class="icon">⭐</div>
+        <div class="text"><b>Звёздами</b><span>Мин. 500 ⭐ (кратно 100)</span></div>
+      </div>
+    </div>
+  `;
+  
+  btn.className = 'modal-btn red'; btn.textContent = 'Отмена';
+  btn.onclick = closeModal;
   mask.classList.add('show');
+}
+
+function showWithdrawForm(type, commission) {
+  const text = document.getElementById('modalText');
+  const content = document.getElementById('modalContent');
+  const btn = document.getElementById('modalBtn');
+  const currentBalanceStars = STATE.balance;
+
+  if (type === 'card') {
+    text.innerHTML = `Введите сумму в рублях и номер карты:`;
+    content.innerHTML = `
+      <div class="input-group">
+        <label>Сумма (₽)</label>
+        <input type="number" id="wdCardAmount" placeholder="Мин. 1100" min="1100">
+      </div>
+      <div class="input-group">
+        <label>Номер карты</label>
+        <input type="text" id="wdCardNumber" placeholder="0000 0000 0000 0000" maxlength="19">
+      </div>
+      <p style="font-size:10px; color:var(--muted); margin-top:10px;">Комиссия ${commission}%. К выводу: <b id="wdPreview">0 ₽</b></p>
+    `;
+    btn.textContent = 'Создать заявку';
+    btn.className = 'modal-btn green';
+    
+    document.getElementById('wdCardAmount').addEventListener('input', (e) => {
+      const v = parseInt(e.target.value) || 0;
+      document.getElementById('wdPreview').textContent = Math.floor(v * ((100-commission)/100)) + ' ₽';
+    });
+
+    btn.onclick = () => {
+      const rub = parseInt(document.getElementById('wdCardAmount').value) || 0;
+      const card = document.getElementById('wdCardNumber').value;
+      const starsNeeded = Math.floor(rub / STATE.rubRate);
+
+      if (rub < 1100) return showLoseModal(false, 'Минимальная сумма вывода на карту — 1100 ₽');
+      if (card.length < 16) return showLoseModal(false, 'Введите корректный номер карты');
+      if (starsNeeded > currentBalanceStars) return showLoseModal(false, 'Недостаточно средств на балансе!');
+
+      STATE.balance -= starsNeeded;
+      updateUI(); closeModal(); SOUNDS.cashout();
+      
+      saveWithdrawRequest('Карта', rub, card);
+      
+      showWinModal(0, '💸', `Заявка на вывод ${rub} ₽ создана! Ожидайте обработки.`);
+      document.querySelector('.win-amount').style.display = 'none';
+    };
+  } else {
+    text.innerHTML = `Введите количество звезд для вывода:`;
+    content.innerHTML = `
+      <div class="input-group">
+        <label>Сумма (⭐)</label>
+        <input type="number" id="wdStarsAmount" placeholder="Мин. 500" min="500" step="100">
+      </div>
+      <p style="font-size:10px; color:var(--muted); margin-top:10px;">Сумма должна быть кратна 100.</p>
+    `;
+    btn.textContent = 'Создать заявку';
+    btn.className = 'modal-btn green';
+
+    btn.onclick = () => {
+      const stars = parseInt(document.getElementById('wdStarsAmount').value) || 0;
+
+      if (stars < 500) return showLoseModal(false, 'Минимальная сумма вывода — 500 ⭐');
+      if (stars % 100 !== 0) return showLoseModal(false, 'Сумма должна быть кратна 100');
+      if (stars > currentBalanceStars) return showLoseModal(false, 'Недостаточно средств на балансе!');
+
+      STATE.balance -= stars;
+      updateUI(); closeModal(); SOUNDS.cashout();
+      
+      saveWithdrawRequest('Звезды', stars, 'Telegram');
+      
+      showWinModal(0, '💸', `Заявка на вывод ${stars} ⭐ создана! Ожидайте обработки.`);
+      document.querySelector('.win-amount').style.display = 'none';
+    };
+  }
+}
+
+function saveWithdrawRequest(method, amount, target) {
+  let requests = JSON.parse(localStorage.getItem('garisDropWithdraws') || '[]');
+  requests.push({ userId: STATE.userId, method: method, amount: amount, target: target, date: new Date().toLocaleString() });
+  localStorage.setItem('garisDropWithdraws', JSON.stringify(requests));
 }
 
 function showLoseModal(isNearMiss, customText = '') {
@@ -1162,13 +1297,18 @@ function showLoseModal(isNearMiss, customText = '') {
   const icon = document.getElementById('modalIcon');
   const title = document.getElementById('modalTitle');
   const text = document.getElementById('modalText');
+  const content = document.getElementById('modalContent');
   const btn = document.getElementById('modalBtn');
   
   box.className = 'modal lose'; icon.className = 'icon-lose'; icon.innerHTML = '✕';
+  content.innerHTML = '';
+  
   if (customText) { title.textContent = 'Внимание!'; text.innerHTML = customText; }
   else if (isNearMiss) { title.textContent = 'Ух, почти!'; text.innerHTML = `На центральной линии не хватило всего одного символа!<br>Попробуйте еще раз!`; }
   else { title.textContent = 'Очень жаль...'; text.innerHTML = 'В этот раз не повезло.<br>Попробуйте еще раз!'; }
+  
   btn.className = 'modal-btn red'; btn.textContent = 'Закрыть';
+  btn.onclick = closeModal;
   document.getElementById('modalMask').classList.add('show');
 }
 
@@ -1177,18 +1317,21 @@ function showWinModal(displayAmount, currencySymbol, mult) {
   const icon = document.getElementById('modalIcon');
   const title = document.getElementById('modalTitle');
   const text = document.getElementById('modalText');
+  const content = document.getElementById('modalContent');
   const btn = document.getElementById('modalBtn');
   
   box.className = 'modal win'; icon.className = 'icon-win'; icon.innerHTML = '★';
   title.textContent = 'Поздравляем!';
+  content.innerHTML = '';
   
   if (typeof mult === 'string') {
-    text.innerHTML = `${mult}<span class="win-amount">+${displayAmount} ${currencySymbol}</span>`;
+    text.innerHTML = `${mult}<span class="win-amount">${displayAmount > 0 ? '+'+displayAmount : ''} ${displayAmount > 0 ? currencySymbol : ''}</span>`;
   } else {
     text.innerHTML = `Вы забрали выигрыш (x${mult})!<span class="win-amount">+${displayAmount} ${currencySymbol}</span>`;
   }
   
   btn.className = 'modal-btn green'; btn.textContent = 'Забрать';
+  btn.onclick = closeModal;
   document.getElementById('modalMask').classList.add('show');
 }
 
