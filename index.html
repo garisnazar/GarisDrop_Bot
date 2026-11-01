@@ -10,10 +10,10 @@
 
   :root{
     --neon:#00ff9d;
-    --bg:#000;
+    --bg:#050505;
     --card:#0a1410;
     --card2:#0f1f18;
-    --border:rgba(0,255,157,.18);
+    --border:rgba(0,255,157,.15);
     --text:#e6fff5;
     --muted:#5f8a78;
     --red:#ff4d6d;
@@ -26,11 +26,11 @@
   /* ===== ФОН ===== */
   #bg{
     position:fixed; inset:0; z-index:0; overflow:hidden;
-    background: radial-gradient(circle at 20% 15%, rgba(0,255,157,.10), transparent 42%), radial-gradient(circle at 85% 75%, rgba(92,191,74,.08), transparent 45%), #000;
+    background: radial-gradient(circle at 20% 15%, rgba(0,255,157,.08), transparent 40%), radial-gradient(circle at 85% 75%, rgba(92,191,74,.06), transparent 45%), #000;
   }
-  #bg::before{ content:""; position:absolute; inset:-50%; background-image:radial-gradient(var(--neon) 1.6px, transparent 1.6px); background-size:38px 38px; opacity:.28; animation: drift 24s linear infinite; }
-  #bg::after{ content:""; position:absolute; inset:-50%; background-image:radial-gradient(var(--neon) 1.2px, transparent 1.2px); background-size:22px 22px; opacity:.12; animation: drift2 40s linear infinite reverse; }
-  @keyframes drift{ to{ transform:translate(38px,38px);} } @keyframes drift2{ to{ transform:translate(-22px,22px);} }
+  #bg::before{ content:""; position:absolute; inset:-50%; background-image:radial-gradient(var(--neon) 1.5px, transparent 1.5px); background-size:36px 36px; opacity:.2; animation: drift 24s linear infinite; }
+  #bg::after{ content:""; position:absolute; inset:-50%; background-image:radial-gradient(var(--neon) 1px, transparent 1px); background-size:20px 20px; opacity:.1; animation: drift2 40s linear infinite reverse; }
+  @keyframes drift{ to{ transform:translate(36px,36px);} } @keyframes drift2{ to{ transform:translate(-20px,20px);} }
 
   /* ===== ЛОАДЕР ===== */
   .loader-overlay { position: fixed; inset: 0; z-index: 999; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
@@ -54,34 +54,35 @@
   .currency-switch-btn:active { transform: scale(0.9); }
   .currency-label { position: absolute; bottom: -13px; font-size: 7px; color: var(--muted); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; pointer-events: none; }
 
-  .balance-pill{ background:var(--card); border:1px solid var(--border); height: 32px; padding: 0 10px; border-radius:999px; font-size:15px; font-weight:900; color:var(--neon); display:flex; align-items:center; gap:4px; box-shadow: 0 0 10px rgba(0,255,157,0.1); max-width: 110px; overflow: hidden; }
+  .balance-pill{ background:var(--card); border:1px solid var(--border); height: 32px; padding: 0 10px; border-radius:999px; font-size:15px; font-weight:900; color:var(--neon); display:flex; align-items:center; gap:4px; box-shadow: 0 0 10px rgba(0,255,157,0.1); max-width: 110px; overflow: hidden; transition: all 0.2s;}
+  .balance-pill.update { transform: scale(1.1); box-shadow: 0 0 20px rgba(0,255,157,0.5); }
+  
+  .sound-toggle { background: none; border: none; font-size: 16px; cursor: pointer; color: var(--muted); transition: color 0.2s; padding: 0 4px;}
+  .sound-toggle.active { color: var(--neon); }
 
   /* ===== PAGES ===== */
   .page{ flex:1; min-height: 0; overflow-y:auto; display:none; flex-direction: column; padding-bottom:12px; color: var(--text); }
-  .page.active{ display:flex; }
-  .title{ font-size:22px; font-weight:900; margin-bottom:10px; flex-shrink: 0; }
+  .page.active{ display:flex; animation: fadeIn 0.3s ease;}
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+  .title{ font-size:22px; font-weight:900; margin-bottom:12px; flex-shrink: 0; }
   .title span{ color:var(--neon); }
 
-  .back-btn { background: var(--card2); border: 1px solid var(--border); color: var(--neon); padding: 12px 18px; border-radius: 16px; font-size: 15px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; margin-bottom: 16px; width: fit-content; transition: transform 0.1s; }
+  .back-btn { background: var(--card2); border: 1px solid var(--border); color: var(--neon); padding: 10px 16px; border-radius: 14px; font-size: 14px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; margin-bottom: 16px; width: fit-content; transition: transform 0.1s; }
   .back-btn:active { transform: scale(0.95); }
 
   /* ===== ЛЕНТА ===== */
-  .live-wins-bar { background: rgba(0,255,157,0.05); border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; font-size: 13px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; white-space: nowrap; position: relative; color: var(--neon); text-shadow: 0 0 8px rgba(0,255,157,0.3);}
-  .live-wins-bar span { display: inline-block; animation: slide 10s linear infinite; padding-left: 100%; }
+  .live-wins-bar { background: rgba(0,255,157,0.05); border: 1px solid var(--border); border-radius: 12px; padding: 8px 12px; font-size: 12px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; white-space: nowrap; position: relative; color: var(--neon); text-shadow: 0 0 8px rgba(0,255,157,0.3); overflow: hidden;}
+  .live-wins-bar span { display: inline-block; animation: slide 12s linear infinite; padding-left: 100%; }
   @keyframes slide { 0% { transform: translateX(0); } 100% { transform: translateX(-150%); } }
 
   /* ===== GAMES GRID ===== */
   .games-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; align-content: start; }
-  .game-card{ position:relative; background:var(--card2); border:1px solid var(--border); border-radius:22px; padding:18px 14px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; cursor:pointer; transition: transform 0.1s; min-height: 130px; }
-  .game-card:active{ transform:scale(.96); }
+  .game-card{ position:relative; background:var(--card2); border:1px solid var(--border); border-radius:22px; padding:18px 14px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; cursor:pointer; transition: all 0.2s; min-height: 130px; }
+  .game-card:active{ transform:scale(.96); border-color: var(--neon);}
   
   .game-icon {
-    width: 64px;
-    height: 64px;
-    object-fit: cover;
-    border-radius: 18px;
-    border: 2px solid var(--border);
-    box-shadow: 0 0 15px rgba(0,255,157,0.25);
+    width: 64px; height: 64px; object-fit: cover; border-radius: 18px;
+    border: 2px solid var(--border); box-shadow: 0 0 15px rgba(0,255,157,0.25);
     margin-bottom: 5px;
   }
 
@@ -97,8 +98,8 @@
 
   .slots-wrapper { position: relative; width: 100%; max-width: 400px; padding: 0 20px; }
   .slots{ display:grid; grid-template-columns: repeat(var(--cols, 3), 1fr); gap:8px; width:100%; background:var(--card); border:1px solid var(--border); border-radius:24px; padding:14px; box-shadow: 0 0 30px rgba(0,255,157,0.05); position: relative; overflow: hidden; }
-  .slots::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 33.33%; background: linear-gradient(to bottom, rgba(0,0,0,0.75), transparent); pointer-events: none; z-index: 2; border-radius: 24px 24px 0 0; }
-  .slots::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 33.33%; background: linear-gradient(to top, rgba(0,0,0,0.75), transparent); pointer-events: none; z-index: 2; border-radius: 0 0 24px 24px; }
+  .slots::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 33.33%; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); pointer-events: none; z-index: 2; border-radius: 24px 24px 0 0; }
+  .slots::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 33.33%; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); pointer-events: none; z-index: 2; border-radius: 0 0 24px 24px; }
 
   .win-line-top, .win-line-bottom { position: absolute; left: 10px; right: 10px; height: 2px; background: rgba(255, 77, 109, 0.6); box-shadow: 0 0 10px rgba(255, 77, 109, 0.8); z-index: 3; pointer-events: none; }
   .win-line-top { top: 33.33%; transform: translateY(-50%); }
@@ -133,11 +134,11 @@
   .wheel-container { position: relative; width: 100%; max-width: 340px; margin: 20px auto; display: flex; justify-content: center; align-items: center; aspect-ratio: 1; }
   
   .wheel-pointer { 
-    position: absolute; top: -15px; left: 50%; transform: translateX(-50%); 
+    position: absolute; top: -12px; left: 50%; transform: translateX(-50%); 
     width: 0; height: 0; 
-    border-left: 15px solid transparent; 
-    border-right: 15px solid transparent; 
-    border-top: 25px solid var(--red); 
+    border-left: 12px solid transparent; 
+    border-right: 12px solid transparent; 
+    border-top: 20px solid var(--red); 
     z-index: 10; 
     filter: drop-shadow(0 4px 6px rgba(0,0,0,0.9)) drop-shadow(0 0 15px rgba(255,77,109,1));
   }
@@ -147,13 +148,13 @@
     border-radius: 50%;
     padding: 8px;
     background: linear-gradient(135deg, #2a3c34, #050d0a);
-    box-shadow: 0 0 50px rgba(0,255,157,0.2), inset 0 0 20px rgba(0,0,0,1), 0 10px 40px rgba(0,0,0,0.9);
+    box-shadow: 0 0 50px rgba(0,255,157,0.15), inset 0 0 20px rgba(0,0,0,1), 0 10px 40px rgba(0,0,0,0.9);
     position: relative;
   }
   .wheel-rim::after {
     content: ''; position: absolute; inset: 4px; border-radius: 50%;
-    border: 2px solid rgba(0, 255, 157, 0.5);
-    box-shadow: inset 0 0 15px rgba(0, 255, 157, 0.3);
+    border: 2px solid rgba(0, 255, 157, 0.4);
+    box-shadow: inset 0 0 15px rgba(0, 255, 157, 0.2);
     pointer-events: none;
   }
 
@@ -177,11 +178,12 @@
     pointer-events: none;
   }
 
+  /* Идеальное позиционирование текста */
   .wheel-text {
     position: absolute; top: 50%; left: 50%;
     font-size: 14px; font-weight: 900; font-family: sans-serif;
-    margin-top: -7px; margin-left: -15px; /* Центрирование */
-    width: 30px; text-align: center;
+    width: 40px; height: 20px; line-height: 20px; text-align: center;
+    margin-top: -10px; margin-left: -20px;
   }
 
   /* Блок ввода ставки */
@@ -230,15 +232,15 @@
   .bonus-btn:disabled { background: var(--card); color: var(--muted); box-shadow: none; cursor: not-allowed; }
 
   /* ===== NAV ===== */
-  .nav{ position:fixed; left:12px; right:12px; bottom:calc(12px + env(safe-area-inset-bottom)); background:rgba(8,20,16,.85); border:1px solid var(--border); border-radius:24px; display:flex; padding:8px; z-index:10; backdrop-filter: blur(10px); }
+  .nav{ position:fixed; left:12px; right:12px; bottom:calc(12px + env(safe-area-inset-bottom)); background:rgba(8,20,16,.7); border:1px solid var(--border); border-radius:24px; display:flex; padding:8px; z-index:10; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); box-shadow: 0 10px 30px rgba(0,0,0,0.5);}
   .nav-btn{ flex:1; padding:12px 5px; border-radius:18px; border:none; background:transparent; color:var(--muted); font-weight:800; cursor:pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12px;}
   .nav-btn.active{ background:rgba(0,255,157,.15); color:var(--neon); }
 
   /* ===== МОДАЛЬНЫЕ ОКНА ===== */
-  .modal-mask{ position:fixed; inset:0; z-index:50; display:none; background:rgba(0,0,0,.7); align-items:center; justify-content:center; backdrop-filter: blur(5px); }
+  .modal-mask{ position:fixed; inset:0; z-index:50; display:none; background:rgba(0,0,0,.8); align-items:center; justify-content:center; backdrop-filter: blur(5px); }
   .modal-mask.show{ display:flex; }
-  .modal{ width:90%; max-width:340px; background:var(--card2); border-radius:28px; padding:25px 20px; position:relative; text-align:center; box-shadow: 0 10px 40px rgba(0,0,0,0.5); animation: popIn 0.3s; display: flex; flex-direction: column; align-items: center; }
-  @keyframes popIn { from { transform: scale(0.9); } to { transform: scale(1); } }
+  .modal{ width:90%; max-width:340px; background:linear-gradient(160deg, var(--card2), #050d0a); border-radius:28px; padding:25px 20px; position:relative; text-align:center; box-shadow: 0 20px 50px rgba(0,0,0,0.8); animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; align-items: center; }
+  @keyframes popIn { from { transform: scale(0.8); opacity: 0;} to { transform: scale(1); opacity: 1;} }
   .modal-brand-top { font-size: 22px; font-weight: 900; color: var(--neon); margin-bottom: 20px; text-transform: uppercase; text-shadow: 0 0 10px rgba(0,255,157,0.4); }
   .modal-brand-bottom { font-size: 12px; font-weight: 700; color: var(--muted); margin-top: 20px; }
   .modal.lose { border: 1px solid rgba(255, 77, 109, 0.4); } .icon-lose { font-size: 46px; color: var(--red); margin-bottom: 10px; }
@@ -261,12 +263,19 @@
   .input-group label { font-size: 12px; color: var(--muted); }
   .input-group input { width: 100%; padding: 14px; background: var(--card); border: 1px solid var(--border); border-radius: 14px; color: white; font-size: 16px; font-weight: bold; outline: none; }
   .input-group input:focus { border-color: var(--neon); }
+
+  /* ===== TOAST ===== */
+  #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+  .toast { background: rgba(0, 255, 157, 0.9); color: #000; padding: 10px 20px; border-radius: 20px; font-weight: 900; font-size: 14px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); animation: slideDown 0.3s ease, fadeOut 0.3s ease 2.7s forwards; }
+  @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
 </style>
 </head>
 <body>
 
 <div id="loader" class="loader-overlay"><div class="spinner"></div></div>
 <div id="bg"></div>
+<div id="toast-container"></div>
 
 <div id="app">
   <div class="header">
@@ -282,6 +291,7 @@
       <div class="balance-pill" id="balancePillHeader">
         <span id="currencyIcon">⭐</span> <span id="balanceTop">0</span>
       </div>
+      <button class="sound-toggle active" id="soundBtn" onclick="toggleSound()">🔊</button>
     </div>
   </div>
 
@@ -305,7 +315,7 @@
         <div class="tag">Играй и забирай</div>
       </div>
       <div class="game-card" onclick="openGame('wheel')">
-        <div class="emoji">🎡</div>
+        <div class="emoji" style="font-size: 50px;">🎡</div>
         <div class="name">Колесо</div>
         <div class="tag">Фортуна</div>
       </div>
@@ -465,8 +475,9 @@
 
 <script>
 // ==========================================
-// СИСТЕМА ЗВУКОВ
+// ЗВУКИ И УВЕДОМЛЕНИЯ
 // ==========================================
+let soundEnabled = true;
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 let audioCtx;
 document.body.addEventListener('click', () => {
@@ -474,15 +485,31 @@ document.body.addEventListener('click', () => {
   if (audioCtx.state === 'suspended') audioCtx.resume();
 }, { once: true });
 
+function toggleSound() {
+  soundEnabled = !soundEnabled;
+  const btn = document.getElementById('soundBtn');
+  btn.textContent = soundEnabled ? '🔊' : '🔇';
+  btn.className = soundEnabled ? 'sound-toggle active' : 'sound-toggle';
+}
+
+function showToast(text) {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.textContent = text;
+  container.appendChild(toast);
+  setTimeout(() => { toast.remove(); }, 3000);
+}
+
 function playTone(freq, type, duration, vol = 0.03) {
-  if (!audioCtx) return;
+  if (!audioCtx || !soundEnabled) return;
   const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
   osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
   gain.gain.setValueAtTime(vol, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
   osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + duration);
 }
 function playNoise(duration, vol = 0.05) {
-  if (!audioCtx) return;
+  if (!audioCtx || !soundEnabled) return;
   const bufferSize = audioCtx.sampleRate * duration; const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
   const data = buffer.getChannelData(0); for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
   const noise = audioCtx.createBufferSource(); noise.buffer = buffer;
@@ -507,7 +534,7 @@ document.querySelectorAll('button, .game-card, .nav-btn, .currency-switch-btn, .
 });
 
 // ==========================================
-// УРОВНИ И ID
+// ДАННЫЕ И СОСТОЯНИЕ
 // ==========================================
 const LEVELS = [
   { lvl: 0, reqRub: 0, frame: '', bonusText: 'Пополни на 50₽ для получения 1 уровня.' },
@@ -526,9 +553,6 @@ function getLevelData(totalDepositedRub) {
   return { current, next };
 }
 
-// ==========================================
-// ЛОГИКА ПРИЛОЖЕНИЯ
-// ==========================================
 const SYMBOLS = ['🍌','🎰','💎','🍒','⭐'];
 
 let STATE = {
@@ -563,6 +587,12 @@ function formatMoney(starsAmount) {
   return amount.toLocaleString('ru-RU');
 }
 function getCurrencyIcon() { return STATE.currency === 'rub' ? '₽' : '⭐'; }
+
+function animateBalance() {
+  const el = document.getElementById('balancePillHeader');
+  el.classList.add('update');
+  setTimeout(() => el.classList.remove('update'), 200);
+}
 
 function updateUI() {
   const displayBalance = formatMoney(STATE.balance);
@@ -639,7 +669,7 @@ function claimDaily() {
   const now = Date.now();
   if (now - STATE.lastDaily < 24 * 60 * 60 * 1000) return;
   STATE.balance += 50; STATE.lastDaily = now;
-  updateUI(); SOUNDS.win();
+  updateUI(); SOUNDS.win(); animateBalance();
   showWinModal(50, '⭐', 'Ежедневный бонус!');
 }
 
@@ -684,6 +714,7 @@ function openComingSoon() { showLoseModal(false, 'Эта функция появ
 function toggleCurrency() {
   STATE.currency = STATE.currency === 'stars' ? 'rub' : 'stars';
   updateUI(); renderHistory();
+  showToast(`Валюта изменена на ${STATE.currency === 'rub' ? 'Рубли' : 'Звезды'}`);
   const btn = document.querySelector('.currency-switch-btn');
   btn.style.transform = 'scale(0.8)';
   setTimeout(() => { btn.style.transform = 'scale(1)'; }, 150);
@@ -789,7 +820,7 @@ function spinSlots() {
   }
 
   STATE.balance -= slotState.bet; 
-  updateUI(); lockSlotControls(true);
+  updateUI(); lockSlotControls(true); animateBalance();
   
   const cells = document.querySelectorAll('#slots .cell');
   cells.forEach(c => c.classList.remove('win'));
@@ -851,7 +882,7 @@ function spinSlots() {
             STATE.balance += winAmountStars; 
             addHistory('Слоты', slotState.bet, winAmountStars);
             for(let c=0; c<mode.cols; c++) cells[WIN_LINE * mode.cols + c].classList.add('win');
-            SOUNDS.win();
+            SOUNDS.win(); animateBalance();
             showWinModal(formatMoney(winAmountStars), getCurrencyIcon(), mode.mult);
           } else {
             addHistory('Слоты', slotState.bet, 0);
@@ -925,7 +956,7 @@ function validateMineBetInput() {
 
 function startMines() {
   if (mineState.active || STATE.balance < mineState.bet) return;
-  STATE.balance -= mineState.bet; updateUI();
+  STATE.balance -= mineState.bet; updateUI(); animateBalance();
   mineState.active = true; mineState.opened = 0; mineState.currentMult = 1.0;
   
   let stepsPool;
@@ -985,7 +1016,7 @@ function cashoutMines() {
   const winAmountStars = Math.floor(mineState.bet * mineState.currentMult);
   STATE.balance += winAmountStars; 
   addHistory('Майнер', mineState.bet, winAmountStars);
-  updateUI();
+  updateUI(); animateBalance();
   mineState.active = false;
   
   document.getElementById('mineCashoutBtn').classList.remove('show');
@@ -1000,8 +1031,6 @@ function cashoutMines() {
 
 /* ================= КОЛЕСО (CSS) ================= */
 let wheelState = { bet: 10, spinning: false, currentRotation: 0 };
-// Множители соответствуют секторам 0-5 (по часовой стрелке от верхнего):
-// 0: x1.2, 1: x0, 2: x1.5, 3: x0, 4: x2.5, 5: x0
 const WHEEL_MULTS = [1.2, 0, 1.5, 0, 2.5, 0];
 
 function resetWheel() {
@@ -1035,7 +1064,7 @@ function spinWheel() {
   if (wheelState.spinning || STATE.balance < wheelState.bet) return;
   wheelState.spinning = true;
   STATE.balance -= wheelState.bet;
-  updateUI();
+  updateUI(); animateBalance();
   
   const btn = document.getElementById('wheelSpinBtn');
   btn.disabled = true;
@@ -1057,8 +1086,6 @@ function spinWheel() {
   const actualMult = WHEEL_MULTS[targetSector];
   
   const extraDegrees = 360 * 5;
-  // Центр сектора targetSector находится под углом (targetSector * 60 + 30).
-  // Чтобы он оказался на 0 градусах (под стрелкой), нужно вычесть этот угол.
   const targetAngle = extraDegrees + (360 - (targetSector * 60 + 30));
   const finalRotation = wheelState.currentRotation + targetAngle;
   
@@ -1092,7 +1119,7 @@ function spinWheel() {
         const winAmountStars = Math.floor(wheelState.bet * actualMult);
         STATE.balance += winAmountStars;
         addHistory('Колесо', wheelState.bet, winAmountStars);
-        SOUNDS.win();
+        SOUNDS.win(); animateBalance();
         showWinModal(formatMoney(winAmountStars), getCurrencyIcon(), actualMult);
       } else {
         addHistory('Колесо', wheelState.bet, 0);
@@ -1159,7 +1186,7 @@ function showDepositForm(type) {
       if (val > 0) {
         STATE.balance += val;
         STATE.totalDepositedRub += (val * STATE.rubRate); 
-        updateUI(); closeModal(); SOUNDS.win();
+        updateUI(); animateBalance(); closeModal(); SOUNDS.win();
         showWinModal(val, '⭐', 'Пополнение Stars');
       }
     };
@@ -1177,7 +1204,7 @@ function showDepositForm(type) {
         const starsToAdd = Math.floor(rub / STATE.rubRate);
         STATE.balance += starsToAdd;
         STATE.totalDepositedRub += rub;
-        updateUI(); closeModal(); SOUNDS.win();
+        updateUI(); animateBalance(); closeModal(); SOUNDS.win();
         showWinModal(starsToAdd, '⭐', `Пополнение на ${rub}₽`);
       }
     };
@@ -1259,7 +1286,7 @@ function showWithdrawForm(type, commission) {
       if (starsNeeded > currentBalanceStars) return showLoseModal(false, 'Недостаточно средств на балансе!');
 
       STATE.balance -= starsNeeded;
-      updateUI(); closeModal(); SOUNDS.cashout();
+      updateUI(); animateBalance(); closeModal(); SOUNDS.cashout();
       
       saveWithdrawRequest('Карта', rub, card);
       
@@ -1286,7 +1313,7 @@ function showWithdrawForm(type, commission) {
       if (stars > currentBalanceStars) return showLoseModal(false, 'Недостаточно средств на балансе!');
 
       STATE.balance -= stars;
-      updateUI(); closeModal(); SOUNDS.cashout();
+      updateUI(); animateBalance(); closeModal(); SOUNDS.cashout();
       
       saveWithdrawRequest('Звезды', stars, 'Telegram');
       
