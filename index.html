@@ -49,7 +49,6 @@
   .deposit-btn-large { background: linear-gradient(135deg, #00ff9d, #5cbf4a); border: none; color: #001a10; height: 36px; padding: 0 12px; border-radius: 999px; font-size: 12px; font-weight: 900; cursor: pointer; box-shadow: 0 0 15px rgba(0,255,157,0.4); display: flex; align-items: center; justify-content: center; transition: transform 0.1s; white-space: nowrap;}
   .deposit-btn-large:active { transform: scale(0.9); }
 
-  /* Идеальное выравнивание */
   .currency-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 36px; position: relative; }
   .currency-switch-btn { background: var(--card); border: 1px solid var(--border); color: var(--neon); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 900; cursor: pointer; transition: transform 0.1s; }
   .currency-switch-btn:active { transform: scale(0.9); }
@@ -73,9 +72,20 @@
 
   /* ===== GAMES GRID ===== */
   .games-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; align-content: start; }
-  .game-card{ position:relative; background:var(--card2); border:1px solid var(--border); border-radius:22px; padding:18px 14px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; cursor:pointer; transition: transform 0.1s; min-height: 120px; }
+  .game-card{ position:relative; background:var(--card2); border:1px solid var(--border); border-radius:22px; padding:18px 14px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; cursor:pointer; transition: transform 0.1s; min-height: 130px; }
   .game-card:active{ transform:scale(.96); }
-  .game-card .emoji{ font-size:38px; }
+  
+  /* Стиль для новых картинок */
+  .game-icon {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: 18px;
+    border: 2px solid var(--border);
+    box-shadow: 0 0 15px rgba(0,255,157,0.25);
+    margin-bottom: 5px;
+  }
+
   .game-card .name{ font-size:15px; font-weight:900; text-align: center; }
   .game-card .tag{ font-size:10px; color:var(--muted); text-align: center; }
   .game-card .nft-badge{ position:absolute; top:8px; right:8px; font-size:8px; font-weight:900; padding:3px 7px; border-radius:999px; background:var(--neon); color:#001a10; }
@@ -265,19 +275,22 @@
     
     <div class="title">Игры <span>▸</span></div>
     <div class="games-grid">
-      <!-- ОБНОВЛЕННАЯ КАРТОЧКА СЛОТОВ -->
+      <!-- Карточка Слоты -->
       <div class="game-card" onclick="openGame('slots')">
         <div class="nft-badge">HOT</div>
-        <img src="https://i.ibb.co/MD04bpxG/1793517333251.png" alt="Слоты" style="width: 52px; height: 52px; object-fit: contain; filter: drop-shadow(0 0 10px rgba(0,255,157,0.6));">
+        <img src="https://i.ibb.co/MD04bpxG/1793517333251.png" alt="Слоты" class="game-icon">
         <div class="name">Слоты</div>
         <div class="tag">3 режима</div>
       </div>
+      
+      <!-- Карточка Майнер (с новой картинкой) -->
       <div class="game-card" onclick="openGame('mines')">
         <div class="nft-badge" style="background:var(--yellow); color:#000;">NEW</div>
-        <div class="emoji">💣💎</div>
+        <img src="https://i.ibb.co/F47cLDmZ/image.png" alt="Майнер" class="game-icon">
         <div class="name">Майнер</div>
         <div class="tag">Играй и забирай</div>
       </div>
+
       <div class="game-card" onclick="openGame('wheel')">
         <div class="emoji">🎡</div>
         <div class="name">Колесо</div>
@@ -362,20 +375,13 @@
               <circle cx="50" cy="50" r="50" fill="#050d0a" />
               <circle cx="50" cy="50" r="47" fill="none" stroke="#00ff9d" stroke-width="1.5" stroke-dasharray="1 4" opacity="0.6" />
 
-              <!-- Сектор 0: x1.5 (Зеленый) -->
               <path d="M50 50 L50 0 A50 50 0 0 1 93.3 25 Z" fill="#00ff9d" stroke="#00ff9d" stroke-width="0.5" />
-              <!-- Сектор 1: x0 (Темный) -->
               <path d="M50 50 L93.3 25 A50 50 0 0 1 93.3 75 Z" fill="#0f172a" stroke="#0f172a" stroke-width="0.5" />
-              <!-- Сектор 2: x2.5 (Золотой) -->
               <path d="M50 50 L93.3 75 A50 50 0 0 1 50 100 Z" fill="#ffd700" stroke="#ffd700" stroke-width="0.5" />
-              <!-- Сектор 3: x0 (Темный) -->
               <path d="M50 50 L50 100 A50 50 0 0 1 6.7 75 Z" fill="#0f172a" stroke="#0f172a" stroke-width="0.5" />
-              <!-- Сектор 4: x1.2 (Фиолетовый) -->
               <path d="M50 50 L6.7 75 A50 50 0 0 1 6.7 25 Z" fill="#a855f7" stroke="#a855f7" stroke-width="0.5" />
-              <!-- Сектор 5: x0 (Темный) -->
               <path d="M50 50 L6.7 25 A50 50 0 0 1 50 0 Z" fill="#0f172a" stroke="#0f172a" stroke-width="0.5" />
 
-              <!-- Разделители -->
               <line x1="50" y1="50" x2="50" y2="0" stroke="rgba(255,255,255,0.2)" stroke-width="0.5" />
               <line x1="50" y1="50" x2="93.3" y2="25" stroke="rgba(255,255,255,0.2)" stroke-width="0.5" />
               <line x1="50" y1="50" x2="93.3" y2="75" stroke="rgba(255,255,255,0.2)" stroke-width="0.5" />
