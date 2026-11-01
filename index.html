@@ -120,7 +120,7 @@
   .cashout-btn { width: 100%; max-width: 340px; padding: 16px; border-radius: 20px; font-size: 17px; font-weight: 900; color: #001a10; background: linear-gradient(135deg, #00ff9d, #5cbf4a); border: none; cursor: pointer; transition: all 0.2s; box-shadow: 0 5px 15px rgba(0,255,157,0.3); display: none; margin-top: 10px; }
   .cashout-btn.show { display: block; } .cashout-btn:active { transform: scale(0.97); }
 
-  /* ===== WHEEL (ПРЕМИАЛЬНОЕ) ===== */
+  /* ===== WHEEL (АБСОЛЮТНО НАДЕЖНОЕ) ===== */
   .wheel-container { position: relative; width: 100%; max-width: 340px; margin: 20px auto; display: flex; justify-content: center; align-items: center; aspect-ratio: 1; }
   
   .wheel-pointer { 
@@ -138,13 +138,9 @@
     border-radius: 50%;
     padding: 8px;
     background: linear-gradient(135deg, #2a3c34, #050d0a);
-    box-shadow: 
-      0 0 50px rgba(0,255,157,0.2),
-      inset 0 0 20px rgba(0,0,0,1),
-      0 10px 40px rgba(0,0,0,0.9);
+    box-shadow: 0 0 50px rgba(0,255,157,0.2), inset 0 0 20px rgba(0,0,0,1), 0 10px 40px rgba(0,0,0,0.9);
     position: relative;
   }
-
   .wheel-rim::after {
     content: ''; position: absolute; inset: 4px; border-radius: 50%;
     border: 2px solid rgba(0, 255, 157, 0.5);
@@ -160,7 +156,6 @@
   }
 
   .wheel-svg { width: 100%; height: 100%; display: block; }
-  .wheel-text { font-size: 11px; font-weight: 900; font-family: sans-serif; text-anchor: middle; dominant-baseline: middle; }
 
   /* Блок ввода ставки */
   .bet-row{ display:flex; align-items:center; gap:10px; margin-top: 10px; z-index: 10; justify-content: center; width: 100%; }
@@ -375,13 +370,38 @@
               <circle cx="50" cy="50" r="50" fill="#050d0a" />
               <circle cx="50" cy="50" r="47" fill="none" stroke="#00ff9d" stroke-width="1.5" stroke-dasharray="1 4" opacity="0.6" />
 
-              <path d="M50 50 L50 0 A50 50 0 0 1 93.3 25 Z" fill="url(#gradGreen)" />
-              <path d="M50 50 L93.3 25 A50 50 0 0 1 93.3 75 Z" fill="url(#gradDark)" />
-              <path d="M50 50 L93.3 75 A50 50 0 0 1 50 100 Z" fill="url(#gradGold)" />
-              <path d="M50 50 L50 100 A50 50 0 0 1 6.7 75 Z" fill="url(#gradDark)" />
-              <path d="M50 50 L6.7 75 A50 50 0 0 1 6.7 25 Z" fill="url(#gradPurple)" />
-              <path d="M50 50 L6.7 25 A50 50 0 0 1 50 0 Z" fill="url(#gradDark)" />
+              <!-- Сектор 0: x1.5 (Зеленый) -->
+              <g transform="rotate(30 50 50)">
+                <path d="M50 50 L50 0 A50 50 0 0 1 93.3 25 Z" fill="url(#gradGreen)" />
+                <text x="50" y="18" fill="#fff" font-weight="900" font-size="11" text-anchor="middle" dominant-baseline="middle">x1.5</text>
+              </g>
+              <!-- Сектор 1: x0 (Темный) -->
+              <g transform="rotate(90 50 50)">
+                <path d="M50 50 L93.3 25 A50 50 0 0 1 93.3 75 Z" fill="url(#gradDark)" />
+                <text x="50" y="18" fill="#8892b0" font-weight="900" font-size="11" text-anchor="middle" dominant-baseline="middle">x0</text>
+              </g>
+              <!-- Сектор 2: x2.5 (Золотой) -->
+              <g transform="rotate(150 50 50)">
+                <path d="M50 50 L93.3 75 A50 50 0 0 1 50 100 Z" fill="url(#gradGold)" />
+                <text x="50" y="18" fill="#fff" font-weight="900" font-size="11" text-anchor="middle" dominant-baseline="middle" transform="rotate(180 50 18)">x2.5</text>
+              </g>
+              <!-- Сектор 3: x0 (Темный) -->
+              <g transform="rotate(210 50 50)">
+                <path d="M50 50 L50 100 A50 50 0 0 1 6.7 75 Z" fill="url(#gradDark)" />
+                <text x="50" y="18" fill="#8892b0" font-weight="900" font-size="11" text-anchor="middle" dominant-baseline="middle" transform="rotate(180 50 18)">x0</text>
+              </g>
+              <!-- Сектор 4: x1.2 (Фиолетовый) -->
+              <g transform="rotate(270 50 50)">
+                <path d="M50 50 L6.7 75 A50 50 0 0 1 6.7 25 Z" fill="url(#gradPurple)" />
+                <text x="50" y="18" fill="#fff" font-weight="900" font-size="11" text-anchor="middle" dominant-baseline="middle">x1.2</text>
+              </g>
+              <!-- Сектор 5: x0 (Темный) -->
+              <g transform="rotate(330 50 50)">
+                <path d="M50 50 L6.7 25 A50 50 0 0 1 50 0 Z" fill="url(#gradDark)" />
+                <text x="50" y="18" fill="#8892b0" font-weight="900" font-size="11" text-anchor="middle" dominant-baseline="middle">x0</text>
+              </g>
 
+              <!-- Разделители секторов -->
               <line x1="50" y1="50" x2="50" y2="0" stroke="#fff" stroke-width="0.5" opacity="0.3" />
               <line x1="50" y1="50" x2="93.3" y2="25" stroke="#fff" stroke-width="0.5" opacity="0.3" />
               <line x1="50" y1="50" x2="93.3" y2="75" stroke="#fff" stroke-width="0.5" opacity="0.3" />
@@ -390,14 +410,6 @@
               <line x1="50" y1="50" x2="6.7" y2="25" stroke="#fff" stroke-width="0.5" opacity="0.3" />
 
               <path d="M50 0 A50 50 0 0 1 93.3 25 A50 50 0 0 1 50 50 A50 50 0 0 1 6.7 25 A50 50 0 0 1 50 0 Z" fill="rgba(255,255,255,0.05)" />
-
-              <!-- Текст -->
-              <text x="50" y="22" transform="rotate(30 50 50)" fill="#fff" font-weight="900" font-size="11" filter="url(#glow)">x1.5</text>
-              <text x="50" y="78" transform="rotate(90 50 50)" fill="#8892b0" font-weight="900" font-size="11">x0</text>
-              <text x="50" y="78" transform="rotate(150 50 50)" fill="#fff" font-weight="900" font-size="11" filter="url(#glow)">x2.5</text>
-              <text x="50" y="22" transform="rotate(210 50 50)" fill="#8892b0" font-weight="900" font-size="11">x0</text>
-              <text x="50" y="22" transform="rotate(270 50 50)" fill="#fff" font-weight="900" font-size="11" filter="url(#glow)">x1.2</text>
-              <text x="50" y="78" transform="rotate(330 50 50)" fill="#8892b0" font-weight="900" font-size="11">x0</text>
 
               <circle cx="50" cy="50" r="8" fill="#0a1410" stroke="#00ff9d" stroke-width="2" filter="url(#glow)" />
               <circle cx="50" cy="50" r="5" fill="url(#centerGrad)" />
@@ -722,7 +734,7 @@ function openGame(game) {
 
 /* ================= СЛОТЫ ================= */
 const SLOT_MODES = {
-  easy: { cols: 3, mult: 1.5, winChance: 0.60, nearMissChance: 0.35 }, // Базовый шанс 60%
+  easy: { cols: 3, mult: 1.5, winChance: 0.60, nearMissChance: 0.35 },
   medium: { cols: 4, mult: 2.0, winChance: 0.40, nearMissChance: 0.45 },
   hard: { cols: 5, mult: 4.0, winChance: 0.20, nearMissChance: 0.45 }
 };
@@ -779,16 +791,12 @@ function spinSlots() {
   if (slotState.spinning || STATE.balance < slotState.bet) return;
   const mode = SLOT_MODES[slotState.mode];
   
-  // НОВАЯ ЛОГИКА ШАНСОВ (ДЛЯ КАЗИНО)
   let currentWinChance = mode.winChance;
   if (slotState.bet < 100) {
-      // Мелкие ставки: выигрывает часто, но математически в минусе из-за x1.5
       currentWinChance = mode.winChance; 
   } else if (slotState.bet < 500) {
-      // Средние: шанс режется
       currentWinChance *= 0.3; 
   } else {
-      // Крупные: почти гарантированный слив
       currentWinChance = 0.01; 
   }
 
@@ -933,15 +941,11 @@ function startMines() {
   mineState.active = true; mineState.opened = 0; mineState.currentMult = 1.0;
   
   let stepsPool;
-  // НОВАЯ ЛОГИКА ШАНСОВ ДЛЯ МАЙНЕРА
   if (mineState.bet < 100) {
-      // Мелкие: даем много звезд, чтобы завлечь (бомба далеко)
       stepsPool = mineState.mode === 'easy' ? [4, 5, 6, 7] : (mineState.mode === 'medium' ? [6, 8, 10] : [10, 12, 15]);
   } else if (mineState.bet < 500) {
-      // Средние
       stepsPool = mineState.mode === 'easy' ? [1, 2, 3] : (mineState.mode === 'medium' ? [3, 4, 5] : [4, 6, 8]);
   } else {
-      // Крупные: слив на 1-2 клике
       stepsPool = [0, 1, 1];
   }
   mineState.deadlyStep = stepsPool[Math.floor(Math.random() * stepsPool.length)];
@@ -1008,7 +1012,7 @@ function cashoutMines() {
 
 /* ================= КОЛЕСО ================= */
 let wheelState = { bet: 10, spinning: false, currentRotation: 0 };
-const WHEEL_MULTS = [1.5, 0, 0, 2.5, 0, 1.2]; // 0:1.5, 1:0, 2:0, 3:2.5, 4:0, 5:1.2
+const WHEEL_MULTS = [1.5, 0, 0, 2.5, 0, 1.2];
 
 function resetWheel() {
   if (wheelState.spinning) return;
@@ -1046,21 +1050,17 @@ function spinWheel() {
   const btn = document.getElementById('wheelSpinBtn');
   btn.disabled = true;
   
-  // ЛОГИКА ШАНСОВ НА КОЛЕСЕ
   let targetSector;
-  const winSectors = [0, 3, 5]; // 1.5, 2.5, 1.2
-  const loseSectors = [1, 2, 4]; // 0
+  const winSectors = [0, 3, 5]; 
+  const loseSectors = [1, 2, 4]; 
   
   if (wheelState.bet < 100) {
-      // Мелкие: 75% шанс на выигрыш
       if (Math.random() < 0.75) targetSector = winSectors[Math.floor(Math.random() * winSectors.length)];
       else targetSector = loseSectors[Math.floor(Math.random() * loseSectors.length)];
   } else if (wheelState.bet < 500) {
-      // Средние: 40% шанс на выигрыш
       if (Math.random() < 0.40) targetSector = winSectors[Math.floor(Math.random() * winSectors.length)];
       else targetSector = loseSectors[Math.floor(Math.random() * loseSectors.length)];
   } else {
-      // Крупные: 100% слив
       targetSector = loseSectors[Math.floor(Math.random() * loseSectors.length)];
   }
 
