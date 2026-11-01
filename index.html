@@ -41,7 +41,6 @@
   /* ===== APP ===== */
   #app{ position:fixed; inset:0; z-index:1; display:flex; flex-direction:column; padding:12px 12px calc(92px + env(safe-area-inset-bottom)); overflow:hidden; }
   
-  /* Шапка оптимизирована */
   .header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; flex-shrink: 0; gap: 4px; padding: 0 2px;}
   .logo{ font-weight:900; font-size:16px; background:linear-gradient(90deg,#00ff9d,#5cbf4a,#00ff9d); -webkit-background-clip:text; background-clip:text; color:transparent; white-space: nowrap;}
   
@@ -130,7 +129,7 @@
   .cashout-btn { width: 100%; max-width: 340px; padding: 16px; border-radius: 20px; font-size: 17px; font-weight: 900; color: #001a10; background: linear-gradient(135deg, #00ff9d, #5cbf4a); border: none; cursor: pointer; transition: all 0.2s; box-shadow: 0 5px 15px rgba(0,255,157,0.3); display: none; margin-top: 10px; }
   .cashout-btn.show { display: block; } .cashout-btn:active { transform: scale(0.97); }
 
-  /* ===== WHEEL ===== */
+  /* ===== WHEEL (CSS-ВЕРСИЯ) ===== */
   .wheel-container { position: relative; width: 100%; max-width: 340px; margin: 20px auto; display: flex; justify-content: center; align-items: center; aspect-ratio: 1; }
   
   .wheel-pointer { 
@@ -163,9 +162,27 @@
     border-radius: 50%;
     overflow: hidden;
     transform: rotate(0deg);
+    background: conic-gradient(
+      #a855f7 0deg 60deg,     /* x1.2 */
+      #0f172a 60deg 120deg,   /* x0 */
+      #00ff9d 120deg 180deg,  /* x1.5 */
+      #0f172a 180deg 240deg,  /* x0 */
+      #ffd700 240deg 300deg,  /* x2.5 */
+      #0f172a 300deg 360deg   /* x0 */
+    );
   }
 
-  .wheel-svg { width: 100%; height: 100%; display: block; }
+  .wheel-text-container {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none;
+  }
+
+  .wheel-text {
+    position: absolute; top: 50%; left: 50%;
+    font-size: 14px; font-weight: 900; font-family: sans-serif;
+    margin-top: -7px; margin-left: -15px; /* Центрирование */
+    width: 30px; text-align: center;
+  }
 
   /* Блок ввода ставки */
   .bet-row{ display:flex; align-items:center; gap:10px; margin-top: 10px; z-index: 10; justify-content: center; width: 100%; }
@@ -367,44 +384,20 @@
         
         <div class="wheel-rim">
           <div class="wheel-spinner" id="wheelSpinner">
-            <svg class="wheel-svg" viewBox="0 0 100 100">
-              <circle cx="50" cy="50" r="50" fill="#050d0a" />
-              <circle cx="50" cy="50" r="47" fill="none" stroke="#00ff9d" stroke-width="1.5" stroke-dasharray="1 4" opacity="0.6" />
+            <!-- Текст позиционируется абсолютно поверх колеса -->
+            <div class="wheel-text-container">
+              <div class="wheel-text" style="transform: rotate(30deg) translateY(-100px); color: #fff;">x1.2</div>
+              <div class="wheel-text" style="transform: rotate(90deg) translateY(-100px); color: #8892b0;">x0</div>
+              <div class="wheel-text" style="transform: rotate(150deg) translateY(-100px); color: #001a10;">x1.5</div>
+              <div class="wheel-text" style="transform: rotate(210deg) translateY(-100px); color: #8892b0;">x0</div>
+              <div class="wheel-text" style="transform: rotate(270deg) translateY(-100px); color: #001a10;">x2.5</div>
+              <div class="wheel-text" style="transform: rotate(330deg) translateY(-100px); color: #8892b0;">x0</div>
+            </div>
 
-              <!-- Сектор 0: Верхний (x1.2) - Фиолетовый -->
-              <g transform="rotate(0 50 50)">
-                <path d="M50 50 L50 0 A50 50 0 0 1 75 6.7 Z" fill="#a855f7" stroke="#a855f7" stroke-width="0.5" />
-                <text x="50" y="22" fill="#fff" font-weight="900" font-size="11" text-anchor="middle" dominant-baseline="middle">x1.2</text>
-              </g>
-              <!-- Сектор 1: Верхне-правый (x0) - Темный -->
-              <g transform="rotate(60 50 50)">
-                <path d="M50 50 L50 0 A50 50 0 0 1 75 6.7 Z" fill="#0f172a" stroke="#0f172a" stroke-width="0.5" />
-                <text x="50" y="22" fill="#8892b0" font-weight="900" font-size="11" text-anchor="middle" dominant-baseline="middle">x0</text>
-              </g>
-              <!-- Сектор 2: Нижне-правый (x1.5) - Зеленый -->
-              <g transform="rotate(120 50 50)">
-                <path d="M50 50 L50 0 A50 50 0 0 1 75 6.7 Z" fill="#00ff9d" stroke="#00ff9d" stroke-width="0.5" />
-                <text x="50" y="22" fill="#001a10" font-weight="900" font-size="11" text-anchor="middle" dominant-baseline="middle">x1.5</text>
-              </g>
-              <!-- Сектор 3: Нижний (x0) - Темный -->
-              <g transform="rotate(180 50 50)">
-                <path d="M50 50 L50 0 A50 50 0 0 1 75 6.7 Z" fill="#0f172a" stroke="#0f172a" stroke-width="0.5" />
-                <text x="50" y="22" fill="#8892b0" font-weight="900" font-size="11" text-anchor="middle" dominant-baseline="middle" transform="rotate(180 50 22)">x0</text>
-              </g>
-              <!-- Сектор 4: Нижне-левый (x2.5) - Золотой -->
-              <g transform="rotate(240 50 50)">
-                <path d="M50 50 L50 0 A50 50 0 0 1 75 6.7 Z" fill="#ffd700" stroke="#ffd700" stroke-width="0.5" />
-                <text x="50" y="22" fill="#001a10" font-weight="900" font-size="11" text-anchor="middle" dominant-baseline="middle" transform="rotate(180 50 22)">x2.5</text>
-              </g>
-              <!-- Сектор 5: Верхне-левый (x0) - Темный -->
-              <g transform="rotate(300 50 50)">
-                <path d="M50 50 L50 0 A50 50 0 0 1 75 6.7 Z" fill="#0f172a" stroke="#0f172a" stroke-width="0.5" />
-                <text x="50" y="22" fill="#8892b0" font-weight="900" font-size="11" text-anchor="middle" dominant-baseline="middle" transform="rotate(180 50 22)">x0</text>
-              </g>
-
-              <circle cx="50" cy="50" r="8" fill="#0a1410" stroke="#00ff9d" stroke-width="2" />
-              <circle cx="50" cy="50" r="5" fill="#00ff9d" />
-            </svg>
+            <!-- Центральный круг -->
+            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 40px; height: 40px; background: #0a1410; border: 3px solid #00ff9d; border-radius: 50%; box-shadow: 0 0 15px #00ff9d; display: flex; justify-content: center; align-items: center;">
+              <div style="width: 20px; height: 20px; background: #00ff9d; border-radius: 50%;"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -1005,9 +998,10 @@ function cashoutMines() {
   resetMinesBoard();
 }
 
-/* ================= КОЛЕСО ================= */
+/* ================= КОЛЕСО (CSS) ================= */
 let wheelState = { bet: 10, spinning: false, currentRotation: 0 };
-// Множители соответствуют визуальным секторам 0-5
+// Множители соответствуют секторам 0-5 (по часовой стрелке от верхнего):
+// 0: x1.2, 1: x0, 2: x1.5, 3: x0, 4: x2.5, 5: x0
 const WHEEL_MULTS = [1.2, 0, 1.5, 0, 2.5, 0];
 
 function resetWheel() {
