@@ -39,22 +39,23 @@
   @keyframes spin { 100% { transform: rotate(360deg); } }
 
   /* ===== APP ===== */
-  #app{ position:fixed; inset:0; z-index:1; display:flex; flex-direction:column; padding:16px 16px calc(92px + env(safe-area-inset-bottom)); overflow:hidden; }
+  #app{ position:fixed; inset:0; z-index:1; display:flex; flex-direction:column; padding:12px 12px calc(92px + env(safe-area-inset-bottom)); overflow:hidden; }
   
-  .header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; flex-shrink: 0; gap: 5px;}
-  .logo{ font-weight:900; font-size:18px; background:linear-gradient(90deg,#00ff9d,#5cbf4a,#00ff9d); -webkit-background-clip:text; background-clip:text; color:transparent; white-space: nowrap;}
+  /* Шапка оптимизирована, чтобы ничего не обрезалось */
+  .header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; flex-shrink: 0; gap: 4px; padding: 0 2px;}
+  .logo{ font-weight:900; font-size:16px; background:linear-gradient(90deg,#00ff9d,#5cbf4a,#00ff9d); -webkit-background-clip:text; background-clip:text; color:transparent; white-space: nowrap;}
   
-  .header-right{ display:flex; align-items:center; gap:8px; }
+  .header-right{ display:flex; align-items:center; gap:6px; }
   
-  .deposit-btn-large { background: linear-gradient(135deg, #00ff9d, #5cbf4a); border: none; color: #001a10; height: 36px; padding: 0 12px; border-radius: 999px; font-size: 12px; font-weight: 900; cursor: pointer; box-shadow: 0 0 15px rgba(0,255,157,0.4); display: flex; align-items: center; justify-content: center; transition: transform 0.1s; white-space: nowrap;}
+  .deposit-btn-large { background: linear-gradient(135deg, #00ff9d, #5cbf4a); border: none; color: #001a10; height: 32px; padding: 0 10px; border-radius: 999px; font-size: 11px; font-weight: 900; cursor: pointer; box-shadow: 0 0 15px rgba(0,255,157,0.4); display: flex; align-items: center; justify-content: center; transition: transform 0.1s; white-space: nowrap;}
   .deposit-btn-large:active { transform: scale(0.9); }
 
-  .currency-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 36px; position: relative; }
-  .currency-switch-btn { background: var(--card); border: 1px solid var(--border); color: var(--neon); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 900; cursor: pointer; transition: transform 0.1s; }
+  .currency-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 32px; position: relative; }
+  .currency-switch-btn { background: var(--card); border: 1px solid var(--border); color: var(--neon); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 900; cursor: pointer; transition: transform 0.1s; }
   .currency-switch-btn:active { transform: scale(0.9); }
-  .currency-label { position: absolute; bottom: -14px; font-size: 7px; color: var(--muted); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; pointer-events: none; }
+  .currency-label { position: absolute; bottom: -13px; font-size: 7px; color: var(--muted); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; pointer-events: none; }
 
-  .balance-pill{ background:var(--card); border:1px solid var(--border); height: 36px; padding: 0 12px; border-radius:999px; font-size:16px; font-weight:900; color:var(--neon); display:flex; align-items:center; gap:4px; box-shadow: 0 0 10px rgba(0,255,157,0.1); }
+  .balance-pill{ background:var(--card); border:1px solid var(--border); height: 32px; padding: 0 10px; border-radius:999px; font-size:15px; font-weight:900; color:var(--neon); display:flex; align-items:center; gap:4px; box-shadow: 0 0 10px rgba(0,255,157,0.1); max-width: 110px; overflow: hidden; }
 
   /* ===== PAGES ===== */
   .page{ flex:1; min-height: 0; overflow-y:auto; display:none; flex-direction: column; padding-bottom:12px; color: var(--text); }
@@ -75,7 +76,6 @@
   .game-card{ position:relative; background:var(--card2); border:1px solid var(--border); border-radius:22px; padding:18px 14px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; cursor:pointer; transition: transform 0.1s; min-height: 130px; }
   .game-card:active{ transform:scale(.96); }
   
-  /* Стиль для новых картинок */
   .game-icon {
     width: 64px;
     height: 64px;
@@ -275,22 +275,18 @@
     
     <div class="title">Игры <span>▸</span></div>
     <div class="games-grid">
-      <!-- Карточка Слоты -->
       <div class="game-card" onclick="openGame('slots')">
         <div class="nft-badge">HOT</div>
         <img src="https://i.ibb.co/MD04bpxG/1793517333251.png" alt="Слоты" class="game-icon">
         <div class="name">Слоты</div>
         <div class="tag">3 режима</div>
       </div>
-      
-      <!-- Карточка Майнер (с новой картинкой) -->
       <div class="game-card" onclick="openGame('mines')">
         <div class="nft-badge" style="background:var(--yellow); color:#000;">NEW</div>
         <img src="https://i.ibb.co/F47cLDmZ/image.png" alt="Майнер" class="game-icon">
         <div class="name">Майнер</div>
         <div class="tag">Играй и забирай</div>
       </div>
-
       <div class="game-card" onclick="openGame('wheel')">
         <div class="emoji">🎡</div>
         <div class="name">Колесо</div>
@@ -375,28 +371,36 @@
               <circle cx="50" cy="50" r="50" fill="#050d0a" />
               <circle cx="50" cy="50" r="47" fill="none" stroke="#00ff9d" stroke-width="1.5" stroke-dasharray="1 4" opacity="0.6" />
 
-              <path d="M50 50 L50 0 A50 50 0 0 1 93.3 25 Z" fill="#00ff9d" stroke="#00ff9d" stroke-width="0.5" />
-              <path d="M50 50 L93.3 25 A50 50 0 0 1 93.3 75 Z" fill="#0f172a" stroke="#0f172a" stroke-width="0.5" />
-              <path d="M50 50 L93.3 75 A50 50 0 0 1 50 100 Z" fill="#ffd700" stroke="#ffd700" stroke-width="0.5" />
-              <path d="M50 50 L50 100 A50 50 0 0 1 6.7 75 Z" fill="#0f172a" stroke="#0f172a" stroke-width="0.5" />
-              <path d="M50 50 L6.7 75 A50 50 0 0 1 6.7 25 Z" fill="#a855f7" stroke="#a855f7" stroke-width="0.5" />
-              <path d="M50 50 L6.7 25 A50 50 0 0 1 50 0 Z" fill="#0f172a" stroke="#0f172a" stroke-width="0.5" />
-
-              <line x1="50" y1="50" x2="50" y2="0" stroke="rgba(255,255,255,0.2)" stroke-width="0.5" />
-              <line x1="50" y1="50" x2="93.3" y2="25" stroke="rgba(255,255,255,0.2)" stroke-width="0.5" />
-              <line x1="50" y1="50" x2="93.3" y2="75" stroke="rgba(255,255,255,0.2)" stroke-width="0.5" />
-              <line x1="50" y1="50" x2="50" y2="100" stroke="rgba(255,255,255,0.2)" stroke-width="0.5" />
-              <line x1="50" y1="50" x2="6.7" y2="75" stroke="rgba(255,255,255,0.2)" stroke-width="0.5" />
-              <line x1="50" y1="50" x2="6.7" y2="25" stroke="rgba(255,255,255,0.2)" stroke-width="0.5" />
-
-              <path d="M50 0 A50 50 0 0 1 93.3 25 A50 50 0 0 1 50 50 A50 50 0 0 1 6.7 25 A50 50 0 0 1 50 0 Z" fill="rgba(255,255,255,0.08)" />
-
-              <g transform="rotate(30 50 50)"><text x="50" y="22" fill="#001a10" font-weight="900" font-size="11" text-anchor="middle" dominant-baseline="middle">x1.5</text></g>
-              <g transform="rotate(90 50 50)"><text x="50" y="22" fill="#8892b0" font-weight="900" font-size="11" text-anchor="middle" dominant-baseline="middle">x0</text></g>
-              <g transform="rotate(150 50 50)"><text x="50" y="22" fill="#001a10" font-weight="900" font-size="11" text-anchor="middle" dominant-baseline="middle" transform="rotate(180 50 22)">x2.5</text></g>
-              <g transform="rotate(210 50 50)"><text x="50" y="22" fill="#8892b0" font-weight="900" font-size="11" text-anchor="middle" dominant-baseline="middle" transform="rotate(180 50 22)">x0</text></g>
-              <g transform="rotate(270 50 50)"><text x="50" y="22" fill="#fff" font-weight="900" font-size="11" text-anchor="middle" dominant-baseline="middle">x1.2</text></g>
-              <g transform="rotate(330 50 50)"><text x="50" y="22" fill="#8892b0" font-weight="900" font-size="11" text-anchor="middle" dominant-baseline="middle">x0</text></g>
+              <!-- Сектор 0: Верхний (x1.2) - Фиолетовый -->
+              <g transform="rotate(0 50 50)">
+                <path d="M50 50 L50 0 A50 50 0 0 1 75 6.7 Z" fill="#a855f7" stroke="#a855f7" stroke-width="0.5" />
+                <text x="50" y="22" fill="#fff" font-weight="900" font-size="11" text-anchor="middle" dominant-baseline="middle">x1.2</text>
+              </g>
+              <!-- Сектор 1: Верхне-правый (x0) - Темный -->
+              <g transform="rotate(60 50 50)">
+                <path d="M50 50 L50 0 A50 50 0 0 1 75 6.7 Z" fill="#0f172a" stroke="#0f172a" stroke-width="0.5" />
+                <text x="50" y="22" fill="#8892b0" font-weight="900" font-size="11" text-anchor="middle" dominant-baseline="middle">x0</text>
+              </g>
+              <!-- Сектор 2: Нижне-правый (x1.5) - Зеленый -->
+              <g transform="rotate(120 50 50)">
+                <path d="M50 50 L50 0 A50 50 0 0 1 75 6.7 Z" fill="#00ff9d" stroke="#00ff9d" stroke-width="0.5" />
+                <text x="50" y="22" fill="#001a10" font-weight="900" font-size="11" text-anchor="middle" dominant-baseline="middle">x1.5</text>
+              </g>
+              <!-- Сектор 3: Нижний (x0) - Темный -->
+              <g transform="rotate(180 50 50)">
+                <path d="M50 50 L50 0 A50 50 0 0 1 75 6.7 Z" fill="#0f172a" stroke="#0f172a" stroke-width="0.5" />
+                <text x="50" y="22" fill="#8892b0" font-weight="900" font-size="11" text-anchor="middle" dominant-baseline="middle" transform="rotate(180 50 22)">x0</text>
+              </g>
+              <!-- Сектор 4: Нижне-левый (x2.5) - Золотой -->
+              <g transform="rotate(240 50 50)">
+                <path d="M50 50 L50 0 A50 50 0 0 1 75 6.7 Z" fill="#ffd700" stroke="#ffd700" stroke-width="0.5" />
+                <text x="50" y="22" fill="#001a10" font-weight="900" font-size="11" text-anchor="middle" dominant-baseline="middle" transform="rotate(180 50 22)">x2.5</text>
+              </g>
+              <!-- Сектор 5: Верхне-левый (x0) - Темный -->
+              <g transform="rotate(300 50 50)">
+                <path d="M50 50 L50 0 A50 50 0 0 1 75 6.7 Z" fill="#0f172a" stroke="#0f172a" stroke-width="0.5" />
+                <text x="50" y="22" fill="#8892b0" font-weight="900" font-size="11" text-anchor="middle" dominant-baseline="middle" transform="rotate(180 50 22)">x0</text>
+              </g>
 
               <circle cx="50" cy="50" r="8" fill="#0a1410" stroke="#00ff9d" stroke-width="2" />
               <circle cx="50" cy="50" r="5" fill="#00ff9d" />
@@ -1003,7 +1007,8 @@ function cashoutMines() {
 
 /* ================= КОЛЕСО ================= */
 let wheelState = { bet: 10, spinning: false, currentRotation: 0 };
-const WHEEL_MULTS = [1.5, 0, 0, 2.5, 0, 1.2];
+// Индексы соответствуют секторам 0-5: 0(x1.2), 1(x0), 2(x1.5), 3(x0), 4(x2.5), 5(x0)
+const WHEEL_MULTS = [1.2, 0, 1.5, 0, 2.5, 0];
 
 function resetWheel() {
   if (wheelState.spinning) return;
@@ -1042,8 +1047,9 @@ function spinWheel() {
   btn.disabled = true;
   
   let targetSector;
-  const winSectors = [0, 3, 5]; 
-  const loseSectors = [1, 2, 4]; 
+  // Выбираем выигрышные или проигрышные сектора в зависимости от ставки
+  const winSectors = [0, 2, 4]; // x1.2, x1.5, x2.5
+  const loseSectors = [1, 3, 5]; // x0
   
   if (wheelState.bet < 100) {
       if (Math.random() < 0.75) targetSector = winSectors[Math.floor(Math.random() * winSectors.length)];
@@ -1058,6 +1064,8 @@ function spinWheel() {
   const actualMult = WHEEL_MULTS[targetSector];
   
   const extraDegrees = 360 * 5;
+  // Центр сектора targetSector находится под углом (targetSector * 60 + 30).
+  // Чтобы он оказался на 0 градусах (под стрелкой), нужно вычесть этот угол.
   const targetAngle = extraDegrees + (360 - (targetSector * 60 + 30));
   const finalRotation = wheelState.currentRotation + targetAngle;
   
@@ -1236,120 +1244,4 @@ function showWithdrawForm(type, commission) {
       </div>
       <div class="input-group">
         <label>Номер карты</label>
-        <input type="text" id="wdCardNumber" placeholder="0000 0000 0000 0000" maxlength="19">
-      </div>
-      <p style="font-size:10px; color:var(--muted); margin-top:10px;">Комиссия ${commission}%. К выводу: <b id="wdPreview">0 ₽</b></p>
-    `;
-    btn.textContent = 'Создать заявку';
-    btn.className = 'modal-btn green';
-    
-    document.getElementById('wdCardAmount').addEventListener('input', (e) => {
-      const v = parseInt(e.target.value) || 0;
-      document.getElementById('wdPreview').textContent = Math.floor(v * ((100-commission)/100)) + ' ₽';
-    });
-
-    btn.onclick = () => {
-      const rub = parseInt(document.getElementById('wdCardAmount').value) || 0;
-      const card = document.getElementById('wdCardNumber').value;
-      const starsNeeded = Math.floor(rub / STATE.rubRate);
-
-      if (rub < 1100) return showLoseModal(false, 'Минимальная сумма вывода на карту — 1100 ₽');
-      if (card.length < 16) return showLoseModal(false, 'Введите корректный номер карты');
-      if (starsNeeded > currentBalanceStars) return showLoseModal(false, 'Недостаточно средств на балансе!');
-
-      STATE.balance -= starsNeeded;
-      updateUI(); closeModal(); SOUNDS.cashout();
-      
-      saveWithdrawRequest('Карта', rub, card);
-      
-      showWinModal(0, '💸', `Заявка на вывод ${rub} ₽ создана! Ожидайте обработки.`);
-      document.querySelector('.win-amount').style.display = 'none';
-    };
-  } else {
-    text.innerHTML = `Введите количество звезд для вывода:`;
-    content.innerHTML = `
-      <div class="input-group">
-        <label>Сумма (⭐)</label>
-        <input type="number" id="wdStarsAmount" placeholder="Мин. 500" min="500" step="100">
-      </div>
-      <p style="font-size:10px; color:var(--muted); margin-top:10px;">Сумма должна быть кратна 100.</p>
-    `;
-    btn.textContent = 'Создать заявку';
-    btn.className = 'modal-btn green';
-
-    btn.onclick = () => {
-      const stars = parseInt(document.getElementById('wdStarsAmount').value) || 0;
-
-      if (stars < 500) return showLoseModal(false, 'Минимальная сумма вывода — 500 ⭐');
-      if (stars % 100 !== 0) return showLoseModal(false, 'Сумма должна быть кратна 100');
-      if (stars > currentBalanceStars) return showLoseModal(false, 'Недостаточно средств на балансе!');
-
-      STATE.balance -= stars;
-      updateUI(); closeModal(); SOUNDS.cashout();
-      
-      saveWithdrawRequest('Звезды', stars, 'Telegram');
-      
-      showWinModal(0, '💸', `Заявка на вывод ${stars} ⭐ создана! Ожидайте обработки.`);
-      document.querySelector('.win-amount').style.display = 'none';
-    };
-  }
-}
-
-function saveWithdrawRequest(method, amount, target) {
-  let requests = JSON.parse(localStorage.getItem('garisDropWithdraws') || '[]');
-  requests.push({ userId: STATE.userId, method: method, amount: amount, target: target, date: new Date().toLocaleString() });
-  localStorage.setItem('garisDropWithdraws', JSON.stringify(requests));
-}
-
-function showLoseModal(isNearMiss, customText = '') {
-  const box = document.getElementById('modalBox');
-  const icon = document.getElementById('modalIcon');
-  const title = document.getElementById('modalTitle');
-  const text = document.getElementById('modalText');
-  const content = document.getElementById('modalContent');
-  const btn = document.getElementById('modalBtn');
-  
-  box.className = 'modal lose'; icon.className = 'icon-lose'; icon.innerHTML = '✕';
-  content.innerHTML = '';
-  
-  if (customText) { title.textContent = 'Внимание!'; text.innerHTML = customText; }
-  else if (isNearMiss) { title.textContent = 'Ух, почти!'; text.innerHTML = `На центральной линии не хватило всего одного символа!<br>Попробуйте еще раз!`; }
-  else { title.textContent = 'Очень жаль...'; text.innerHTML = 'В этот раз не повезло.<br>Попробуйте еще раз!'; }
-  
-  btn.className = 'modal-btn red'; btn.textContent = 'Закрыть';
-  btn.onclick = closeModal;
-  document.getElementById('modalMask').classList.add('show');
-}
-
-function showWinModal(displayAmount, currencySymbol, mult) {
-  const box = document.getElementById('modalBox');
-  const icon = document.getElementById('modalIcon');
-  const title = document.getElementById('modalTitle');
-  const text = document.getElementById('modalText');
-  const content = document.getElementById('modalContent');
-  const btn = document.getElementById('modalBtn');
-  
-  box.className = 'modal win'; icon.className = 'icon-win'; icon.innerHTML = '★';
-  title.textContent = 'Поздравляем!';
-  content.innerHTML = '';
-  
-  if (typeof mult === 'string') {
-    text.innerHTML = `${mult}<span class="win-amount">${displayAmount > 0 ? '+'+displayAmount : ''} ${displayAmount > 0 ? currencySymbol : ''}</span>`;
-  } else {
-    text.innerHTML = `Вы забрали выигрыш (x${mult})!<span class="win-amount">+${displayAmount} ${currencySymbol}</span>`;
-  }
-  
-  btn.className = 'modal-btn green'; btn.textContent = 'Забрать';
-  btn.onclick = closeModal;
-  document.getElementById('modalMask').classList.add('show');
-}
-
-function closeModal() { document.getElementById('modalMask').classList.remove('show'); }
-
-// --- СТАРТ ---
-loadState(); 
-updateUI();
-setSlotMode('easy');
-</script>
-</body>
-</html>
+        <input type="text" id="wdCardNumber"
