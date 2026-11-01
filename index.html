@@ -52,7 +52,7 @@
   .currency-switch-btn { background: var(--card); border: 1px solid var(--border); color: var(--neon); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 900; cursor: pointer; transition: transform 0.1s; }
   .currency-switch-btn:active { transform: scale(0.9); }
 
-  /* УВЕЛИЧЕННЫЙ БАЛАНС СВЕРХУ */
+  /* УВЕЛИЧЕННЫЙ БАЛАНС */
   .balance-pill{ background:var(--card); border:1px solid var(--border); padding:6px 12px; border-radius:999px; font-size:18px; font-weight:900; color:var(--neon); display:flex; align-items:center; gap:4px; box-shadow: 0 0 10px rgba(0,255,157,0.1);}
 
   /* ===== PAGES ===== */
@@ -64,7 +64,7 @@
   .back-btn { background: var(--card2); border: 1px solid var(--border); color: var(--neon); padding: 12px 18px; border-radius: 16px; font-size: 15px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; margin-bottom: 16px; width: fit-content; transition: transform 0.1s; }
   .back-btn:active { transform: scale(0.95); }
 
-  /* ===== РЕАЛЬНАЯ ЛЕНТА (ЛИЧНАЯ) ===== */
+  /* ===== ЛЕНТА ===== */
   .live-wins-bar { background: rgba(0,255,157,0.05); border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; font-size: 13px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; white-space: nowrap; position: relative; color: var(--neon); text-shadow: 0 0 8px rgba(0,255,157,0.3);}
   .live-wins-bar span { display: inline-block; animation: slide 10s linear infinite; padding-left: 100%; }
   @keyframes slide { 0% { transform: translateX(0); } 100% { transform: translateX(-150%); } }
@@ -119,11 +119,27 @@
   .cashout-btn.show { display: block; } .cashout-btn:active { transform: scale(0.97); }
 
   /* ===== WHEEL (ОБНОВЛЕННОЕ) ===== */
-  .wheel-wrap { position: relative; width: 100%; max-width: 320px; margin: 10px auto 20px; display: flex; justify-content: center; align-items: center; aspect-ratio: 1; }
-  .wheel-pointer { position: absolute; top: -20px; font-size: 36px; z-index: 10; color: var(--neon); text-shadow: 0 0 20px rgba(0,255,157,0.9), 0 0 10px #000; }
-  .wheel-svg { width: 100%; height: 100%; border-radius: 50%; box-shadow: 0 0 50px rgba(0,255,157,0.2), inset 0 0 20px #000; transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99); transform: rotate(0deg); border: 3px solid var(--neon); }
-  .wheel-svg text { font-size: 11px; font-weight: 900; font-family: sans-serif; text-anchor: middle; dominant-baseline: middle; }
+  .wheel-wrap { position: relative; width: 100%; max-width: 320px; margin: 20px auto; display: flex; justify-content: center; align-items: center; aspect-ratio: 1; }
+  
+  .wheel-pointer { 
+    position: absolute; top: -16px; left: 50%; transform: translateX(-50%); 
+    font-size: 32px; z-index: 10; color: var(--neon); 
+    text-shadow: 0 0 20px rgba(0,255,157,0.8), 0 0 10px #000; 
+  }
 
+  .wheel-svg { 
+    width: 100%; height: 100%; border-radius: 50%; 
+    box-shadow: 0 0 40px rgba(0,255,157,0.15), inset 0 0 20px #000; 
+    transform: rotate(0deg); border: 4px solid #0f1f18; /* Темный обод */
+  }
+  
+  /* Обертка для анимации (чтобы не дергать SVG напрямую) */
+  .wheel-spinner {
+    width: 100%; height: 100%; position: relative;
+  }
+
+  .wheel-svg text { font-size: 14px; font-weight: 900; font-family: sans-serif; text-anchor: middle; dominant-baseline: middle; }
+  
   /* Блок ввода ставки */
   .bet-row{ display:flex; align-items:center; gap:10px; margin-top: 10px; z-index: 10; justify-content: center; width: 100%; }
   .bet-btn{ width:44px; height:44px; border-radius:14px; background:var(--card); border:1px solid var(--border); color:var(--neon); font-size:20px; font-weight:800; cursor:pointer; transition: transform 0.1s; }
@@ -164,7 +180,6 @@
   .info-block h4{ font-size:13px; color:var(--neon); margin-bottom:8px; }
   .info-block p{ font-size:12px; color:var(--muted); line-height:1.5; }
 
-  /* Бонусная страница */
   .bonus-card { background: var(--card2); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 10px;}
   .bonus-card h3 { color: var(--neon); font-size: 16px; }
   .bonus-card p { font-size: 12px; color: var(--muted); }
@@ -209,7 +224,6 @@
       <div class="currency-switch-btn" onclick="toggleCurrency()">
         <span id="btnCurrencyIcon">⭐</span>
       </div>
-      <!-- Увеличенный баланс -->
       <div class="balance-pill" id="balancePillHeader">
         <span id="currencyIcon">⭐</span> <span id="balanceTop">0</span>
       </div>
@@ -218,7 +232,6 @@
 
   <!-- ГЛАВНОЕ МЕНЮ -->
   <div class="page active" id="page-games">
-    <!-- Честная лента выигрышей -->
     <div class="live-wins-bar">
       <span id="liveWinsText">🍀 Здесь появятся ваши реальные выигрыши. Начните играть!</span>
     </div>
@@ -318,35 +331,46 @@
     <div class="game-wrap">
       <div class="wheel-wrap">
         <div class="wheel-pointer">▼</div>
-        <svg class="wheel-svg" id="wheelSvg" viewBox="0 0 100 100">
-          <!-- Круглая основа -->
-          <circle cx="50" cy="50" r="48" fill="#000" />
-          
-          <!-- Сектора -->
-          <!-- x1.5 (Зеленый) -->
-          <path d="M50 50 L50 2 A48 48 0 0 1 91.57 26 Z" fill="#00ff9d" />
-          <!-- x0 (Красный) -->
-          <path d="M50 50 L91.57 26 A48 48 0 0 1 91.57 74 Z" fill="#ff4d6d" />
-          <!-- x2.5 (Золотой) -->
-          <path d="M50 50 L91.57 74 A48 48 0 0 1 50 98 Z" fill="#ffd700" />
-          <!-- x0 (Красный) -->
-          <path d="M50 50 L50 98 A48 48 0 0 1 8.43 74 Z" fill="#ff4d6d" />
-          <!-- x1.2 (Фиолетовый) -->
-          <path d="M50 50 L8.43 74 A48 48 0 0 1 8.43 26 Z" fill="#a855f7" />
-          <!-- x0 (Красный) -->
-          <path d="M50 50 L8.43 26 A48 48 0 0 1 50 2 Z" fill="#ff4d6d" />
+        <div class="wheel-spinner" id="wheelSpinner">
+          <svg class="wheel-svg" viewBox="0 0 100 100">
+            <!-- Темный фон для объема -->
+            <circle cx="50" cy="50" r="48" fill="#050d0a" stroke="#0a1410" stroke-width="4" />
+            
+            <!-- Сектора -->
+            <!-- 0: x1.5 (Зеленый) -->
+            <path d="M50 50 L50 2 A48 48 0 0 1 91.57 26 Z" fill="#00ff9d" />
+            <!-- 1: x0 (Темный) -->
+            <path d="M50 50 L91.57 26 A48 48 0 0 1 91.57 74 Z" fill="#0f1f18" />
+            <!-- 2: x2.5 (Золотой) -->
+            <path d="M50 50 L91.57 74 A48 48 0 0 1 50 98 Z" fill="#ffd700" />
+            <!-- 3: x0 (Темный) -->
+            <path d="M50 50 L50 98 A48 48 0 0 1 8.43 74 Z" fill="#0f1f18" />
+            <!-- 4: x1.2 (Фиолетовый) -->
+            <path d="M50 50 L8.43 74 A48 48 0 0 1 8.43 26 Z" fill="#a855f7" />
+            <!-- 5: x0 (Темный) -->
+            <path d="M50 50 L8.43 26 A48 48 0 0 1 50 2 Z" fill="#0f1f18" />
 
-          <!-- Аккуратный текст -->
-          <text x="50" y="22" transform="rotate(30 50 50)" fill="#001a10">x1.5</text>
-          <text x="50" y="22" transform="rotate(90 50 50)" fill="#001a10">x0</text>
-          <text x="50" y="22" transform="rotate(150 50 50)" fill="#001a10">x2.5</text>
-          <text x="50" y="22" transform="rotate(210 50 50)" fill="#001a10">x0</text>
-          <text x="50" y="22" transform="rotate(270 50 50)" fill="#fff">x1.2</text>
-          <text x="50" y="22" transform="rotate(330 50 50)" fill="#001a10">x0</text>
+            <!-- Внутренние линии (разделители) -->
+            <line x1="50" y1="50" x2="50" y2="2" stroke="#000" stroke-width="1" opacity="0.3" />
+            <line x1="50" y1="50" x2="91.57" y2="26" stroke="#000" stroke-width="1" opacity="0.3" />
+            <line x1="50" y1="50" x2="91.57" y2="74" stroke="#000" stroke-width="1" opacity="0.3" />
+            <line x1="50" y1="50" x2="50" y2="98" stroke="#000" stroke-width="1" opacity="0.3" />
+            <line x1="50" y1="50" x2="8.43" y2="74" stroke="#000" stroke-width="1" opacity="0.3" />
+            <line x1="50" y1="50" x2="8.43" y2="26" stroke="#000" stroke-width="1" opacity="0.3" />
 
-          <!-- Центральный куб -->
-          <circle cx="50" cy="50" r="7" fill="#0f1f18" stroke="#00ff9d" stroke-width="2" />
-        </svg>
+            <!-- Текст -->
+            <text x="50" y="22" transform="rotate(30 50 50)" fill="#001a10">x1.5</text>
+            <text x="50" y="22" transform="rotate(90 50 50)" fill="#e6fff5">x0</text>
+            <text x="50" y="22" transform="rotate(150 50 50)" fill="#001a10">x2.5</text>
+            <text x="50" y="22" transform="rotate(210 50 50)" fill="#e6fff5">x0</text>
+            <text x="50" y="22" transform="rotate(270 50 50)" fill="#fff">x1.2</text>
+            <text x="50" y="22" transform="rotate(330 50 50)" fill="#e6fff5">x0</text>
+
+            <!-- Центральный куб -->
+            <circle cx="50" cy="50" r="8" fill="#0a1410" stroke="#00ff9d" stroke-width="2" />
+            <text x="50" y="50" fill="#00ff9d" font-size="8">SPIN</text>
+          </svg>
+        </div>
       </div>
       
       <div class="bet-row">
@@ -368,12 +392,7 @@
   <div class="page" id="page-profile">
     <div class="title">Профиль <span>▸</span></div>
     <div class="profile-card">
-      
-      <div class="avatar" id="profileAvatar">
-        🐸
-        <div class="badge" id="vipBadge" style="display:none;">VIP</div>
-      </div>
-      
+      <div class="avatar" id="profileAvatar">🐸<div class="badge" id="vipBadge" style="display:none;">VIP</div></div>
       <div class="profile-name" id="userName">Игрок</div>
       <div class="profile-id" id="userId">ID: ...</div>
       
@@ -384,19 +403,12 @@
         </div>
         <div class="level-wrap"><div class="level-bar" id="xpBar"></div></div>
       </div>
-
-      <div class="profile-balance">
-        <span id="profileCurrencyIcon">⭐</span> <span id="balanceProfile">0</span>
-      </div>
+      <div class="profile-balance"><span id="profileCurrencyIcon">⭐</span> <span id="balanceProfile">0</span></div>
     </div>
 
     <div class="action-grid">
-      <button class="action-btn-icon" onclick="switchPage('history')">
-        <span class="ic">📊</span> История игр
-      </button>
-      <button class="action-btn-icon" onclick="openComingSoon()">
-        <span class="ic">🏆</span> Рейтинг
-      </button>
+      <button class="action-btn-icon" onclick="switchPage('history')"><span class="ic">📊</span> История игр</button>
+      <button class="action-btn-icon" onclick="openComingSoon()"><span class="ic">🏆</span> Рейтинг</button>
     </div>
 
     <div class="action-grid" style="grid-template-columns: 1fr 1fr; margin-top: -5px;">
@@ -425,7 +437,7 @@
 
 <script>
 // ==========================================
-// СИСТЕМА ЗВУКОВ
+// СИСТЕМА ЗВУКОВ (Web Audio API)
 // ==========================================
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 let audioCtx;
@@ -460,7 +472,11 @@ const SOUNDS = {
   gem: () => playTone(1000, 'sine', 0.15, 0.04),
   bomb: () => { playNoise(0.4, 0.08); playTone(80, 'triangle', 0.3, 0.05); },
   cashout: () => { playTone(800, 'sine', 0.05, 0.03); setTimeout(() => playTone(1000, 'sine', 0.05, 0.03), 60); setTimeout(() => playTone(1200, 'sine', 0.1, 0.03), 120); },
-  wheelTick: () => playTone(500, 'sine', 0.02, 0.015)
+  // Улучшенный звук треска (щелчок)
+  wheelTick: () => {
+    playTone(1200, 'triangle', 0.02, 0.03);
+    playTone(800, 'square', 0.01, 0.01);
+  }
 };
 
 document.querySelectorAll('button, .game-card, .nav-btn, .currency-switch-btn, .back-btn, .bonus-btn').forEach(el => {
@@ -493,13 +509,8 @@ function getLevelData(totalDepositedRub) {
 const SYMBOLS = ['🍌','🎰','💎','🍒','⭐'];
 
 let STATE = {
-  balance: 1000, 
-  currency: 'stars', 
-  rubRate: 1.5, 
-  totalDepositedRub: 0,
-  lastDaily: 0,
-  history: [],
-  userId: null
+  balance: 1000, currency: 'stars', rubRate: 1.5, totalDepositedRub: 0,
+  lastDaily: 0, history: [], userId: null
 };
 
 function initUserId() {
@@ -520,14 +531,9 @@ function saveState() { localStorage.setItem('garisDropData', JSON.stringify(STAT
 
 if (window.Telegram?.WebApp) {
   Telegram.WebApp.ready(); Telegram.WebApp.expand();
-  if (Telegram.WebApp.initDataUnsafe?.user) {
-    document.getElementById('userName').textContent = Telegram.WebApp.initDataUnsafe.user.first_name;
-  }
+  if (Telegram.WebApp.initDataUnsafe?.user) document.getElementById('userName').textContent = Telegram.WebApp.initDataUnsafe.user.first_name;
 }
 
-// ==========================================
-// ОБЩАЯ ЛОГИКА
-// ==========================================
 function formatMoney(starsAmount) { return STATE.currency === 'rub' ? Math.floor(starsAmount * STATE.rubRate) : Math.floor(starsAmount); }
 function getCurrencyIcon() { return STATE.currency === 'rub' ? '₽' : '⭐'; }
 
@@ -556,8 +562,7 @@ function updateUI() {
   const { current, next } = getLevelData(STATE.totalDepositedRub);
   const avatar = document.getElementById('profileAvatar');
   const vipBadge = document.getElementById('vipBadge');
-  avatar.className = 'avatar';
-  vipBadge.style.display = 'none';
+  avatar.className = 'avatar'; vipBadge.style.display = 'none';
 
   document.getElementById('userLevel').textContent = current.lvl;
   if (current.frame) avatar.classList.add(current.frame);
@@ -567,8 +572,7 @@ function updateUI() {
   if (next) {
     const range = next.reqRub - current.reqRub;
     const progress = STATE.totalDepositedRub - current.reqRub;
-    const percent = Math.min((progress / range) * 100, 100);
-    levelBar.style.width = percent + '%';
+    levelBar.style.width = Math.min((progress / range) * 100, 100) + '%';
     document.getElementById('nextLevelText').textContent = `До ${next.lvl} ур.: ${next.reqRub - STATE.totalDepositedRub} ₽`;
   } else {
     levelBar.style.width = '100%';
@@ -598,8 +602,7 @@ function updateTicker() {
   const lastWin = STATE.history.find(item => item.isWin);
   
   if (lastWin) {
-    const displayAmt = formatMoney(lastWin.winStars);
-    ticker.textContent = `🏆 Ваш последний выигрыш: +${displayAmt} ${getCurrencyIcon()} в игре ${lastWin.game}!`;
+    ticker.textContent = `🏆 Ваш последний выигрыш: +${formatMoney(lastWin.winStars)} ${getCurrencyIcon()} в игре ${lastWin.game}!`;
   } else {
     ticker.textContent = '🍀 Здесь появятся ваши реальные выигрыши. Начните играть!';
   }
@@ -614,7 +617,7 @@ function claimDaily() {
 }
 
 function copyRefLink() {
-  const botUsername = 'GarisDrop_Bot'; // Замени на своего бота!
+  const botUsername = 'GarisDrop_Bot'; 
   const link = `https://t.me/${botUsername}?start=${STATE.userId}`;
   
   navigator.clipboard.writeText(link).then(() => {
@@ -630,8 +633,7 @@ function copyRefLink() {
 function addHistory(game, betStars, winStars) {
   STATE.history.unshift({ game, betStars, winStars, isWin: winStars > 0 });
   if (STATE.history.length > 10) STATE.history.pop();
-  renderHistory(); 
-  updateUI(); // Обновляет ленту и баланс
+  renderHistory(); updateUI();
 }
 
 function renderHistory() {
@@ -961,16 +963,16 @@ function cashoutMines() {
   resetMinesBoard();
 }
 
-/* ================= КОЛЕСО ================= */
+/* ================= КОЛЕСО (ФИЗИКА И ЗВУК) ================= */
 let wheelState = { bet: 10, spinning: false, currentRotation: 0 };
-const WHEEL_MULTS = [1.5, 0, 0, 2.5, 0, 1.2]; // Порядок подстроен под новый дизайн
+const WHEEL_MULTS = [1.5, 0, 0, 2.5, 0, 1.2];
 
 function resetWheel() {
   if (wheelState.spinning) return;
-  const svg = document.getElementById('wheelSvg');
+  const wheel = document.getElementById('wheelSpinner');
   wheelState.currentRotation = 0;
-  svg.style.transition = 'none';
-  svg.style.transform = `rotate(0deg)`;
+  wheel.style.transition = 'none';
+  wheel.style.transform = `rotate(0deg)`;
   updateUI();
 }
 
@@ -1001,49 +1003,71 @@ function spinWheel() {
   const btn = document.getElementById('wheelSpinBtn');
   btn.disabled = true;
   
+  // 1. Выбираем выигрышный сектор (0-5)
   const targetSector = Math.floor(Math.random() * 6);
-  const extraDegrees = 360 * 5; // 5 полных оборотов
+  // Сектор 0: x1.5 (Зеленый), Сектор 2: x2.5 (Золотой), Сектор 4: x1.2 (Фиолетовый)
+  // Сектора 1, 3, 5 - это x0 (пустые)
+  const actualMult = WHEEL_MULTS[targetSector];
   
-  // Вычисляем угол, чтобы нужный сектор оказался под стрелкой (0 градусов)
-  // Центр сектора 0 находится на 30 градусах.
+  // 2. Вычисляем финальный угол
+  // Каждый сектор по 60 градусов. Центр сектора 0 на 30 градусах.
+  // Чтобы сектор оказался под стрелкой (0 градусов), нужно повернуть колесо назад на его угол.
+  const extraDegrees = 360 * 5; // 5 полных оборотов для красоты
   const targetAngle = extraDegrees + (360 - (targetSector * 60 + 30));
-  const jitter = (Math.random() - 0.5) * 40; // Небольшой разброс
+  const jitter = (Math.random() - 0.5) * 40; // Небольшой разброс, чтобы не вставало идеально в центр
   const finalRotation = wheelState.currentRotation + targetAngle + jitter;
-  wheelState.currentRotation = finalRotation;
   
-  const svg = document.getElementById('wheelSvg');
-  svg.style.transition = 'transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99)';
-  svg.style.transform = `rotate(${finalRotation}deg)`;
-  
-  let tickCount = 0;
-  const tickInterval = setInterval(() => {
-    SOUNDS.wheelTick(); tickCount++;
-    if (tickCount > 30) clearInterval(tickInterval);
-  }, 100);
+  const wheel = document.getElementById('wheelSpinner');
+  // Мы используем кастомную JS анимацию вместо CSS transition, чтобы идеально синхронизировать звук
+  const startRotation = wheelState.currentRotation;
+  const duration = 4500; // 4.5 секунды
+  const startTime = performance.now();
+  let lastSector = Math.floor(startRotation / 60);
 
-  setTimeout(() => {
-    clearInterval(tickInterval);
-    // В связи с тем как отрисованы сектора в SVG (по часовой стрелке):
-    // Sector 0: x1.5, Sector 1: x0, Sector 2: x2.5, Sector 3: x0, Sector 4: x1.2, Sector 5: x0
-    const actualMultIndex = targetSector === 0 ? 1.5 : (targetSector === 2 ? 2.5 : (targetSector === 4 ? 1.2 : 0));
+  function animateWheel(time) {
+    let elapsed = time - startTime;
+    let progress = Math.min(elapsed / duration, 1);
     
-    if (actualMultIndex > 0) {
-      const winAmountStars = Math.floor(wheelState.bet * actualMultIndex);
-      STATE.balance += winAmountStars;
-      addHistory('Колесо', wheelState.bet, winAmountStars);
-      SOUNDS.win();
-      showWinModal(formatMoney(winAmountStars), getCurrencyIcon(), actualMultIndex);
-    } else {
-      addHistory('Колесо', wheelState.bet, 0);
-      SOUNDS.lose();
-      showLoseModal(false, 'Колесо остановилось на пустом секторе... Повезет в следующий раз!');
+    // Функция плавного замедления (easeOutQuart)
+    let easeOut = 1 - Math.pow(1 - progress, 4);
+    let currentRot = startRotation + (finalRotation - startRotation) * easeOut;
+    
+    wheel.style.transform = `rotate(${currentRot}deg)`;
+    
+    // 3. Треск при пересечении сектора
+    // Мы проверяем, изменился ли текущий сектор под указателем
+    let currentSector = Math.floor(currentRot / 60); // Каждые 60 градусов - новый сектор
+    if (currentSector !== lastSector) {
+      SOUNDS.wheelTick();
+      lastSector = currentSector;
     }
-    
-    updateUI();
-    wheelState.spinning = false;
-    btn.disabled = false;
-    resetWheel();
-  }, 4200); 
+
+    if (progress < 1) {
+      requestAnimationFrame(animateWheel);
+    } else {
+      // 4. Конец вращения
+      wheelState.currentRotation = finalRotation;
+      
+      if (actualMult > 0) {
+        const winAmountStars = Math.floor(wheelState.bet * actualMult);
+        STATE.balance += winAmountStars;
+        addHistory('Колесо', wheelState.bet, winAmountStars);
+        SOUNDS.win();
+        showWinModal(formatMoney(winAmountStars), getCurrencyIcon(), actualMult);
+      } else {
+        addHistory('Колесо', wheelState.bet, 0);
+        SOUNDS.lose();
+        showLoseModal(false, 'Колесо остановилось на пустом секторе... Повезет в следующий раз!');
+      }
+      
+      updateUI();
+      wheelState.spinning = false;
+      btn.disabled = false;
+      // Не сбрасываем угол сразу, оставляем как есть до следующей игры
+    }
+  }
+  
+  requestAnimationFrame(animateWheel);
 }
 
 /* ================= МОДАЛКИ И ПОПОЛНЕНИЕ ================= */
