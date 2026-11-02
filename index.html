@@ -369,7 +369,7 @@ function initUserId() {
 
 async function initUserData() {
   STATE.userId = initUserId();
-  updateUI(); // <--- ВАЖНО: Сразу показываем ID на экране!
+  updateUI(); 
   
   if (!window.db) {
     console.error("Firebase не инициализирован!");
@@ -387,7 +387,7 @@ async function initUserData() {
       await setDoc(userDocRef, { balance: 0, history: [], createdAt: new Date() });
       STATE.balance = 0;
       STATE.history = [];
-      updateUI(); // <--- ВАЖНО
+      updateUI(); 
       finishLoading();
     } else {
       onSnapshot(userDocRef, (doc) => {
@@ -395,7 +395,7 @@ async function initUserData() {
           const data = doc.data();
           STATE.balance = data.balance || 0;
           STATE.history = data.history || [];
-          updateUI(); // <--- ВАЖНО
+          updateUI(); 
           renderHistory();
           if (!isDataLoaded) finishLoading();
         }
@@ -404,7 +404,7 @@ async function initUserData() {
   } catch (e) {
     console.error("Ошибка Firebase:", e);
     showToast("Ошибка синхронизации");
-    updateUI(); // <--- ВАЖНО
+    updateUI(); 
     finishLoading();
   }
 }
@@ -441,7 +441,7 @@ function updateUI() {
   const displayBalance = formatMoney(STATE.balance);
   document.getElementById('balanceTop').textContent = displayBalance;
   document.getElementById('balanceProfile').textContent = formatMoney(STATE.balance);
-  document.getElementById('userId').textContent = `ID: ${STATE.userId}`; // ТУТ ТЕПЕРЬ ПИШЕТСЯ ID
+  document.getElementById('userId').textContent = `ID: ${STATE.userId}`; 
   
   if (document.getElementById('slot-betInput')) {
     document.getElementById('slot-betInput').value = formatMoney(slotState.bet);
