@@ -308,14 +308,8 @@
 </div>
 
 <script>
-// ==========================================
-// ССЫЛКА НА ТВОЙ СЕРВЕР
-// ==========================================
 const API_URL = 'https://garisdrop-backend.garisnazar1.workers.dev';
 
-// ==========================================
-// ЗВУКИ И УВЕДОМЛЕНИЯ
-// ==========================================
 let soundEnabled = true;
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 let audioCtx;
@@ -361,13 +355,9 @@ document.querySelectorAll('button, .game-card, .nav-btn, .back-btn, .bonus-btn')
   el.addEventListener('click', () => SOUNDS.click());
 });
 
-// ==========================================
-// ДАННЫЕ И СОСТОЯНИЕ (FIREBASE)
-// ==========================================
-let STATE = {
-  balance: 0, currency: 'stars', history: [], userId: null
-};
+let STATE = { balance: 0, currency: 'stars', history: [], userId: null };
 let userDocRef = null;
+let isDataLoaded = false;
 
 function initUserId() {
   let tgId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
@@ -380,7 +370,11 @@ function initUserId() {
 async function initUserData() {
   STATE.userId = initUserId();
   
-  if (!window.db) return;
+  if (!window.db) {
+    console.error("Firebase не инициализирован!");
+    finishLoading();
+    return;
+  }
 
   const { doc, getDoc, setDoc, onSnapshot } = window;
   userDocRef = doc(window.db, "users", STATE.userId);
@@ -389,15 +383,10 @@ async function initUserData() {
     const docSnap = await getDoc(userDocRef);
     
     if (!docSnap.exists()) {
-      // Если игрока нет - создаем с балансом 0
-      await setDoc(userDocRef, {
-        balance: 0,
-        history: [],
-        createdAt: new Date()
-      });
+      await setDoc(userDocRef, { balance: 0, history: [], createdAt: new Date() });
       STATE.balance = 0;
       STATE.history = [];
-      updateUI();
+      finishLoading();
     } else {
       onSnapshot(userDocRef, (doc) => {
         if (doc.exists()) {
@@ -406,22 +395,27 @@ async function initUserData() {
           STATE.history = data.history || [];
           updateUI();
           renderHistory();
+          if (!isDataLoaded) finishLoading();
         }
       });
     }
   } catch (e) {
     console.error("Ошибка Firebase:", e);
+    showToast("Ошибка синхронизации");
+    finishLoading();
   }
+}
+
+function finishLoading() {
+  isDataLoaded = true;
+  document.getElementById('loader').classList.remove('show');
 }
 
 async function updateBalanceInDb(newBalance, newHistory) {
   if (!userDocRef) return;
   const { updateDoc } = window;
   try {
-    await updateDoc(userDocRef, {
-      balance: newBalance,
-      history: newHistory
-    });
+    await updateDoc(userDocRef, { balance: newBalance, history: newHistory });
   } catch (e) {
     console.error("Ошибка сохранения:", e);
   }
@@ -451,11 +445,9 @@ function updateUI() {
   document.getElementById('balanceTop').textContent = displayBalance;
   document.getElementById('balanceProfile').textContent = formatMoney(STATE.balance);
   document.getElementById('userId').textContent = `ID: ${STATE.userId}`;
-  
   if (document.getElementById('slot-betInput')) {
     document.getElementById('slot-betInput').value = formatMoney(slotState.bet);
   }
-
   document.getElementById('userLevel').textContent = '0';
   document.getElementById('nextLevelText').textContent = `Пополни на 50 ⭐`;
 }
@@ -518,7 +510,6 @@ function openGame(game) {
   });
 }
 
-/* ================= СЛОТЫ ================= */
 const SLOT_MODES = {
   easy: { cols: 3, mult: 1.5, baseWinChance: 0.30 }, 
   medium: { cols: 4, mult: 2.0, baseWinChance: 0.20 },
@@ -598,11 +589,9 @@ function spinSlots() {
     
     setTimeout(() => {
       clearInterval(spinInterval);
-      
       for (let row = 0; row < 3; row++) {
         const cell = document.querySelector(`.cell[data-col="${col}"][data-row="${row}"]`);
         cell.classList.remove('spinning');
-        
         if (row === 1 && isWin) {
            cell.textContent = winSymbol;
            cell.classList.add('win');
@@ -612,30 +601,23 @@ function spinSlots() {
         }
       }
       SOUNDS.spinTick(); 
-      
-      if (col === cols - 1) {
-        setTimeout(() => endSpin(isWin, winSymbol), 300);
-      }
+      if (col === cols - 1) setTimeout(() => endSpin(isWin, winSymbol), 300);
     }, (col + 1) * 400);
   }
 }
 
 function endSpin(isWin, winSymbol) {
   const modeData = SLOT_MODES[slotState.mode];
-  
   if (isWin) {
     const winAmount = Math.floor(slotState.bet * modeData.mult);
     STATE.balance += winAmount;
     addHistory('Слоты', slotState.bet, winAmount);
-    SOUNDS.win();
-    animateBalance();
+    SOUNDS.win(); animateBalance();
     showWinModal(winAmount, '⭐', 'Отличный выигрыш!');
   } else {
     addHistory('Слоты', slotState.bet, 0);
-    SOUNDS.lose();
-    showLoseModal(true, 'Повезет в следующий раз!');
+    SOUNDS.lose(); showLoseModal(true, 'Повезет в следующий раз!');
   }
-
   slotState.spinning = false;
   document.getElementById('spinBtn').disabled = false;
   document.getElementById('slot-betMinus').disabled = false;
@@ -644,7 +626,6 @@ function endSpin(isWin, winSymbol) {
   updateUI();
 }
 
-/* ================= МОДАЛКИ ================= */
 function closeModal() {
   document.getElementById('modalMask').classList.remove('show');
   document.getElementById('modalContent').innerHTML = '';
@@ -658,9 +639,7 @@ function showWinModal(amount, currency, title) {
   document.getElementById('modalTitle').textContent = title;
   document.getElementById('modalText').innerHTML = `Вы заработали:<br><span class="win-amount">${formatMoney(amount)} <span>${currency}</span></span>`;
   const btn = document.getElementById('modalBtn');
-  btn.className = 'modal-btn green';
-  btn.textContent = 'Забрать';
-  btn.style.display = 'block';
+  btn.className = 'modal-btn green'; btn.textContent = 'Забрать'; btn.style.display = 'block';
   document.getElementById('modalMask').classList.add('show');
 }
 
@@ -671,28 +650,21 @@ function showLoseModal(isGame, text) {
   document.getElementById('modalTitle').textContent = isGame ? 'Не повезло...' : 'Внимание';
   document.getElementById('modalText').textContent = text;
   const btn = document.getElementById('modalBtn');
-  btn.className = 'modal-btn purple';
-  btn.textContent = 'Продолжить';
-  btn.style.display = 'block';
+  btn.className = 'modal-btn purple'; btn.textContent = 'Продолжить'; btn.style.display = 'block';
   document.getElementById('modalMask').classList.add('show');
 }
 
-/* ================= РАБОЧЕЕ ПОПОЛНЕНИЕ (STARS) ================= */
 function openDepositModal() {
   const modal = document.getElementById('modalBox');
   modal.className = 'modal win';
   document.getElementById('modalIcon').innerHTML = '<div class="icon-win">💎</div>';
   document.getElementById('modalTitle').textContent = 'Пополнение';
   document.getElementById('modalText').innerHTML = 'Введите сумму в звездах:';
-  
   const content = document.getElementById('modalContent');
   content.innerHTML = `
-    <div class="input-group">
-      <input type="number" id="depositAmountInput" placeholder="Например: 100" min="1">
-    </div>
+    <div class="input-group"><input type="number" id="depositAmountInput" placeholder="Например: 100" min="1"></div>
     <button class="main-action-btn" style="margin-top: 15px;" onclick="processStarsPayment()">Оплатить Stars ⭐</button>
   `;
-  
   document.getElementById('modalBtn').style.display = 'none';
   document.getElementById('modalMask').classList.add('show');
 }
@@ -700,58 +672,38 @@ function openDepositModal() {
 async function processStarsPayment() {
   const amount = parseInt(document.getElementById('depositAmountInput').value);
   if (!amount || amount < 1) return showToast('Введите корректную сумму!');
-
   closeModal();
   showLoader(async () => {
     try {
-      // Делаем запрос на сервер
       const response = await fetch(`${API_URL}/create-invoice`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: STATE.userId, amount: amount })
       });
-
       const data = await response.json();
-
       if (data.success && data.invoiceLink) {
         if (window.Telegram?.WebApp) {
           window.Telegram.WebApp.openInvoice(data.invoiceLink, (status) => {
-            if (status === 'paid') showToast('Оплата прошла успешно!');
+            if (status === 'paid') showToast('Оплата прошла!');
             else showToast('Оплата отменена.');
           });
-        } else {
-          window.open(data.invoiceLink, '_blank');
-        }
-      } else {
-        showLoseModal(false, data.error || 'Ошибка при создании счета.');
-      }
-    } catch (e) {
-      showLoseModal(false, 'Ошибка сети или сервера: ' + e.message);
-    }
+        } else { window.open(data.invoiceLink, '_blank'); }
+      } else { showLoseModal(false, data.error || 'Ошибка при создании счета.'); }
+    } catch (e) { showLoseModal(false, 'Ошибка сети: ' + e.message); }
   });
 }
 
-/* ================= РАБОЧИЙ ВЫВОД ================= */
 function openWithdrawModal() {
   const modal = document.getElementById('modalBox');
   modal.className = 'modal win';
   document.getElementById('modalIcon').innerHTML = '<div class="icon-win">💸</div>';
   document.getElementById('modalTitle').textContent = 'Вывод средств';
   document.getElementById('modalText').innerHTML = 'Заявка уйдет администратору:';
-  
   const content = document.getElementById('modalContent');
   content.innerHTML = `
-    <div class="input-group">
-      <label>Сумма (⭐)</label>
-      <input type="number" id="withdrawAmountInput" placeholder="Мин. 100" min="100">
-    </div>
-    <div class="input-group">
-      <label>Куда вывести (Реквизиты)</label>
-      <input type="text" id="withdrawDetailsInput" placeholder="Номер карты или TON-кошелек">
-    </div>
-    <button class="main-action-btn" style="margin-top: 15px;" onclick="submitWithdraw()">Отправить админу</button>
+    <div class="input-group"><label>Сумма (⭐)</label><input type="number" id="withdrawAmountInput" placeholder="Мин. 100" min="100"></div>
+    <div class="input-group"><label>Реквизиты</label><input type="text" id="withdrawDetailsInput" placeholder="Карта или кошелек"></div>
+    <button class="main-action-btn" style="margin-top: 15px;" onclick="submitWithdraw()">Отправить</button>
   `;
-  
   document.getElementById('modalBtn').style.display = 'none';
   document.getElementById('modalMask').classList.add('show');
 }
@@ -759,49 +711,31 @@ function openWithdrawModal() {
 async function submitWithdraw() {
   const amount = parseInt(document.getElementById('withdrawAmountInput').value);
   const details = document.getElementById('withdrawDetailsInput').value.trim();
-
-  if (!amount || amount < 100) return showToast('Минимальная сумма вывода 100⭐');
-  if (!details) return showToast('Введите реквизиты для вывода!');
-  if (amount > STATE.balance) return showToast('Недостаточно средств на балансе!');
-
+  if (!amount || amount < 100) return showToast('Мин. сумма 100⭐');
+  if (!details) return showToast('Введите реквизиты!');
+  if (amount > STATE.balance) return showToast('Недостаточно средств!');
   closeModal();
   showLoader(async () => {
     try {
       const response = await fetch(`${API_URL}/withdraw`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: STATE.userId,
-          amount: amount,
-          details: details
-        })
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: STATE.userId, amount: amount, details: details })
       });
-
       const data = await response.json();
-
       if (data.success) {
         STATE.balance -= amount;
-        updateUI();
-        updateBalanceInDb(STATE.balance, STATE.history); // Обновляем в базе
-        
+        updateUI(); updateBalanceInDb(STATE.balance, STATE.history);
         showWinModal(amount, '⭐', 'Заявка отправлена!');
-        document.getElementById('modalText').innerHTML = 'Ожидайте, администратор свяжется с вами.';
+        document.getElementById('modalText').innerHTML = 'Ожидайте связи от администратора.';
         document.querySelector('.win-amount').style.display = 'none'; 
-      } else {
-        showLoseModal(false, data.error || 'Ошибка при отправке заявки.');
-      }
-    } catch (e) {
-      showLoseModal(false, 'Ошибка сети. Не удалось отправить заявку.');
-    }
+      } else { showLoseModal(false, data.error || 'Ошибка.'); }
+    } catch (e) { showLoseModal(false, 'Ошибка сети.'); }
   });
 }
 
-/* ================= СТАРТ ================= */
 initUserData();
 setSlotMode('easy'); 
 updateUI();
-renderHistory();
-document.getElementById('loader').classList.remove('show');
 </script>
 </body>
 </html>
