@@ -26,7 +26,6 @@
 </script>
 
 <style>
-  /* ... (ТВОИ СТИЛИ ОСТАЮТСЯ БЕЗ ИЗМЕНЕНИЙ, Я НЕ ТРОГАЛ CSS) ... */
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; }
   :root{ --neon:#00ff9d; --bg:#050505; --card:#0a1410; --card2:#0f1f18; --border:rgba(0,255,157,.15); --text:#e6fff5; --muted:#5f8a78; --red:#ff4d6d; --yellow:#ffd700; --purple:#a855f7; }
   html,body{ height:100%; background:var(--bg); color:var(--text); overflow:hidden; }
@@ -147,12 +146,7 @@
   .modal{ width:90%; max-width:320px; background:linear-gradient(160deg, var(--card2), #050d0a); border-radius:32px; padding:30px 24px; position:relative; text-align:center; box-shadow: 0 20px 60px rgba(0,0,0,0.9); animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
   @keyframes popIn { from { transform: scale(0.85) translateY(20px); opacity: 0;} to { transform: scale(1) translateY(0); opacity: 1;} }
   
-  .modal-close-btn {
-    position: absolute; top: 15px; right: 15px; width: 32px; height: 32px; border-radius: 50%;
-    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--muted);
-    display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer;
-    transition: all 0.2s; z-index: 10;
-  }
+  .modal-close-btn { position: absolute; top: 15px; right: 15px; width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--muted); display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; transition: all 0.2s; z-index: 10; }
   .modal-close-btn:active { background: rgba(255,255,255,0.15); color: white; transform: scale(0.9); }
 
   .modal-brand-top { font-size: 18px; font-weight: 900; letter-spacing: 1px; color: var(--muted); margin-bottom: 20px; text-transform: uppercase; }
@@ -182,14 +176,6 @@
   .history-win { color: var(--neon); }
   .history-lose { color: var(--red); }
   
-  .dep-method { display: flex; flex-direction: column; gap: 10px; width: 100%; margin-top: 10px; }
-  .dep-option { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 14px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
-  .dep-option:active { background: rgba(0,255,157,0.1); border-color: var(--neon); }
-  .dep-option .icon { font-size: 24px; }
-  .dep-option .text { text-align: left; }
-  .dep-option .text b { display: block; font-size: 15px; color: white; }
-  .dep-option .text span { font-size: 11px; color: var(--muted); }
-
   .input-group { display: flex; flex-direction: column; text-align: left; width: 100%; margin-top: 15px; gap: 5px; }
   .input-group label { font-size: 12px; color: var(--muted); }
   .input-group input { width: 100%; padding: 14px; background: var(--card); border: 1px solid var(--border); border-radius: 14px; color: white; font-size: 16px; font-weight: bold; outline: none; }
@@ -322,10 +308,13 @@
 </div>
 
 <script>
+// ==========================================
+// ССЫЛКА НА ТВОЙ СЕРВЕР
+// ==========================================
 const API_URL = 'https://garisdrop-backend.garisnazar1.workers.dev';
 
 // ==========================================
-// ЗВУКИ
+// ЗВУКИ И УВЕДОМЛЕНИЯ
 // ==========================================
 let soundEnabled = true;
 const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -383,7 +372,6 @@ let userDocRef = null;
 function initUserId() {
   let tgId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
   if (tgId) return String(tgId);
-  // Для тестов в браузере
   let savedId = localStorage.getItem('garisDropUserId');
   if (!savedId) { savedId = String(Math.floor(Math.random() * 9000000) + 1000000); localStorage.setItem('garisDropUserId', savedId); }
   return savedId;
@@ -392,10 +380,7 @@ function initUserId() {
 async function initUserData() {
   STATE.userId = initUserId();
   
-  if (!window.db) {
-    console.error("Firebase не инициализирован!");
-    return;
-  }
+  if (!window.db) return;
 
   const { doc, getDoc, setDoc, onSnapshot } = window;
   userDocRef = doc(window.db, "users", STATE.userId);
@@ -414,7 +399,6 @@ async function initUserData() {
       STATE.history = [];
       updateUI();
     } else {
-      // Подписываемся на изменения баланса в реальном времени
       onSnapshot(userDocRef, (doc) => {
         if (doc.exists()) {
           const data = doc.data();
@@ -427,11 +411,9 @@ async function initUserData() {
     }
   } catch (e) {
     console.error("Ошибка Firebase:", e);
-    showToast("Ошибка синхронизации с сервером");
   }
 }
 
-// Функция для обновления баланса в базе
 async function updateBalanceInDb(newBalance, newHistory) {
   if (!userDocRef) return;
   const { updateDoc } = window;
@@ -474,7 +456,6 @@ function updateUI() {
     document.getElementById('slot-betInput').value = formatMoney(slotState.bet);
   }
 
-  // Заглушка для уровней, так как это уже другая логика
   document.getElementById('userLevel').textContent = '0';
   document.getElementById('nextLevelText').textContent = `Пополни на 50 ⭐`;
 }
@@ -485,11 +466,8 @@ function copyRefLink() {
 
 function addHistory(game, betStars, winStars) {
   const newHistory = [...STATE.history, { game, betStars, winStars, isWin: winStars > 0, date: new Date() }];
-  if (newHistory.length > 15) newHistory.shift(); // Ограничиваем историю
-  
-  const newBalance = winStars > 0 ? STATE.balance + winStars : STATE.balance; // Баланс уже списан в spinSlots
-  
-  // Обновляем в базе
+  if (newHistory.length > 15) newHistory.shift();
+  const newBalance = winStars > 0 ? STATE.balance + winStars : STATE.balance;
   updateBalanceInDb(newBalance, newHistory);
 }
 
@@ -500,7 +478,6 @@ function renderHistory() {
   if (STATE.history.length === 0) {
     list.innerHTML = '<p style="color:var(--muted); text-align:center; margin-top:20px;">История пуста</p>'; return;
   }
-  // Показываем в обратном порядке (новые сверху)
   [...STATE.history].reverse().forEach(item => {
     const div = document.createElement('div');
     div.className = 'history-item';
@@ -591,13 +568,8 @@ function spinSlots() {
   if (STATE.balance < slotState.bet) return showLoseModal(false, 'Недостаточно средств на балансе!');
 
   slotState.spinning = true;
-  
-  // Списываем ставку локально и обновляем в базе (баланс уменьшится после ответа Firebase)
   STATE.balance -= slotState.bet;
-  const newBalanceAfterBet = STATE.balance;
-  
-  // Обновляем в БД
-  updateBalanceInDb(newBalanceAfterBet, STATE.history);
+  updateBalanceInDb(STATE.balance, STATE.history);
 
   document.getElementById('spinBtn').disabled = true;
   document.getElementById('slot-betMinus').disabled = true;
@@ -653,7 +625,7 @@ function endSpin(isWin, winSymbol) {
   
   if (isWin) {
     const winAmount = Math.floor(slotState.bet * modeData.mult);
-    STATE.balance += winAmount; // Начисляем выигрыш
+    STATE.balance += winAmount;
     addHistory('Слоты', slotState.bet, winAmount);
     SOUNDS.win();
     animateBalance();
@@ -669,7 +641,167 @@ function endSpin(isWin, winSymbol) {
   document.getElementById('slot-betMinus').disabled = false;
   document.getElementById('slot-betPlus').disabled = false;
   document.getElementById('slot-betInput').disabled = false;
+  updateUI();
 }
+
+/* ================= МОДАЛКИ ================= */
+function closeModal() {
+  document.getElementById('modalMask').classList.remove('show');
+  document.getElementById('modalContent').innerHTML = '';
+  setTimeout(() => { document.getElementById('modalBtn').style.display = 'block'; }, 300);
+}
+
+function showWinModal(amount, currency, title) {
+  const modal = document.getElementById('modalBox');
+  modal.className = 'modal win';
+  document.getElementById('modalIcon').innerHTML = `<div class="icon-win"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>`;
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalText').innerHTML = `Вы заработали:<br><span class="win-amount">${formatMoney(amount)} <span>${currency}</span></span>`;
+  const btn = document.getElementById('modalBtn');
+  btn.className = 'modal-btn green';
+  btn.textContent = 'Забрать';
+  btn.style.display = 'block';
+  document.getElementById('modalMask').classList.add('show');
+}
+
+function showLoseModal(isGame, text) {
+  const modal = document.getElementById('modalBox');
+  modal.className = 'modal lose';
+  document.getElementById('modalIcon').innerHTML = `<div class="icon-lose"><svg viewBox="0 0 24 24"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path><path d="M8 15s1.5-2 4-2 4 2 4 2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg></div>`;
+  document.getElementById('modalTitle').textContent = isGame ? 'Не повезло...' : 'Внимание';
+  document.getElementById('modalText').textContent = text;
+  const btn = document.getElementById('modalBtn');
+  btn.className = 'modal-btn purple';
+  btn.textContent = 'Продолжить';
+  btn.style.display = 'block';
+  document.getElementById('modalMask').classList.add('show');
+}
+
+/* ================= РАБОЧЕЕ ПОПОЛНЕНИЕ (STARS) ================= */
+function openDepositModal() {
+  const modal = document.getElementById('modalBox');
+  modal.className = 'modal win';
+  document.getElementById('modalIcon').innerHTML = '<div class="icon-win">💎</div>';
+  document.getElementById('modalTitle').textContent = 'Пополнение';
+  document.getElementById('modalText').innerHTML = 'Введите сумму в звездах:';
+  
+  const content = document.getElementById('modalContent');
+  content.innerHTML = `
+    <div class="input-group">
+      <input type="number" id="depositAmountInput" placeholder="Например: 100" min="1">
+    </div>
+    <button class="main-action-btn" style="margin-top: 15px;" onclick="processStarsPayment()">Оплатить Stars ⭐</button>
+  `;
+  
+  document.getElementById('modalBtn').style.display = 'none';
+  document.getElementById('modalMask').classList.add('show');
+}
+
+async function processStarsPayment() {
+  const amount = parseInt(document.getElementById('depositAmountInput').value);
+  if (!amount || amount < 1) return showToast('Введите корректную сумму!');
+
+  closeModal();
+  showLoader(async () => {
+    try {
+      // Делаем запрос на сервер
+      const response = await fetch(`${API_URL}/create-invoice`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: STATE.userId, amount: amount })
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.invoiceLink) {
+        if (window.Telegram?.WebApp) {
+          window.Telegram.WebApp.openInvoice(data.invoiceLink, (status) => {
+            if (status === 'paid') showToast('Оплата прошла успешно!');
+            else showToast('Оплата отменена.');
+          });
+        } else {
+          window.open(data.invoiceLink, '_blank');
+        }
+      } else {
+        showLoseModal(false, data.error || 'Ошибка при создании счета.');
+      }
+    } catch (e) {
+      showLoseModal(false, 'Ошибка сети или сервера: ' + e.message);
+    }
+  });
+}
+
+/* ================= РАБОЧИЙ ВЫВОД ================= */
+function openWithdrawModal() {
+  const modal = document.getElementById('modalBox');
+  modal.className = 'modal win';
+  document.getElementById('modalIcon').innerHTML = '<div class="icon-win">💸</div>';
+  document.getElementById('modalTitle').textContent = 'Вывод средств';
+  document.getElementById('modalText').innerHTML = 'Заявка уйдет администратору:';
+  
+  const content = document.getElementById('modalContent');
+  content.innerHTML = `
+    <div class="input-group">
+      <label>Сумма (⭐)</label>
+      <input type="number" id="withdrawAmountInput" placeholder="Мин. 100" min="100">
+    </div>
+    <div class="input-group">
+      <label>Куда вывести (Реквизиты)</label>
+      <input type="text" id="withdrawDetailsInput" placeholder="Номер карты или TON-кошелек">
+    </div>
+    <button class="main-action-btn" style="margin-top: 15px;" onclick="submitWithdraw()">Отправить админу</button>
+  `;
+  
+  document.getElementById('modalBtn').style.display = 'none';
+  document.getElementById('modalMask').classList.add('show');
+}
+
+async function submitWithdraw() {
+  const amount = parseInt(document.getElementById('withdrawAmountInput').value);
+  const details = document.getElementById('withdrawDetailsInput').value.trim();
+
+  if (!amount || amount < 100) return showToast('Минимальная сумма вывода 100⭐');
+  if (!details) return showToast('Введите реквизиты для вывода!');
+  if (amount > STATE.balance) return showToast('Недостаточно средств на балансе!');
+
+  closeModal();
+  showLoader(async () => {
+    try {
+      const response = await fetch(`${API_URL}/withdraw`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: STATE.userId,
+          amount: amount,
+          details: details
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        STATE.balance -= amount;
+        updateUI();
+        updateBalanceInDb(STATE.balance, STATE.history); // Обновляем в базе
+        
+        showWinModal(amount, '⭐', 'Заявка отправлена!');
+        document.getElementById('modalText').innerHTML = 'Ожидайте, администратор свяжется с вами.';
+        document.querySelector('.win-amount').style.display = 'none'; 
+      } else {
+        showLoseModal(false, data.error || 'Ошибка при отправке заявки.');
+      }
+    } catch (e) {
+      showLoseModal(false, 'Ошибка сети. Не удалось отправить заявку.');
+    }
+  });
+}
+
+/* ================= СТАРТ ================= */
+initUserData();
+setSlotMode('easy'); 
+updateUI();
+renderHistory();
+document.getElementById('loader').classList.remove('show');
 </script>
 </body>
 </html>
