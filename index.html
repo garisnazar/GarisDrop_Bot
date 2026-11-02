@@ -92,16 +92,8 @@
   
   .cell{ aspect-ratio:1; border-radius:12px; background:#0d1f18; border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size: clamp(20px, 6vw, 32px); transition: transform 0.1s, opacity 0.1s, box-shadow 0.2s, border-color 0.2s; position: relative; z-index: 1; }
   
-  .cell.spinning { 
-    animation: slotSpin 0.15s linear infinite; 
-    filter: blur(1.5px);
-    opacity: 0.8;
-  }
-  @keyframes slotSpin { 
-    0% { transform: translateY(-30%); opacity: 0; } 
-    50% { transform: translateY(0); opacity: 0.8; } 
-    100% { transform: translateY(30%); opacity: 0; } 
-  }
+  .cell.spinning { animation: slotSpin 0.15s linear infinite; filter: blur(1.5px); opacity: 0.8; }
+  @keyframes slotSpin { 0% { transform: translateY(-30%); opacity: 0; } 50% { transform: translateY(0); opacity: 0.8; } 100% { transform: translateY(30%); opacity: 0; } }
 
   .cell.win{ border-color:var(--neon); box-shadow: 0 0 20px rgba(0,255,157,0.8), inset 0 0 10px rgba(0,255,157,0.4); background: rgba(0,255,157,0.1); transform: scale(1.05); z-index: 4; }
   
@@ -150,31 +142,18 @@
   .nav-btn{ flex:1; padding:12px 5px; border-radius:18px; border:none; background:transparent; color:var(--muted); font-weight:800; cursor:pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12px;}
   .nav-btn.active{ background:rgba(0,255,157,.15); color:var(--neon); }
   
-  /* === МЯГКИЕ МОДАЛКИ === */
+  /* === МОДАЛКИ === */
   .modal-mask{ position:fixed; inset:0; z-index:50; display:none; background:rgba(0,0,0,.7); align-items:center; justify-content:center; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
   .modal-mask.show{ display:flex; }
   
   .modal{ width:90%; max-width:320px; background:linear-gradient(160deg, var(--card2), #050d0a); border-radius:32px; padding:30px 24px; position:relative; text-align:center; box-shadow: 0 20px 60px rgba(0,0,0,0.9); animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
   @keyframes popIn { from { transform: scale(0.85) translateY(20px); opacity: 0;} to { transform: scale(1) translateY(0); opacity: 1;} }
   
-  /* Кнопка закрытия (крестик) */
   .modal-close-btn {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.1);
-    color: var(--muted);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    cursor: pointer;
-    transition: all 0.2s;
-    z-index: 10;
+    position: absolute; top: 15px; right: 15px; width: 32px; height: 32px; border-radius: 50%;
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--muted);
+    display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer;
+    transition: all 0.2s; z-index: 10;
   }
   .modal-close-btn:active { background: rgba(255,255,255,0.15); color: white; transform: scale(0.9); }
 
@@ -212,6 +191,11 @@
   .dep-option .text { text-align: left; }
   .dep-option .text b { display: block; font-size: 15px; color: white; }
   .dep-option .text span { font-size: 11px; color: var(--muted); }
+
+  .input-group { display: flex; flex-direction: column; text-align: left; width: 100%; margin-top: 15px; gap: 5px; }
+  .input-group label { font-size: 12px; color: var(--muted); }
+  .input-group input { width: 100%; padding: 14px; background: var(--card); border: 1px solid var(--border); border-radius: 14px; color: white; font-size: 16px; font-weight: bold; outline: none; }
+  .input-group input:focus { border-color: var(--neon); }
 </style>
 </head>
 <body>
@@ -225,7 +209,6 @@
     <div class="logo">🐸 GARISDROP</div>
     <div class="header-right">
       <button class="deposit-btn-large" onclick="openDepositModal()">+ Пополнить</button>
-      <!-- Кнопка переключения валюты убрана -->
       <div class="balance-pill" id="balancePillHeader">
         <span id="currencyIcon">⭐</span> <span id="balanceTop">0</span>
       </div>
@@ -328,7 +311,6 @@
 
 <div class="modal-mask" id="modalMask">
   <div class="modal" id="modalBox">
-    <!-- Кнопка закрытия добавлена -->
     <button class="modal-close-btn" onclick="closeModal()">✕</button>
     
     <div class="modal-brand-top">GarisDrop</div>
@@ -342,10 +324,13 @@
 </div>
 
 <script>
+// ==========================================
+// ССЫЛКА НА ТВОЙ ОЖИВШИЙ СЕРВЕР
+// ==========================================
 const API_URL = 'https://garisdrop-backend.garisnazar1.workers.dev';
 
 // ==========================================
-// ЗВУКИ
+// ЗВУКИ И УВЕДОМЛЕНИЯ
 // ==========================================
 let soundEnabled = true;
 const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -375,11 +360,9 @@ function playTone(freq, type, duration, vol = 0.02) {
   if (!audioCtx || !soundEnabled) return;
   const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
   osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-  
   gain.gain.setValueAtTime(0, audioCtx.currentTime);
   gain.gain.linearRampToValueAtTime(vol, audioCtx.currentTime + 0.02);
   gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-  
   osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + duration);
 }
 
@@ -387,9 +370,7 @@ const SOUNDS = {
   click: () => playTone(600, 'sine', 0.05, 0.015),
   win: () => { playTone(440.00, 'sine', 0.4, 0.03); setTimeout(() => playTone(554.37, 'sine', 0.4, 0.03), 150); setTimeout(() => playTone(659.25, 'sine', 0.6, 0.04), 300); },
   lose: () => { playTone(392.00, 'sine', 0.3, 0.02); setTimeout(() => playTone(349.23, 'sine', 0.4, 0.02), 200); },
-  spinTick: () => playTone(800, 'triangle', 0.02, 0.008),
-  gem: () => playTone(1046.50, 'sine', 0.2, 0.02),
-  cashout: () => { playTone(600, 'sine', 0.05, 0.02); setTimeout(() => playTone(800, 'sine', 0.1, 0.02), 80); }
+  spinTick: () => playTone(800, 'triangle', 0.02, 0.008)
 };
 
 document.querySelectorAll('button, .game-card, .nav-btn, .back-btn, .bonus-btn').forEach(el => {
@@ -610,16 +591,13 @@ function spinSlots() {
   const modeData = SLOT_MODES[slotState.mode];
   const cols = modeData.cols;
   
-  // Шанс выигрыша зависит от ставки: чем выше ставка, тем выше шанс
-  // Например, при ставке 100⭐ шанс будет значительно выше, чем при 10⭐
   let dynamicWinChance = modeData.baseWinChance + (Math.min(slotState.bet, 500) / 1000); 
-  if (dynamicWinChance > 0.85) dynamicWinChance = 0.85; // Максимальный шанс 85% (чтобы не разорить)
+  if (dynamicWinChance > 0.85) dynamicWinChance = 0.85; 
 
   const isWin = Math.random() < dynamicWinChance;
   let winSymbol = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
   
   for (let col = 0; col < cols; col++) {
-    // Запускаем анимацию кручения для колонки
     const spinInterval = setInterval(() => {
       for (let row = 0; row < 3; row++) {
         const cell = document.querySelector(`.cell[data-col="${col}"][data-row="${row}"]`);
@@ -630,16 +608,14 @@ function spinSlots() {
       }
     }, 50);
     
-    // Останавливаем колонку по очереди
     setTimeout(() => {
-      clearInterval(spinInterval); // Останавливаем анимацию этой колонки
+      clearInterval(spinInterval);
       
       for (let row = 0; row < 3; row++) {
         const cell = document.querySelector(`.cell[data-col="${col}"][data-row="${row}"]`);
         cell.classList.remove('spinning');
         
         if (row === 1 && isWin) {
-           // Выигрышная линия по центру
            cell.textContent = winSymbol;
            cell.classList.add('win');
         } else {
@@ -649,11 +625,10 @@ function spinSlots() {
       }
       SOUNDS.spinTick(); 
       
-      // Если остановили последнюю колонку
       if (col === cols - 1) {
         setTimeout(() => endSpin(isWin, winSymbol), 300);
       }
-    }, (col + 1) * 400); // Задержка между остановками
+    }, (col + 1) * 400);
   }
 }
 
@@ -685,7 +660,6 @@ function endSpin(isWin, winSymbol) {
 function closeModal() {
   document.getElementById('modalMask').classList.remove('show');
   document.getElementById('modalContent').innerHTML = '';
-  // Восстанавливаем кнопку, если она была скрыта
   setTimeout(() => { document.getElementById('modalBtn').style.display = 'block'; }, 300);
 }
 
@@ -715,44 +689,137 @@ function showLoseModal(isGame, text) {
   document.getElementById('modalMask').classList.add('show');
 }
 
-/* ================= ОПЛАТА ================= */
+/* ================= РАБОЧЕЕ ПОПОЛНЕНИЕ (STARS) ================= */
 function openDepositModal() {
   const modal = document.getElementById('modalBox');
   modal.className = 'modal win';
   document.getElementById('modalIcon').innerHTML = '<div class="icon-win">💎</div>';
   document.getElementById('modalTitle').textContent = 'Пополнение';
-  document.getElementById('modalText').innerHTML = 'Выберите способ:';
+  document.getElementById('modalText').innerHTML = 'Введите сумму в звездах:';
   
   const content = document.getElementById('modalContent');
   content.innerHTML = `
-    <div class="dep-method">
-      <div class="dep-option" onclick="processPayment('stars')">
+    <div class="input-group">
+      <input type="number" id="depositAmountInput" placeholder="Например: 100" min="1">
+    </div>
+    <div class="dep-method" style="margin-top: 15px;">
+      <div class="dep-option" onclick="processStarsPayment()">
         <div class="icon">⭐</div>
-        <div class="text"><b>Telegram Stars</b><span>Встроенная валюта</span></div>
-      </div>
-      <div class="dep-option" onclick="processPayment('crypto')">
-        <div class="icon">💎</div>
-        <div class="text"><b>Криптовалюта</b><span>TON / USDT</span></div>
+        <div class="text"><b>Оплатить Stars</b><span>Откроется окно Telegram</span></div>
       </div>
     </div>
   `;
   
-  // Скрываем кнопку "Закрыть" снизу, так как есть крестик сверху
   document.getElementById('modalBtn').style.display = 'none';
   document.getElementById('modalMask').classList.add('show');
 }
 
-function processPayment(method) {
+async function processStarsPayment() {
+  const amount = parseInt(document.getElementById('depositAmountInput').value);
+  if (!amount || amount < 1) {
+    showToast('Введите корректную сумму!');
+    return;
+  }
+
   closeModal();
-  showLoader(() => {
-    showWinModal(0, '', 'Перенаправление...');
-    document.getElementById('modalText').innerHTML = 'Здесь откроется окно оплаты.<br><br><span style="color:red; font-size:12px;">(Ошибка сервера 500)</span>';
-    document.querySelector('.win-amount').style.display = 'none';
+  showLoader(async () => {
+    try {
+      // Отправляем запрос на наш бэкенд для создания счета
+      const response = await fetch(`${API_URL}/create-invoice`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: STATE.userId, amount: amount })
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.invoiceLink) {
+        // Открываем окно оплаты Telegram
+        if (window.Telegram?.WebApp) {
+          window.Telegram.WebApp.openInvoice(data.invoiceLink, (status) => {
+            if (status === 'paid') {
+              showToast('Оплата прошла успешно!');
+              // Здесь в будущем нужно обновить баланс, запросив данные с сервера
+            } else {
+              showToast('Оплата отменена.');
+            }
+          });
+        } else {
+          // Для теста в обычном браузере
+          window.open(data.invoiceLink, '_blank');
+        }
+      } else {
+        showLoseModal(false, data.error || 'Ошибка при создании счета.');
+      }
+    } catch (e) {
+      showLoseModal(false, 'Ошибка сети. Сервер не отвечает.');
+    }
   });
 }
 
+/* ================= РАБОЧИЙ ВЫВОД ================= */
 function openWithdrawModal() {
-  showLoseModal(false, 'Вывод средств временно недоступен. (Требуется настройка API на сервере)');
+  const modal = document.getElementById('modalBox');
+  modal.className = 'modal win';
+  document.getElementById('modalIcon').innerHTML = '<div class="icon-win">💸</div>';
+  document.getElementById('modalTitle').textContent = 'Вывод средств';
+  document.getElementById('modalText').innerHTML = 'Заявка уйдет администратору:';
+  
+  const content = document.getElementById('modalContent');
+  content.innerHTML = `
+    <div class="input-group">
+      <label>Сумма (⭐)</label>
+      <input type="number" id="withdrawAmountInput" placeholder="Мин. 100" min="100">
+    </div>
+    <div class="input-group">
+      <label>Куда вывести (Реквизиты)</label>
+      <input type="text" id="withdrawDetailsInput" placeholder="Номер карты или TON-кошелек">
+    </div>
+    <button class="main-action-btn" style="margin-top: 15px;" onclick="submitWithdraw()">Отправить админу</button>
+  `;
+  
+  document.getElementById('modalBtn').style.display = 'none';
+  document.getElementById('modalMask').classList.add('show');
+}
+
+async function submitWithdraw() {
+  const amount = parseInt(document.getElementById('withdrawAmountInput').value);
+  const details = document.getElementById('withdrawDetailsInput').value.trim();
+
+  if (!amount || amount < 100) return showToast('Минимальная сумма вывода 100⭐');
+  if (!details) return showToast('Введите реквизиты для вывода!');
+  if (amount > STATE.balance) return showToast('Недостаточно средств на балансе!');
+
+  closeModal();
+  showLoader(async () => {
+    try {
+      const response = await fetch(`${API_URL}/withdraw`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: STATE.userId,
+          amount: amount,
+          method: 'manual',
+          details: details
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Списываем баланс только если сервер подтвердил отправку
+        STATE.balance -= amount;
+        updateUI();
+        showWinModal(amount, '⭐', 'Заявка отправлена!');
+        document.getElementById('modalText').innerHTML = 'Ожидайте, администратор свяжется с вами.';
+        document.querySelector('.win-amount').style.display = 'none'; // Скрываем сумму, так как это не выигрыш
+      } else {
+        showLoseModal(false, data.error || 'Ошибка при отправке заявки.');
+      }
+    } catch (e) {
+      showLoseModal(false, 'Ошибка сети. Не удалось отправить заявку.');
+    }
+  });
 }
 
 /* ================= СТАРТ ================= */
