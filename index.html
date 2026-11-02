@@ -43,13 +43,10 @@
   #app{ position:fixed; inset:0; z-index:1; display:flex; flex-direction:column; padding:12px 12px calc(92px + env(safe-area-inset-bottom)); overflow:hidden; }
   .header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; flex-shrink: 0; gap: 4px; padding: 0 2px; width: 100%;}
   .logo{ font-weight:900; font-size:16px; background:linear-gradient(90deg,#00ff9d,#5cbf4a,#00ff9d); -webkit-background-clip:text; background-clip:text; color:transparent; white-space: nowrap;}
-  .header-right{ display:flex; align-items:center; gap:4px; flex-shrink: 0;}
+  .header-right{ display:flex; align-items:center; gap:6px; flex-shrink: 0;}
   .deposit-btn-large { background: linear-gradient(135deg, #00ff9d, #5cbf4a); border: none; color: #001a10; height: 32px; padding: 0 10px; border-radius: 999px; font-size: 11px; font-weight: 900; cursor: pointer; box-shadow: 0 0 15px rgba(0,255,157,0.4); display: flex; align-items: center; justify-content: center; transition: transform 0.1s; white-space: nowrap;}
   .deposit-btn-large:active { transform: scale(0.9); }
-  .currency-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 32px; position: relative; flex-shrink: 0;}
-  .currency-switch-btn { background: var(--card); border: 1px solid var(--border); color: var(--neon); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 900; cursor: pointer; transition: transform 0.1s; }
-  .currency-switch-btn:active { transform: scale(0.9); }
-  .currency-label { position: absolute; bottom: -13px; font-size: 7px; color: var(--muted); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; pointer-events: none; }
+  
   .balance-pill{ background:var(--card); border:1px solid var(--border); height: 32px; padding: 0 8px; border-radius:999px; font-size:14px; font-weight:900; color:var(--neon); display:flex; align-items:center; gap:2px; box-shadow: 0 0 10px rgba(0,255,157,0.1); max-width: 85px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; transition: all 0.2s;}
   .balance-pill.update { transform: scale(1.05); box-shadow: 0 0 20px rgba(0,255,157,0.5); }
   .sound-toggle { background: none; border: none; font-size: 16px; cursor: pointer; color: var(--muted); transition: color 0.2s; padding: 0 2px; flex-shrink: 0;}
@@ -82,8 +79,10 @@
   
   .slots-wrapper { position: relative; width: 100%; max-width: 400px; padding: 0 20px; }
   .slots{ display:grid; grid-template-columns: repeat(var(--cols, 3), 1fr); gap:8px; width:100%; background:var(--card); border:1px solid var(--border); border-radius:24px; padding:14px; box-shadow: 0 0 30px rgba(0,255,157,0.05); position: relative; overflow: hidden; }
-  .slots::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 33.33%; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); pointer-events: none; z-index: 2; border-radius: 24px 24px 0 0; }
-  .slots::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 33.33%; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); pointer-events: none; z-index: 2; border-radius: 0 0 24px 24px; }
+  
+  .slots::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 25%; background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent); pointer-events: none; z-index: 2; border-radius: 24px 24px 0 0; }
+  .slots::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 25%; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); pointer-events: none; z-index: 2; border-radius: 0 0 24px 24px; }
+
   .win-line-top, .win-line-bottom { position: absolute; left: 10px; right: 10px; height: 2px; background: rgba(255, 77, 109, 0.6); box-shadow: 0 0 10px rgba(255, 77, 109, 0.8); z-index: 3; pointer-events: none; }
   .win-line-top { top: 33.33%; transform: translateY(-50%); }
   .win-line-bottom { top: 66.66%; transform: translateY(-50%); }
@@ -91,9 +90,19 @@
   .red-arrow.left { left: -4px; } .red-arrow.right { right: -4px; }
   @keyframes pulseArrow { from { opacity: 0.6; transform: translateY(-50%) scale(0.9); } to { opacity: 1; transform: translateY(-50%) scale(1.1); } }
   
-  .cell{ aspect-ratio:1; border-radius:12px; background:#0d1f18; border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size: clamp(20px, 6vw, 32px); transition: all 0.2s; position: relative; z-index: 1; }
-  .cell.spinning { animation: blurSpin 0.1s linear infinite; }
-  @keyframes blurSpin { 0% { transform: translateY(-5px); opacity: 0.7; } 100% { transform: translateY(5px); opacity: 1; } }
+  .cell{ aspect-ratio:1; border-radius:12px; background:#0d1f18; border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size: clamp(20px, 6vw, 32px); transition: transform 0.1s, opacity 0.1s, box-shadow 0.2s, border-color 0.2s; position: relative; z-index: 1; }
+  
+  .cell.spinning { 
+    animation: slotSpin 0.15s linear infinite; 
+    filter: blur(1.5px);
+    opacity: 0.8;
+  }
+  @keyframes slotSpin { 
+    0% { transform: translateY(-30%); opacity: 0; } 
+    50% { transform: translateY(0); opacity: 0.8; } 
+    100% { transform: translateY(30%); opacity: 0; } 
+  }
+
   .cell.win{ border-color:var(--neon); box-shadow: 0 0 20px rgba(0,255,157,0.8), inset 0 0 10px rgba(0,255,157,0.4); background: rgba(0,255,157,0.1); transform: scale(1.05); z-index: 4; }
   
   .bet-row{ display:flex; align-items:center; gap:10px; margin-top: 10px; z-index: 10; justify-content: center; width: 100%; }
@@ -148,34 +157,50 @@
   .modal{ width:90%; max-width:320px; background:linear-gradient(160deg, var(--card2), #050d0a); border-radius:32px; padding:30px 24px; position:relative; text-align:center; box-shadow: 0 20px 60px rgba(0,0,0,0.9); animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
   @keyframes popIn { from { transform: scale(0.85) translateY(20px); opacity: 0;} to { transform: scale(1) translateY(0); opacity: 1;} }
   
+  /* Кнопка закрытия (крестик) */
+  .modal-close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+    z-index: 10;
+  }
+  .modal-close-btn:active { background: rgba(255,255,255,0.15); color: white; transform: scale(0.9); }
+
   .modal-brand-top { font-size: 18px; font-weight: 900; letter-spacing: 1px; color: var(--muted); margin-bottom: 20px; text-transform: uppercase; }
   .modal-brand-bottom { font-size: 11px; font-weight: 600; color: rgba(95, 138, 120, 0.5); margin-top: 25px; }
   
-  /* Модалка Выигрыша */
   .modal.win { border: 1px solid rgba(0, 255, 157, 0.3); box-shadow: 0 0 40px rgba(0, 255, 157, 0.15), inset 0 0 20px rgba(0, 255, 157, 0.05); }
   .icon-win { width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, rgba(0, 255, 157, 0.15), rgba(92, 191, 74, 0.15)); border: 2px solid var(--neon); display: flex; align-items: center; justify-content: center; margin-bottom: 15px; box-shadow: 0 0 20px rgba(0, 255, 157, 0.3); }
   .icon-win svg { width: 36px; height: 36px; stroke: var(--neon); stroke-width: 3; fill: none; stroke-linecap: round; stroke-linejoin: round; }
   .modal.win h3 { color: var(--neon); font-size: 22px; font-weight: 900; margin-bottom: 8px; }
   .modal.win p { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
   
-  /* Модалка Проигрыша */
   .modal.lose { border: 1px solid rgba(168, 85, 247, 0.2); box-shadow: 0 0 40px rgba(0, 0, 0, 0.5); background: linear-gradient(160deg, #101317, #050505); }
   .icon-lose { width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(168, 85, 247, 0.05)); border: 2px solid rgba(168, 85, 247, 0.4); display: flex; align-items: center; justify-content: center; margin-bottom: 15px; }
   .icon-lose svg { width: 32px; height: 32px; stroke: var(--purple); stroke-width: 2.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
   .modal.lose h3 { color: #e6fff5; font-size: 20px; font-weight: 800; margin-bottom: 8px; }
   .modal.lose p { color: var(--muted); font-size: 14px; margin-bottom: 20px; line-height: 1.4; }
 
-  /* Сумма выигрыша */
   .win-amount { font-size: 32px; font-weight: 900; color: #fff; display: block; margin: 10px 0; text-shadow: 0 0 20px rgba(0, 255, 157, 0.6); letter-spacing: -0.5px; }
   .win-amount span { font-size: 20px; color: var(--neon); }
   
-  /* Кнопки */
   .modal-btn { width: 100%; padding: 16px; border-radius: 18px; border: none; font-weight: 900; font-size: 15px; cursor: pointer; margin-top: 10px; transition: transform 0.15s, opacity 0.15s; }
   .modal-btn:active { transform: scale(0.96); opacity: 0.9; }
   .modal-btn.green { background: linear-gradient(135deg, #00ff9d, #5cbf4a); color: #001a10; box-shadow: 0 5px 20px rgba(0, 255, 157, 0.3); }
   .modal-btn.purple { background: rgba(168, 85, 247, 0.15); color: var(--purple); border: 1px solid rgba(168, 85, 247, 0.3); }
   
-  /* Стили для истории */
   .history-item { display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; font-weight: bold; }
   .history-win { color: var(--neon); }
   .history-lose { color: var(--red); }
@@ -200,12 +225,7 @@
     <div class="logo">🐸 GARISDROP</div>
     <div class="header-right">
       <button class="deposit-btn-large" onclick="openDepositModal()">+ Пополнить</button>
-      <div class="currency-wrapper">
-        <div class="currency-switch-btn" onclick="toggleCurrency()">
-          <span id="btnCurrencyIcon">⭐</span>
-        </div>
-        <div class="currency-label">ВАЛЮТА</div>
-      </div>
+      <!-- Кнопка переключения валюты убрана -->
       <div class="balance-pill" id="balancePillHeader">
         <span id="currencyIcon">⭐</span> <span id="balanceTop">0</span>
       </div>
@@ -229,7 +249,6 @@
     </div>
   </div>
 
-  <!-- ОБНОВЛЕННАЯ СТРАНИЦА БОНУСОВ (Без ежедневного бонуса) -->
   <div class="page" id="page-bonus">
     <div class="title">Бонусы <span>▸</span></div>
     
@@ -309,6 +328,9 @@
 
 <div class="modal-mask" id="modalMask">
   <div class="modal" id="modalBox">
+    <!-- Кнопка закрытия добавлена -->
+    <button class="modal-close-btn" onclick="closeModal()">✕</button>
+    
     <div class="modal-brand-top">GarisDrop</div>
     <div id="modalIcon"></div>
     <h3 id="modalTitle"></h3>
@@ -323,7 +345,7 @@
 const API_URL = 'https://garisdrop-backend.garisnazar1.workers.dev';
 
 // ==========================================
-// ЗВУКИ (МЯГКИЕ)
+// ЗВУКИ
 // ==========================================
 let soundEnabled = true;
 const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -370,7 +392,7 @@ const SOUNDS = {
   cashout: () => { playTone(600, 'sine', 0.05, 0.02); setTimeout(() => playTone(800, 'sine', 0.1, 0.02), 80); }
 };
 
-document.querySelectorAll('button, .game-card, .nav-btn, .currency-switch-btn, .back-btn, .bonus-btn').forEach(el => {
+document.querySelectorAll('button, .game-card, .nav-btn, .back-btn, .bonus-btn').forEach(el => {
   el.addEventListener('click', () => SOUNDS.click());
 });
 
@@ -470,7 +492,6 @@ function updateUI() {
   saveState();
 }
 
-// РЕФЕРАЛЬНАЯ ПРОГРАММА ЗАКРЫТА
 function copyRefLink() {
   showLoseModal(false, 'Реферальная программа временно закрыта. Мы работаем над улучшением системы приглашений. Следите за обновлениями!');
 }
@@ -498,7 +519,6 @@ function renderHistory() {
 }
 
 function openComingSoon() { showLoseModal(false, 'Эта функция появится в следующих обновлениях! Следите за новостями.'); }
-function toggleCurrency() { showToast('Валюта фиксирована: Звезды ⭐'); }
 
 function showLoader(callback) {
   const loader = document.getElementById('loader');
@@ -531,9 +551,9 @@ function openGame(game) {
 
 /* ================= СЛОТЫ ================= */
 const SLOT_MODES = {
-  easy: { cols: 3, mult: 1.5, winChance: 0.60 },
-  medium: { cols: 4, mult: 2.0, winChance: 0.40 },
-  hard: { cols: 5, mult: 4.0, winChance: 0.20 }
+  easy: { cols: 3, mult: 1.5, baseWinChance: 0.30 }, 
+  medium: { cols: 4, mult: 2.0, baseWinChance: 0.20 },
+  hard: { cols: 5, mult: 4.0, baseWinChance: 0.10 }
 };
 let slotState = { mode: 'easy', bet: 10, spinning: false };
 
@@ -590,30 +610,16 @@ function spinSlots() {
   const modeData = SLOT_MODES[slotState.mode];
   const cols = modeData.cols;
   
-  const isWin = Math.random() < modeData.winChance;
+  // Шанс выигрыша зависит от ставки: чем выше ставка, тем выше шанс
+  // Например, при ставке 100⭐ шанс будет значительно выше, чем при 10⭐
+  let dynamicWinChance = modeData.baseWinChance + (Math.min(slotState.bet, 500) / 1000); 
+  if (dynamicWinChance > 0.85) dynamicWinChance = 0.85; // Максимальный шанс 85% (чтобы не разорить)
+
+  const isWin = Math.random() < dynamicWinChance;
   let winSymbol = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
   
   for (let col = 0; col < cols; col++) {
-    setTimeout(() => {
-      for (let row = 0; row < 3; row++) {
-        const cell = document.querySelector(`.cell[data-col="${col}"][data-row="${row}"]`);
-        cell.classList.remove('spinning');
-        
-        if (row === 1 && isWin) {
-           cell.textContent = winSymbol;
-           cell.classList.add('win');
-        } else {
-           cell.textContent = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
-           cell.classList.remove('win');
-        }
-      }
-      SOUNDS.spinTick(); 
-      
-      if (col === cols - 1) {
-        setTimeout(() => endSpin(isWin, winSymbol), 400);
-      }
-    }, (col + 1) * 400);
-
+    // Запускаем анимацию кручения для колонки
     const spinInterval = setInterval(() => {
       for (let row = 0; row < 3; row++) {
         const cell = document.querySelector(`.cell[data-col="${col}"][data-row="${row}"]`);
@@ -624,7 +630,30 @@ function spinSlots() {
       }
     }, 50);
     
-    setTimeout(() => clearInterval(spinInterval), (col + 1) * 400);
+    // Останавливаем колонку по очереди
+    setTimeout(() => {
+      clearInterval(spinInterval); // Останавливаем анимацию этой колонки
+      
+      for (let row = 0; row < 3; row++) {
+        const cell = document.querySelector(`.cell[data-col="${col}"][data-row="${row}"]`);
+        cell.classList.remove('spinning');
+        
+        if (row === 1 && isWin) {
+           // Выигрышная линия по центру
+           cell.textContent = winSymbol;
+           cell.classList.add('win');
+        } else {
+           cell.textContent = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+           cell.classList.remove('win');
+        }
+      }
+      SOUNDS.spinTick(); 
+      
+      // Если остановили последнюю колонку
+      if (col === cols - 1) {
+        setTimeout(() => endSpin(isWin, winSymbol), 300);
+      }
+    }, (col + 1) * 400); // Задержка между остановками
   }
 }
 
@@ -656,6 +685,8 @@ function endSpin(isWin, winSymbol) {
 function closeModal() {
   document.getElementById('modalMask').classList.remove('show');
   document.getElementById('modalContent').innerHTML = '';
+  // Восстанавливаем кнопку, если она была скрыта
+  setTimeout(() => { document.getElementById('modalBtn').style.display = 'block'; }, 300);
 }
 
 function showWinModal(amount, currency, title) {
@@ -705,6 +736,8 @@ function openDepositModal() {
       </div>
     </div>
   `;
+  
+  // Скрываем кнопку "Закрыть" снизу, так как есть крестик сверху
   document.getElementById('modalBtn').style.display = 'none';
   document.getElementById('modalMask').classList.add('show');
 }
