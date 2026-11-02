@@ -5,41 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>GarisDrop</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-<!-- ПОДКЛЮЧЕНИЕ FIREBASE SDK -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-  import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, onSnapshot, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-
-  // ТВОИ КЛЮЧИ
-  const firebaseConfig = {
-    apiKey: "AIzaSyCgrphceMHytjNPu0FMH4ZQAyykOHnnwt8",
-    authDomain: "garisdrop.firebaseapp.com",
-    projectId: "garisdrop",
-    storageBucket: "garisdrop.firebasestorage.app",
-    messagingSenderId: "1091919506726",
-    appId: "1:1091919506726:web:9f18f735c125d0324da5e7"
-  };
-
-  // Инициализация
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
-  // Экспорт в глобальную область, чтобы обычный скрипт мог пользоваться
-  window.db = db;
-  window.doc = doc;
-  window.getDoc = getDoc;
-  window.setDoc = setDoc;
-  window.updateDoc = updateDoc;
-  window.collection = collection;
-  window.addDoc = addDoc;
-  window.onSnapshot = onSnapshot;
-  window.query = query;
-  window.orderBy = orderBy;
-  window.limit = limit;
-  window.getDocs = getDocs;
-</script>
-
 <style>
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; }
 
@@ -319,7 +284,7 @@
 </head>
 <body>
 
-<div id="loader" class="loader-overlay show"><div class="spinner"></div></div>
+<div id="loader" class="loader-overlay"><div class="spinner"></div></div>
 <div id="bg"></div>
 <div id="toast-container"></div>
 
@@ -343,7 +308,7 @@
 
   <div class="online-bar">
     <div class="online-dot"></div>
-    <span>Сейчас в игре: <b id="onlineCount">...</b> чел.</span>
+    <span>Сейчас в игре: <b id="onlineCount">142</b> чел.</span>
   </div>
 
   <div class="page active" id="page-games">
@@ -518,4 +483,575 @@
     <p id="modalText"></p>
     <div id="modalContent"></div>
     <button class="modal-btn" id="modalBtn" onclick="closeModal()"></button>
-    <div class="
+    <div class="modal-brand-bottom">@GarisDrop_Bot</div>
+  </div>
+</div>
+
+<script>
+// ==========================================
+// ЗВУКИ И УВЕДОМЛЕНИЯ
+// ==========================================
+let soundEnabled = true;
+const AudioContext = window.AudioContext || window.webkitAudioContext;
+let audioCtx;
+document.body.addEventListener('click', () => {
+  if (!audioCtx) audioCtx = new AudioContext();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+}, { once: true });
+
+function toggleSound() {
+  soundEnabled = !soundEnabled;
+  const btn = document.getElementById('soundBtn');
+  btn.textContent = soundEnabled ? '🔊' : '🔇';
+  btn.className = soundEnabled ? 'sound-toggle active' : 'sound-toggle';
+}
+
+function showToast(text) {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.textContent = text;
+  container.appendChild(toast);
+  setTimeout(() => { toast.remove(); }, 3000);
+}
+
+function playTone(freq, type, duration, vol = 0.03) {
+  if (!audioCtx || !soundEnabled) return;
+  const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+  osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+  gain.gain.setValueAtTime(vol, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+  osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + duration);
+}
+function playNoise(duration, vol = 0.05) {
+  if (!audioCtx || !soundEnabled) return;
+  const bufferSize = audioCtx.sampleRate * duration; const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+  const data = buffer.getChannelData(0); for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+  const noise = audioCtx.createBufferSource(); noise.buffer = buffer;
+  const filter = audioCtx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.value = 400;
+  const gain = audioCtx.createGain(); gain.gain.setValueAtTime(vol, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+  noise.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination); noise.start();
+}
+
+const SOUNDS = {
+  click: () => playTone(400, 'sine', 0.08, 0.03),
+  win: () => { playTone(523.25, 'sine', 0.2, 0.04); setTimeout(() => playTone(659.25, 'sine', 0.2, 0.04), 120); setTimeout(() => playTone(783.99, 'sine', 0.3, 0.04), 240); setTimeout(() => playTone(1046.50, 'sine', 0.4, 0.05), 360); },
+  lose: () => { playTone(300, 'sine', 0.2, 0.03); setTimeout(() => playTone(250, 'sine', 0.3, 0.03), 150); },
+  spinTick: () => playTone(600, 'sine', 0.03, 0.01),
+  gem: () => playTone(1000, 'sine', 0.15, 0.04),
+  bomb: () => { playNoise(0.4, 0.08); playTone(80, 'triangle', 0.3, 0.05); },
+  cashout: () => { playTone(800, 'sine', 0.05, 0.03); setTimeout(() => playTone(1000, 'sine', 0.05, 0.03), 60); setTimeout(() => playTone(1200, 'sine', 0.1, 0.03), 120); },
+  wheelTick: () => { playTone(1200, 'triangle', 0.02, 0.03); playTone(800, 'square', 0.01, 0.01); }
+};
+
+document.querySelectorAll('button, .game-card, .nav-btn, .currency-switch-btn, .back-btn, .bonus-btn').forEach(el => {
+  el.addEventListener('click', () => SOUNDS.click());
+});
+
+// ==========================================
+// СИМУЛЯЦИЯ ОНЛАЙНА И ЛЕНТЫ
+// ==========================================
+let onlineCount = Math.floor(Math.random() * 50) + 120; // от 120 до 170
+document.getElementById('onlineCount').textContent = onlineCount;
+
+setInterval(() => {
+  // Меняем счетчик онлайна на +/- 1-3 человека
+  const change = Math.floor(Math.random() * 7) - 3;
+  onlineCount += change;
+  if (onlineCount < 110) onlineCount += 5;
+  if (onlineCount > 180) onlineCount -= 5;
+  document.getElementById('onlineCount').textContent = onlineCount;
+}, 5000);
+
+const fakeNames = ['Alex', 'Dmitry', 'Ivan', 'Petya', 'Vlad', 'Sasha', 'Max', 'Nikita', 'Oleg', 'Roma', 'Denis', 'Кирилл', 'Артем', 'Максим'];
+const fakeGames = ['Слоты', 'Майнер', 'Колесо'];
+
+function generateFakeWin() {
+  const name = fakeNames[Math.floor(Math.random() * fakeNames.length)];
+  const game = fakeGames[Math.floor(Math.random() * fakeGames.length)];
+  const amount = Math.floor(Math.random() * 850) + 50;
+  const currency = Math.random() > 0.4 ? '⭐' : '₽';
+  const displayAmt = currency === '₽' ? Math.floor(amount * 1.5) : amount;
+
+  const ticker = document.getElementById('liveWinsText');
+  ticker.textContent = `🎉 ${name} только что выиграл ${displayAmt} ${currency} в игре ${game}!`;
+
+  // Перезапуск анимации бегущей строки
+  ticker.style.animation = 'none';
+  ticker.offsetHeight; /* trigger reflow */
+  ticker.style.animation = 'slide 15s linear infinite';
+}
+setInterval(generateFakeWin, 7000); // Каждые 7 секунд
+generateFakeWin(); // Первый запуск
+
+// ==========================================
+// ДАННЫЕ И СОСТОЯНИЕ
+// ==========================================
+const LEVELS = [
+  { lvl: 0, reqRub: 0, frame: '', bonusText: 'Пополни на 50₽ для получения 1 уровня.' },
+  { lvl: 1, reqRub: 50, frame: 'frame-lvl-1', bonusText: 'Зеленая неоновая рамка профиля.' },
+  { lvl: 2, reqRub: 250, frame: 'frame-lvl-2', bonusText: 'Фиолетовая рамка профиля.' },
+  { lvl: 3, reqRub: 500, frame: 'frame-lvl-3', bonusText: 'Золотая рамка + комиссия на вывод 3%.' },
+  { lvl: 4, reqRub: 1500, frame: 'frame-lvl-4', bonusText: 'Красная рамка + комиссия на вывод 0%.' },
+  { lvl: 5, reqRub: 2500, frame: 'frame-lvl-5', bonusText: 'VIP Анимированная рамка + безлимитный статус!' }
+];
+
+function getLevelData(totalDepositedRub) {
+  let current = LEVELS[0]; let next = LEVELS[1];
+  for (let i = 0; i < LEVELS.length; i++) {
+    if (totalDepositedRub >= LEVELS[i].reqRub) { current = LEVELS[i]; next = LEVELS[i+1] || null; }
+  }
+  return { current, next };
+}
+
+const SYMBOLS = ['🍌','🎰','💎','🍒','⭐'];
+
+let STATE = {
+  balance: 1000, currency: 'stars', rubRate: 1.5, totalDepositedRub: 0,
+  lastDaily: 0, history: [], userId: null
+};
+
+function initUserId() {
+  let tgId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
+  if (tgId) return tgId;
+  let savedId = localStorage.getItem('garisDropUserId');
+  if (!savedId) { savedId = Math.floor(Math.random() * 9000000) + 1000000; localStorage.setItem('garisDropUserId', savedId); }
+  return savedId;
+}
+
+function loadState() {
+  STATE.userId = initUserId();
+  const saved = localStorage.getItem('garisDropData');
+  if (saved) { 
+    try { 
+      const parsed = JSON.parse(saved); 
+      STATE = { ...STATE, ...parsed }; 
+    } catch(e) { console.log('Ошибка загрузки данных'); } 
+  }
+  STATE.userId = initUserId(); 
+}
+function saveState() { 
+  localStorage.setItem('garisDropData', JSON.stringify(STATE)); 
+}
+
+if (window.Telegram?.WebApp) {
+  Telegram.WebApp.ready(); Telegram.WebApp.expand();
+  if (Telegram.WebApp.initDataUnsafe?.user) document.getElementById('userName').textContent = Telegram.WebApp.initDataUnsafe.user.first_name;
+}
+
+// УМНОЕ ФОРМАТИРОВАНИЕ БОЛЬШИХ ЧИСЕЛ
+function formatMoney(starsAmount) {
+  if (isNaN(starsAmount) || !isFinite(starsAmount)) return '0';
+  const amount = STATE.currency === 'rub' ? Math.floor(starsAmount * STATE.rubRate) : Math.floor(starsAmount);
+  
+  if (amount >= 1000000) return (amount / 1000000).toFixed(1) + 'M';
+  if (amount >= 10000) return (amount / 1000).toFixed(1) + 'K';
+  return amount.toLocaleString('ru-RU');
+}
+function getCurrencyIcon() { return STATE.currency === 'rub' ? '₽' : '⭐'; }
+
+function animateBalance() {
+  const el = document.getElementById('balancePillHeader');
+  el.classList.add('update');
+  setTimeout(() => el.classList.remove('update'), 200);
+}
+
+function updateUI() {
+  const displayBalance = formatMoney(STATE.balance);
+  const icon = getCurrencyIcon();
+  
+  document.getElementById('balanceTop').textContent = displayBalance;
+  document.getElementById('currencyIcon').textContent = icon;
+  document.getElementById('btnCurrencyIcon').textContent = icon;
+  document.getElementById('balanceProfile').textContent = formatMoney(STATE.balance);
+  document.getElementById('profileCurrencyIcon').textContent = icon;
+  document.getElementById('cashoutCurrency').textContent = icon;
+
+  document.getElementById('userId').textContent = `ID: ${STATE.userId}`;
+
+  document.getElementById('slot-betInput').value = formatMoney(slotState.bet);
+  document.getElementById('mine-betInput').value = formatMoney(mineState.bet);
+  document.getElementById('wheel-betInput').value = formatMoney(wheelState.bet);
+  
+  if (mineState.active) {
+    const amountStars = Math.floor(mineState.bet * mineState.currentMult);
+    document.getElementById('cashoutAmount').textContent = formatMoney(amountStars);
+  }
+
+  const { current, next } = getLevelData(STATE.totalDepositedRub);
+  const avatar = document.getElementById('profileAvatar');
+  const vipBadge = document.getElementById('vipBadge');
+  avatar.className = 'avatar'; vipBadge.style.display = 'none';
+
+  document.getElementById('userLevel').textContent = current.lvl;
+  if (current.frame) avatar.classList.add(current.frame);
+  if (current.lvl === 5) vipBadge.style.display = 'block';
+
+  const levelBar = document.getElementById('xpBar');
+  if (next) {
+    const range = next.reqRub - current.reqRub;
+    const progress = STATE.totalDepositedRub - current.reqRub;
+    levelBar.style.width = Math.min((progress / range) * 100, 100) + '%';
+    document.getElementById('nextLevelText').textContent = `До ${next.lvl} ур.: ${(next.reqRub - STATE.totalDepositedRub).toLocaleString('ru-RU')} ₽`;
+  } else {
+    levelBar.style.width = '100%';
+    document.getElementById('nextLevelText').textContent = 'Максимальный уровень!';
+  }
+  document.getElementById('levelBonusText').innerHTML = `<b>Уровень ${current.lvl}:</b> ${current.bonusText}`;
+
+  const now = Date.now();
+  const cooldown = 24 * 60 * 60 * 1000;
+  const dailyBtn = document.getElementById('dailyBtn');
+  const timerText = document.getElementById('dailyTimerText');
+  
+  if (now - STATE.lastDaily < cooldown) {
+    dailyBtn.disabled = true; dailyBtn.textContent = 'Уже получено'; timerText.style.display = 'block';
+    const hoursLeft = Math.ceil((cooldown - (now - STATE.lastDaily)) / (1000 * 60 * 60));
+    timerText.textContent = `Доступно через ${hoursLeft} ч.`;
+  } else {
+    dailyBtn.disabled = false; dailyBtn.textContent = 'Забрать 50 ⭐'; timerText.style.display = 'none';
+  }
+
+  saveState();
+}
+
+function claimDaily() {
+  const now = Date.now();
+  if (now - STATE.lastDaily < 24 * 60 * 60 * 1000) return;
+  STATE.balance += 50; STATE.lastDaily = now;
+  updateUI(); SOUNDS.win(); animateBalance();
+  showWinModal(50, '⭐', 'Ежедневный бонус!');
+}
+
+function copyRefLink() {
+  const botUsername = 'GarisDrop_Bot'; 
+  const link = `https://t.me/${botUsername}?start=${STATE.userId}`;
+  
+  navigator.clipboard.writeText(link).then(() => {
+    SOUNDS.cashout();
+    showWinModal(0, '🎁', 'Ссылка скопирована!');
+    document.getElementById('modalText').innerHTML = 'Ссылка скопирована! Отправь её другу.<br><span style="font-size:10px; color:#aaa;">' + link + '</span>';
+    document.querySelector('.win-amount').style.display = 'none';
+  }).catch(() => {
+    prompt("Скопируй ссылку вручную:", link);
+  });
+}
+
+function addHistory(game, betStars, winStars) {
+  STATE.history.unshift({ game, betStars, winStars, isWin: winStars > 0 });
+  if (STATE.history.length > 10) STATE.history.pop();
+  renderHistory(); updateUI();
+}
+
+function renderHistory() {
+  const list = document.getElementById('historyList');
+  list.innerHTML = '';
+  if (STATE.history.length === 0) {
+    list.innerHTML = '<p style="color:var(--muted); text-align:center; margin-top:20px;">История пуста</p>'; return;
+  }
+  STATE.history.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'history-item';
+    const resClass = item.isWin ? 'history-win' : 'history-lose';
+    const resText = item.isWin ? `+${formatMoney(item.winStars)} ${getCurrencyIcon()}` : `-${formatMoney(item.betStars)} ${getCurrencyIcon()}`;
+    div.innerHTML = `<span>${item.game}</span><span class="${resClass}">${resText}</span>`;
+    list.appendChild(div);
+  });
+}
+
+function openComingSoon() { showLoseModal(false, 'Эта функция появится в следующих обновлениях! Следите за новостями.'); }
+
+function toggleCurrency() {
+  STATE.currency = STATE.currency === 'stars' ? 'rub' : 'stars';
+  updateUI(); renderHistory();
+  showToast(`Валюта изменена на ${STATE.currency === 'rub' ? 'Рубли' : 'Звезды'}`);
+  const btn = document.querySelector('.currency-switch-btn');
+  btn.style.transform = 'scale(0.8)';
+  setTimeout(() => { btn.style.transform = 'scale(1)'; }, 150);
+}
+
+function showLoader(callback) {
+  const loader = document.getElementById('loader');
+  loader.classList.add('show');
+  setTimeout(() => { loader.classList.remove('show'); if(callback) callback(); }, 600);
+}
+
+function switchPage(name) {
+  document.querySelectorAll('.page').forEach(p => { p.classList.remove('active'); p.style.display = 'none'; });
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  
+  const targetPage = document.getElementById('page-' + name);
+  if (targetPage) { targetPage.classList.add('active'); targetPage.style.display = 'flex'; }
+  
+  if(name === 'games' || name === 'profile' || name === 'bonus') {
+    const nav = document.getElementById('nav-' + name); if(nav) nav.classList.add('active');
+  } else if (name === 'history') {
+    const nav = document.getElementById('nav-profile'); if(nav) nav.classList.add('active');
+  }
+  
+  if(name === 'history') renderHistory();
+  updateUI();
+}
+
+function openGame(game) {
+  showLoader(() => {
+    if (game === 'slots') { switchPage('slots'); setSlotMode(slotState.mode); }
+    else if (game === 'mines') { switchPage('mines'); resetMinesBoard(); }
+    else if (game === 'wheel') { switchPage('wheel'); resetWheel(); }
+  });
+}
+
+/* ================= СЛОТЫ ================= */
+const SLOT_MODES = {
+  easy: { cols: 3, mult: 1.5, winChance: 0.60, nearMissChance: 0.35 },
+  medium: { cols: 4, mult: 2.0, winChance: 0.40, nearMissChance: 0.45 },
+  hard: { cols: 5, mult: 4.0, winChance: 0.20, nearMissChance: 0.45 }
+};
+let slotState = { mode: 'easy', bet: 10, spinning: false };
+
+function setSlotMode(mode) {
+  if (slotState.spinning) return;
+  slotState.mode = mode;
+  document.querySelectorAll('[id^="btn-slot-"]').forEach(b => b.classList.remove('active'));
+  document.getElementById('btn-slot-' + mode).classList.add('active');
+  const cols = SLOT_MODES[mode].cols;
+  const slotsContainer = document.getElementById('slots');
+  slotsContainer.style.setProperty('--cols', cols);
+  slotsContainer.innerHTML = '';
+  for (let row = 0; row < 3; row++) {
+    for (let col = 0; col < cols; col++) {
+      let cell = document.createElement('div');
+      cell.className = 'cell'; cell.dataset.col = col; cell.dataset.row = row;
+      cell.textContent = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+      slotsContainer.appendChild(cell);
+    }
+  }
+  updateUI();
+}
+
+function changeSlotBet(d) {
+  if (slotState.spinning) return;
+  let stepStars = STATE.currency === 'rub' ? (10 / STATE.rubRate) : 1;
+  let nb = slotState.bet + (d * stepStars);
+  let minBet = STATE.currency === 'rub' ? (10 / STATE.rubRate) : 1;
+  if (nb >= minBet && nb <= STATE.balance) { slotState.bet = nb; updateUI(); }
+}
+
+function validateSlotBetInput() {
+  if (slotState.spinning) return;
+  let inputVal = parseFloat(document.getElementById('slot-betInput').value) || 1;
+  let starsVal = STATE.currency === 'rub' ? (inputVal / STATE.rubRate) : inputVal;
+  let minBet = STATE.currency === 'rub' ? (10 / STATE.rubRate) : 1;
+  if (starsVal < minBet) starsVal = minBet;
+  if (starsVal > STATE.balance) starsVal = STATE.balance;
+  slotState.bet = starsVal; updateUI();
+}
+
+function lockSlotControls(isLocked) {
+  slotState.spinning = isLocked;
+  document.getElementById('spinBtn').disabled = isLocked;
+  document.getElementById('slot-betInput').disabled = isLocked;
+  document.getElementById('slot-betPlus').disabled = isLocked;
+  document.getElementById('slot-betMinus').disabled = isLocked;
+  document.querySelectorAll('[id^="btn-slot-"]').forEach(b => b.disabled = isLocked);
+}
+
+function spinSlots() {
+  if (slotState.spinning || STATE.balance < slotState.bet) return;
+  const mode = SLOT_MODES[slotState.mode];
+  
+  let currentWinChance = mode.winChance;
+  if (slotState.bet < 100) {
+      currentWinChance = mode.winChance; 
+  } else if (slotState.bet < 500) {
+      currentWinChance *= 0.3; 
+  } else {
+      currentWinChance = 0.01; 
+  }
+
+  STATE.balance -= slotState.bet; 
+  updateUI(); lockSlotControls(true); animateBalance();
+  
+  const cells = document.querySelectorAll('#slots .cell');
+  cells.forEach(c => c.classList.remove('win'));
+
+  let grid = []; 
+  let isWin = Math.random() < currentWinChance;
+  let isNearMiss = !isWin && Math.random() < mode.nearMissChance;
+  for(let i=0; i < 3 * mode.cols; i++) grid.push(null);
+  const WIN_LINE = 1;
+
+  if (isWin) {
+    const sym = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+    for(let c=0; c < mode.cols; c++) grid[WIN_LINE * mode.cols + c] = sym;
+  } else if (isNearMiss) {
+    const cols = mode.cols;
+    const sym = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+    const matchLen = Math.floor(Math.random() * (cols - 2 + 1)) + 2; 
+    const startIdx = Math.floor(Math.random() * (cols - matchLen + 1));
+    for (let i = 0; i < matchLen; i++) grid[WIN_LINE * cols + startIdx + i] = sym;
+    for (let c = 0; c < cols; c++) {
+       if (grid[WIN_LINE * cols + c] === null) {
+          let failSym = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+          while (failSym === sym) failSym = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+          grid[WIN_LINE * cols + c] = failSym;
+       }
+    }
+  }
+
+  for (let i = 0; i < grid.length; i++) { if (!grid[i]) grid[i] = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)]; }
+  if (!isWin) {
+      let fullMatch = true; let firstSym = grid[WIN_LINE * mode.cols];
+      for (let c = 1; c < mode.cols; c++) { if (grid[WIN_LINE * mode.cols + c] !== firstSym) { fullMatch = false; break; } }
+      if (fullMatch) grid[WIN_LINE * mode.cols + (mode.cols - 1)] = SYMBOLS[(SYMBOLS.indexOf(firstSym)+1)%SYMBOLS.length];
+  }
+
+  const spinIntervals = [];
+  for (let col = 0; col < mode.cols; col++) {
+    const colCells = Array.from(cells).filter(c => parseInt(c.dataset.col) === col);
+    colCells.forEach(c => c.classList.add('spinning'));
+    spinIntervals[col] = setInterval(() => { 
+        colCells.forEach(c => c.textContent = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)]); 
+        if (Math.random() < 0.1) SOUNDS.spinTick(); 
+    }, 60);
+  }
+
+  for (let col = 0; col < mode.cols; col++) {
+    setTimeout(() => {
+      clearInterval(spinIntervals[col]);
+      const colCells = Array.from(cells).filter(c => parseInt(c.dataset.col) === col);
+      colCells.forEach((c, rowIndex) => {
+        c.classList.remove('spinning'); c.textContent = grid[rowIndex * mode.cols + col];
+      });
+      SOUNDS.spinTick();
+
+      if (col === mode.cols - 1) {
+        setTimeout(() => {
+          if (isWin) {
+            const winAmountStars = Math.floor(slotState.bet * mode.mult);
+            STATE.balance += winAmountStars; 
+            addHistory('Слоты', slotState.bet, winAmountStars);
+            for(let c=0; c<mode.cols; c++) cells[WIN_LINE * mode.cols + c].classList.add('win');
+            SOUNDS.win(); animateBalance();
+            showWinModal(formatMoney(winAmountStars), getCurrencyIcon(), mode.mult);
+          } else {
+            addHistory('Слоты', slotState.bet, 0);
+            SOUNDS.lose();
+            showLoseModal(isNearMiss);
+          }
+          lockSlotControls(false);
+        }, 300); 
+      }
+    }, 800 + col * 500);
+  }
+}
+
+/* ================= МАЙНЕР ================= */
+const MINE_MODES = { easy: { size: 3 }, medium: { size: 4 }, hard: { size: 5 } };
+const MULT_TABLES = {
+  easy: [1.1, 1.2, 1.4, 1.6, 1.9, 2.3, 2.8, 3.5],
+  medium: [1.2, 1.4, 1.6, 1.9, 2.2, 2.6, 3.1, 3.7, 4.4, 5.3, 6.4, 7.8, 9.5],
+  hard: [1.3, 1.5, 1.8, 2.1, 2.5, 3.0, 3.6, 4.3, 5.1, 6.1, 7.3, 8.7, 10.4, 12.4, 14.8, 17.7, 21.2, 25.4, 30.5, 36.6]
+};
+let mineState = { mode: 'easy', bet: 10, active: false, grid: [], opened: 0, currentMult: 1.0, deadlyStep: -1 };
+
+function setMineMode(mode) {
+  if (mineState.active) return;
+  mineState.mode = mode;
+  document.querySelectorAll('[id^="btn-mine-"]').forEach(b => b.classList.remove('active'));
+  document.getElementById('btn-mine-' + mode).classList.add('active');
+  resetMinesBoard();
+}
+
+function resetMinesBoard() {
+  const mode = MINE_MODES[mineState.mode];
+  const grid = document.getElementById('minesGrid');
+  grid.style.setProperty('--size', mode.size);
+  grid.innerHTML = '';
+  
+  mineState.active = false; mineState.grid = []; mineState.opened = 0; mineState.currentMult = 1.0;
+  document.getElementById('minesBetPanel').style.display = 'flex';
+  document.getElementById('mineStartBtn').style.display = 'block';
+  document.getElementById('mineCashoutBtn').classList.remove('show');
+  document.getElementById('multiplierDisplay').classList.remove('show');
+
+  const totalCells = mode.size * mode.size;
+  for (let i = 0; i < totalCells; i++) {
+    let cell = document.createElement('div');
+    cell.className = 'mine-cell'; cell.dataset.index = i;
+    cell.onclick = () => clickMineCell(i);
+    grid.appendChild(cell);
+    mineState.grid.push({ isOpened: false, el: cell });
+  }
+  updateUI();
+}
+
+function changeMineBet(d) { 
+  if (mineState.active) return; 
+  let stepStars = STATE.currency === 'rub' ? (10 / STATE.rubRate) : 1;
+  let nb = mineState.bet + (d * stepStars); 
+  let minBet = STATE.currency === 'rub' ? (10 / STATE.rubRate) : 1;
+  if (nb >= minBet && nb <= STATE.balance) { mineState.bet = nb; updateUI(); } 
+}
+
+function validateMineBetInput() { 
+  if (mineState.active) return; 
+  let inputVal = parseFloat(document.getElementById('mine-betInput').value) || 1;
+  let starsVal = STATE.currency === 'rub' ? (inputVal / STATE.rubRate) : inputVal;
+  let minBet = STATE.currency === 'rub' ? (10 / STATE.rubRate) : 1;
+  if (starsVal < minBet) starsVal = minBet; 
+  if (starsVal > STATE.balance) starsVal = STATE.balance; 
+  mineState.bet = starsVal; updateUI(); 
+}
+
+function startMines() {
+  if (mineState.active || STATE.balance < mineState.bet) return;
+  STATE.balance -= mineState.bet; updateUI(); animateBalance();
+  mineState.active = true; mineState.opened = 0; mineState.currentMult = 1.0;
+  
+  let stepsPool;
+  if (mineState.bet < 100) {
+      stepsPool = mineState.mode === 'easy' ? [4, 5, 6, 7] : (mineState.mode === 'medium' ? [6, 8, 10] : [10, 12, 15]);
+  } else if (mineState.bet < 500) {
+      stepsPool = mineState.mode === 'easy' ? [1, 2, 3] : (mineState.mode === 'medium' ? [3, 4, 5] : [4, 6, 8]);
+  } else {
+      stepsPool = [0, 1, 1];
+  }
+  mineState.deadlyStep = stepsPool[Math.floor(Math.random() * stepsPool.length)];
+
+  document.getElementById('minesBetPanel').style.display = 'none';
+  document.getElementById('mineStartBtn').style.display = 'none';
+  document.getElementById('mineCashoutBtn').classList.add('show');
+  document.getElementById('multiplierDisplay').classList.add('show');
+  updateUI();
+}
+
+function clickMineCell(index) {
+  if (!mineState.active) return;
+  const cellData = mineState.grid[index];
+  if (cellData.isOpened) return;
+  cellData.isOpened = true;
+  
+  if (mineState.opened === mineState.deadlyStep) {
+    cellData.el.classList.add('bomb'); cellData.el.innerHTML = ''; mineState.active = false;
+    let bombsToShow = mineState.mode === 'easy' ? 1 : (mineState.mode === 'medium' ? 3 : 5); bombsToShow--;
+    let unopened = mineState.grid.filter(c => !c.isOpened);
+    while(bombsToShow > 0 && unopened.length > 0) {
+      let r = Math.floor(Math.random() * unopened.length);
+      unopened[r].el.classList.add('bomb'); unopened[r].el.innerHTML = ''; unopened[r].el.style.opacity = '0.4';
+      unopened.splice(r, 1); bombsToShow--;
+    }
+    SOUNDS.bomb();
+    setTimeout(() => {
+      document.getElementById('mineCashoutBtn').classList.remove('show');
+      document.getElementById('mineStartBtn').style.display = 'block';
+      document.getElementById('minesBetPanel').style.display = 'flex';
+      document.getElementById('multiplierDisplay').classList.remove('show');
+      addHistory('Майнер', mineState.bet, 0);
+      showLoseModal(false, 'Вы наткнулись на мину!');
+      resetMinesBoard();
+    }, 1500);
+  } else {
+    cellData.el.classList.add('gem'); cellData.el.innerHTML = ''; mineState.opened++;
+    SOUNDS.gem();
+    const multTable = MULT_TABLES[mineState.mode];
+    mineState.currentMult = multTable[Math.min(m
