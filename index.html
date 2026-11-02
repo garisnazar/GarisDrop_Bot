@@ -5,6 +5,38 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>GarisDrop</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<!-- ТВОЯ ССЫЛКА НА СЕРВЕР УЖЕ ВСТРОЕНА СЮДА -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+  import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, onSnapshot, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCgrphceMHytjNPu0FMH4ZQAyykOHnnwt8",
+    authDomain: "garisdrop.firebaseapp.com",
+    projectId: "garisdrop",
+    storageBucket: "garisdrop.firebasestorage.app",
+    messagingSenderId: "1091919506726",
+    appId: "1:1091919506726:web:9f18f735c125d0324da5e7"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  window.db = db;
+  window.doc = doc;
+  window.getDoc = getDoc;
+  window.setDoc = setDoc;
+  window.updateDoc = updateDoc;
+  window.collection = collection;
+  window.addDoc = addDoc;
+  window.onSnapshot = onSnapshot;
+  window.query = query;
+  window.orderBy = orderBy;
+  window.limit = limit;
+  window.getDocs = getDocs;
+</script>
+
 <style>
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; }
 
@@ -41,24 +73,36 @@
   /* ===== APP ===== */
   #app{ position:fixed; inset:0; z-index:1; display:flex; flex-direction:column; padding:12px 12px calc(92px + env(safe-area-inset-bottom)); overflow:hidden; }
   
-  .header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; flex-shrink: 0; gap: 4px; padding: 0 2px;}
+  .header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; flex-shrink: 0; gap: 4px; padding: 0 2px; width: 100%;}
   .logo{ font-weight:900; font-size:16px; background:linear-gradient(90deg,#00ff9d,#5cbf4a,#00ff9d); -webkit-background-clip:text; background-clip:text; color:transparent; white-space: nowrap;}
   
-  .header-right{ display:flex; align-items:center; gap:6px; }
+  .header-right{ display:flex; align-items:center; gap:4px; flex-shrink: 0;}
   
   .deposit-btn-large { background: linear-gradient(135deg, #00ff9d, #5cbf4a); border: none; color: #001a10; height: 32px; padding: 0 10px; border-radius: 999px; font-size: 11px; font-weight: 900; cursor: pointer; box-shadow: 0 0 15px rgba(0,255,157,0.4); display: flex; align-items: center; justify-content: center; transition: transform 0.1s; white-space: nowrap;}
   .deposit-btn-large:active { transform: scale(0.9); }
 
-  .currency-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 32px; position: relative; }
+  .currency-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 32px; position: relative; flex-shrink: 0;}
   .currency-switch-btn { background: var(--card); border: 1px solid var(--border); color: var(--neon); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 900; cursor: pointer; transition: transform 0.1s; }
   .currency-switch-btn:active { transform: scale(0.9); }
   .currency-label { position: absolute; bottom: -13px; font-size: 7px; color: var(--muted); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; pointer-events: none; }
 
-  .balance-pill{ background:var(--card); border:1px solid var(--border); height: 32px; padding: 0 10px; border-radius:999px; font-size:15px; font-weight:900; color:var(--neon); display:flex; align-items:center; gap:4px; box-shadow: 0 0 10px rgba(0,255,157,0.1); max-width: 110px; overflow: hidden; transition: all 0.2s;}
-  .balance-pill.update { transform: scale(1.1); box-shadow: 0 0 20px rgba(0,255,157,0.5); }
+  .balance-pill{ background:var(--card); border:1px solid var(--border); height: 32px; padding: 0 8px; border-radius:999px; font-size:14px; font-weight:900; color:var(--neon); display:flex; align-items:center; gap:2px; box-shadow: 0 0 10px rgba(0,255,157,0.1); max-width: 85px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; transition: all 0.2s;}
+  .balance-pill.update { transform: scale(1.05); box-shadow: 0 0 20px rgba(0,255,157,0.5); }
   
-  .sound-toggle { background: none; border: none; font-size: 16px; cursor: pointer; color: var(--muted); transition: color 0.2s; padding: 0 4px;}
+  .sound-toggle { background: none; border: none; font-size: 16px; cursor: pointer; color: var(--muted); transition: color 0.2s; padding: 0 2px; flex-shrink: 0;}
   .sound-toggle.active { color: var(--neon); }
+
+  /* ===== ONLINE COUNTER ===== */
+  .online-bar {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    font-size: 11px; color: var(--muted); margin-bottom: 10px;
+  }
+  .online-dot {
+    width: 6px; height: 6px; background: #00ff9d; border-radius: 50%;
+    box-shadow: 0 0 8px #00ff9d; animation: pulseDot 1.5s infinite;
+  }
+  @keyframes pulseDot { 0% { opacity: 0.5; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.2); } 100% { opacity: 0.5; transform: scale(0.8); } }
+  .online-bar b { color: var(--text); }
 
   /* ===== PAGES ===== */
   .page{ flex:1; min-height: 0; overflow-y:auto; display:none; flex-direction: column; padding-bottom:12px; color: var(--text); }
@@ -71,8 +115,8 @@
   .back-btn:active { transform: scale(0.95); }
 
   /* ===== ЛЕНТА ===== */
-  .live-wins-bar { background: rgba(0,255,157,0.05); border: 1px solid var(--border); border-radius: 12px; padding: 8px 12px; font-size: 12px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; white-space: nowrap; position: relative; color: var(--neon); text-shadow: 0 0 8px rgba(0,255,157,0.3); overflow: hidden;}
-  .live-wins-bar span { display: inline-block; animation: slide 12s linear infinite; padding-left: 100%; }
+  .live-wins-bar { background: rgba(0,255,157,0.05); border: 1px solid var(--border); border-radius: 12px; padding: 8px 12px; font-size: 12px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; position: relative; color: var(--neon); text-shadow: 0 0 8px rgba(0,255,157,0.3); overflow: hidden; width: 100%;}
+  .live-wins-bar span { display: inline-block; white-space: nowrap; animation: slide 15s linear infinite; padding-left: 100%; }
   @keyframes slide { 0% { transform: translateX(0); } 100% { transform: translateX(-150%); } }
 
   /* ===== GAMES GRID ===== */
@@ -178,7 +222,6 @@
     pointer-events: none;
   }
 
-  /* Идеальное позиционирование текста */
   .wheel-text {
     position: absolute; top: 50%; left: 50%;
     font-size: 14px; font-weight: 900; font-family: sans-serif;
@@ -273,7 +316,7 @@
 </head>
 <body>
 
-<div id="loader" class="loader-overlay"><div class="spinner"></div></div>
+<div id="loader" class="loader-overlay show"><div class="spinner"></div></div>
 <div id="bg"></div>
 <div id="toast-container"></div>
 
@@ -295,9 +338,14 @@
     </div>
   </div>
 
+  <div class="online-bar">
+    <div class="online-dot"></div>
+    <span>Сейчас в игре: <b id="onlineCount">...</b> чел.</span>
+  </div>
+
   <div class="page active" id="page-games">
     <div class="live-wins-bar">
-      <span id="liveWinsText">🍀 Здесь появятся ваши реальные выигрыши. Начните играть!</span>
+      <span id="liveWinsText">🍀 Ожидание новых побед...</span>
     </div>
     
     <div class="title">Игры <span>▸</span></div>
@@ -394,7 +442,6 @@
         
         <div class="wheel-rim">
           <div class="wheel-spinner" id="wheelSpinner">
-            <!-- Текст позиционируется абсолютно поверх колеса -->
             <div class="wheel-text-container">
               <div class="wheel-text" style="transform: rotate(30deg) translateY(-100px); color: #fff;">x1.2</div>
               <div class="wheel-text" style="transform: rotate(90deg) translateY(-100px); color: #8892b0;">x0</div>
@@ -404,7 +451,6 @@
               <div class="wheel-text" style="transform: rotate(330deg) translateY(-100px); color: #8892b0;">x0</div>
             </div>
 
-            <!-- Центральный круг -->
             <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 40px; height: 40px; background: #0a1410; border: 3px solid #00ff9d; border-radius: 50%; box-shadow: 0 0 15px #00ff9d; display: flex; justify-content: center; align-items: center;">
               <div style="width: 20px; height: 20px; background: #00ff9d; border-radius: 50%;"></div>
             </div>
@@ -475,6 +521,11 @@
 
 <script>
 // ==========================================
+// ССЫЛКА НА ТВОЙ СЕРВЕР
+// ==========================================
+const API_URL = 'https://garisdrop-backend.garisnazar1.workers.dev';
+
+// ==========================================
 // ЗВУКИ И УВЕДОМЛЕНИЯ
 // ==========================================
 let soundEnabled = true;
@@ -534,6 +585,36 @@ document.querySelectorAll('button, .game-card, .nav-btn, .currency-switch-btn, .
 });
 
 // ==========================================
+// СИМУЛЯЦИЯ ОНЛАЙНА
+// ==========================================
+let onlineCount = Math.floor(Math.random() * 50) + 120;
+document.getElementById('onlineCount').textContent = onlineCount;
+setInterval(() => {
+  const change = Math.floor(Math.random() * 7) - 3;
+  onlineCount += change;
+  if (onlineCount < 110) onlineCount += 5;
+  if (onlineCount > 180) onlineCount -= 5;
+  document.getElementById('onlineCount').textContent = onlineCount;
+}, 5000);
+
+const fakeNames = ['Alex', 'Dmitry', 'Ivan', 'Petya', 'Vlad', 'Sasha', 'Max', 'Nikita', 'Oleg', 'Roma', 'Denis', 'Кирилл', 'Артем', 'Максим'];
+const fakeGames = ['Слоты', 'Майнер', 'Колесо'];
+function generateFakeWin() {
+  const name = fakeNames[Math.floor(Math.random() * fakeNames.length)];
+  const game = fakeGames[Math.floor(Math.random() * fakeGames.length)];
+  const amount = Math.floor(Math.random() * 850) + 50;
+  const currency = Math.random() > 0.4 ? '⭐' : '₽';
+  const displayAmt = currency === '₽' ? Math.floor(amount * 1.5) : amount;
+  const ticker = document.getElementById('liveWinsText');
+  ticker.textContent = `🎉 ${name} только что выиграл ${displayAmt} ${currency} в игре ${game}!`;
+  ticker.style.animation = 'none';
+  ticker.offsetHeight;
+  ticker.style.animation = 'slide 15s linear infinite';
+}
+setInterval(generateFakeWin, 7000);
+generateFakeWin();
+
+// ==========================================
 // ДАННЫЕ И СОСТОЯНИЕ
 // ==========================================
 const LEVELS = [
@@ -571,7 +652,9 @@ function initUserId() {
 function loadState() {
   STATE.userId = initUserId();
   const saved = localStorage.getItem('garisDropData');
-  if (saved) { try { const parsed = JSON.parse(saved); STATE = { ...STATE, ...parsed }; } catch(e) {} }
+  if (saved) { 
+    try { const parsed = JSON.parse(saved); STATE = { ...STATE, ...parsed }; } catch(e) {} 
+  }
   STATE.userId = initUserId(); 
 }
 function saveState() { localStorage.setItem('garisDropData', JSON.stringify(STATE)); }
@@ -584,6 +667,8 @@ if (window.Telegram?.WebApp) {
 function formatMoney(starsAmount) {
   if (isNaN(starsAmount) || !isFinite(starsAmount)) return '0';
   const amount = STATE.currency === 'rub' ? Math.floor(starsAmount * STATE.rubRate) : Math.floor(starsAmount);
+  if (amount >= 1000000) return (amount / 1000000).toFixed(1) + 'M';
+  if (amount >= 10000) return (amount / 1000).toFixed(1) + 'K';
   return amount.toLocaleString('ru-RU');
 }
 function getCurrencyIcon() { return STATE.currency === 'rub' ? '₽' : '⭐'; }
@@ -601,7 +686,7 @@ function updateUI() {
   document.getElementById('balanceTop').textContent = displayBalance;
   document.getElementById('currencyIcon').textContent = icon;
   document.getElementById('btnCurrencyIcon').textContent = icon;
-  document.getElementById('balanceProfile').textContent = displayBalance;
+  document.getElementById('balanceProfile').textContent = formatMoney(STATE.balance);
   document.getElementById('profileCurrencyIcon').textContent = icon;
   document.getElementById('cashoutCurrency').textContent = icon;
 
@@ -650,19 +735,7 @@ function updateUI() {
     dailyBtn.disabled = false; dailyBtn.textContent = 'Забрать 50 ⭐'; timerText.style.display = 'none';
   }
 
-  updateTicker();
   saveState();
-}
-
-function updateTicker() {
-  const ticker = document.getElementById('liveWinsText');
-  const lastWin = STATE.history.find(item => item.isWin);
-  
-  if (lastWin) {
-    ticker.textContent = `🏆 Ваш последний выигрыш: +${formatMoney(lastWin.winStars)} ${getCurrencyIcon()} в игре ${lastWin.game}!`;
-  } else {
-    ticker.textContent = '🍀 Здесь появятся ваши реальные выигрыши. Начните играть!';
-  }
 }
 
 function claimDaily() {
@@ -784,600 +857,4 @@ function changeSlotBet(d) {
   let stepStars = STATE.currency === 'rub' ? (10 / STATE.rubRate) : 1;
   let nb = slotState.bet + (d * stepStars);
   let minBet = STATE.currency === 'rub' ? (10 / STATE.rubRate) : 1;
-  if (nb >= minBet && nb <= STATE.balance) { slotState.bet = nb; updateUI(); }
-}
-
-function validateSlotBetInput() {
-  if (slotState.spinning) return;
-  let inputVal = parseFloat(document.getElementById('slot-betInput').value) || 1;
-  let starsVal = STATE.currency === 'rub' ? (inputVal / STATE.rubRate) : inputVal;
-  let minBet = STATE.currency === 'rub' ? (10 / STATE.rubRate) : 1;
-  if (starsVal < minBet) starsVal = minBet;
-  if (starsVal > STATE.balance) starsVal = STATE.balance;
-  slotState.bet = starsVal; updateUI();
-}
-
-function lockSlotControls(isLocked) {
-  slotState.spinning = isLocked;
-  document.getElementById('spinBtn').disabled = isLocked;
-  document.getElementById('slot-betInput').disabled = isLocked;
-  document.getElementById('slot-betPlus').disabled = isLocked;
-  document.getElementById('slot-betMinus').disabled = isLocked;
-  document.querySelectorAll('[id^="btn-slot-"]').forEach(b => b.disabled = isLocked);
-}
-
-function spinSlots() {
-  if (slotState.spinning || STATE.balance < slotState.bet) return;
-  const mode = SLOT_MODES[slotState.mode];
-  
-  let currentWinChance = mode.winChance;
-  if (slotState.bet < 100) {
-      currentWinChance = mode.winChance; 
-  } else if (slotState.bet < 500) {
-      currentWinChance *= 0.3; 
-  } else {
-      currentWinChance = 0.01; 
-  }
-
-  STATE.balance -= slotState.bet; 
-  updateUI(); lockSlotControls(true); animateBalance();
-  
-  const cells = document.querySelectorAll('#slots .cell');
-  cells.forEach(c => c.classList.remove('win'));
-
-  let grid = []; 
-  let isWin = Math.random() < currentWinChance;
-  let isNearMiss = !isWin && Math.random() < mode.nearMissChance;
-  for(let i=0; i < 3 * mode.cols; i++) grid.push(null);
-  const WIN_LINE = 1;
-
-  if (isWin) {
-    const sym = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
-    for(let c=0; c < mode.cols; c++) grid[WIN_LINE * mode.cols + c] = sym;
-  } else if (isNearMiss) {
-    const cols = mode.cols;
-    const sym = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
-    const matchLen = Math.floor(Math.random() * (cols - 2 + 1)) + 2; 
-    const startIdx = Math.floor(Math.random() * (cols - matchLen + 1));
-    for (let i = 0; i < matchLen; i++) grid[WIN_LINE * cols + startIdx + i] = sym;
-    for (let c = 0; c < cols; c++) {
-       if (grid[WIN_LINE * cols + c] === null) {
-          let failSym = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
-          while (failSym === sym) failSym = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
-          grid[WIN_LINE * cols + c] = failSym;
-       }
-    }
-  }
-
-  for (let i = 0; i < grid.length; i++) { if (!grid[i]) grid[i] = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)]; }
-  if (!isWin) {
-      let fullMatch = true; let firstSym = grid[WIN_LINE * mode.cols];
-      for (let c = 1; c < mode.cols; c++) { if (grid[WIN_LINE * mode.cols + c] !== firstSym) { fullMatch = false; break; } }
-      if (fullMatch) grid[WIN_LINE * mode.cols + (mode.cols - 1)] = SYMBOLS[(SYMBOLS.indexOf(firstSym)+1)%SYMBOLS.length];
-  }
-
-  const spinIntervals = [];
-  for (let col = 0; col < mode.cols; col++) {
-    const colCells = Array.from(cells).filter(c => parseInt(c.dataset.col) === col);
-    colCells.forEach(c => c.classList.add('spinning'));
-    spinIntervals[col] = setInterval(() => { 
-        colCells.forEach(c => c.textContent = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)]); 
-        if (Math.random() < 0.1) SOUNDS.spinTick(); 
-    }, 60);
-  }
-
-  for (let col = 0; col < mode.cols; col++) {
-    setTimeout(() => {
-      clearInterval(spinIntervals[col]);
-      const colCells = Array.from(cells).filter(c => parseInt(c.dataset.col) === col);
-      colCells.forEach((c, rowIndex) => {
-        c.classList.remove('spinning'); c.textContent = grid[rowIndex * mode.cols + col];
-      });
-      SOUNDS.spinTick();
-
-      if (col === mode.cols - 1) {
-        setTimeout(() => {
-          if (isWin) {
-            const winAmountStars = Math.floor(slotState.bet * mode.mult);
-            STATE.balance += winAmountStars; 
-            addHistory('Слоты', slotState.bet, winAmountStars);
-            for(let c=0; c<mode.cols; c++) cells[WIN_LINE * mode.cols + c].classList.add('win');
-            SOUNDS.win(); animateBalance();
-            showWinModal(formatMoney(winAmountStars), getCurrencyIcon(), mode.mult);
-          } else {
-            addHistory('Слоты', slotState.bet, 0);
-            SOUNDS.lose();
-            showLoseModal(isNearMiss);
-          }
-          lockSlotControls(false);
-        }, 300); 
-      }
-    }, 800 + col * 500);
-  }
-}
-
-/* ================= МАЙНЕР ================= */
-const MINE_MODES = { easy: { size: 3 }, medium: { size: 4 }, hard: { size: 5 } };
-const MULT_TABLES = {
-  easy: [1.1, 1.2, 1.4, 1.6, 1.9, 2.3, 2.8, 3.5],
-  medium: [1.2, 1.4, 1.6, 1.9, 2.2, 2.6, 3.1, 3.7, 4.4, 5.3, 6.4, 7.8, 9.5],
-  hard: [1.3, 1.5, 1.8, 2.1, 2.5, 3.0, 3.6, 4.3, 5.1, 6.1, 7.3, 8.7, 10.4, 12.4, 14.8, 17.7, 21.2, 25.4, 30.5, 36.6]
-};
-let mineState = { mode: 'easy', bet: 10, active: false, grid: [], opened: 0, currentMult: 1.0, deadlyStep: -1 };
-
-function setMineMode(mode) {
-  if (mineState.active) return;
-  mineState.mode = mode;
-  document.querySelectorAll('[id^="btn-mine-"]').forEach(b => b.classList.remove('active'));
-  document.getElementById('btn-mine-' + mode).classList.add('active');
-  resetMinesBoard();
-}
-
-function resetMinesBoard() {
-  const mode = MINE_MODES[mineState.mode];
-  const grid = document.getElementById('minesGrid');
-  grid.style.setProperty('--size', mode.size);
-  grid.innerHTML = '';
-  
-  mineState.active = false; mineState.grid = []; mineState.opened = 0; mineState.currentMult = 1.0;
-  document.getElementById('minesBetPanel').style.display = 'flex';
-  document.getElementById('mineStartBtn').style.display = 'block';
-  document.getElementById('mineCashoutBtn').classList.remove('show');
-  document.getElementById('multiplierDisplay').classList.remove('show');
-
-  const totalCells = mode.size * mode.size;
-  for (let i = 0; i < totalCells; i++) {
-    let cell = document.createElement('div');
-    cell.className = 'mine-cell'; cell.dataset.index = i;
-    cell.onclick = () => clickMineCell(i);
-    grid.appendChild(cell);
-    mineState.grid.push({ isOpened: false, el: cell });
-  }
-  updateUI();
-}
-
-function changeMineBet(d) { 
-  if (mineState.active) return; 
-  let stepStars = STATE.currency === 'rub' ? (10 / STATE.rubRate) : 1;
-  let nb = mineState.bet + (d * stepStars); 
-  let minBet = STATE.currency === 'rub' ? (10 / STATE.rubRate) : 1;
-  if (nb >= minBet && nb <= STATE.balance) { mineState.bet = nb; updateUI(); } 
-}
-
-function validateMineBetInput() { 
-  if (mineState.active) return; 
-  let inputVal = parseFloat(document.getElementById('mine-betInput').value) || 1;
-  let starsVal = STATE.currency === 'rub' ? (inputVal / STATE.rubRate) : inputVal;
-  let minBet = STATE.currency === 'rub' ? (10 / STATE.rubRate) : 1;
-  if (starsVal < minBet) starsVal = minBet; 
-  if (starsVal > STATE.balance) starsVal = STATE.balance; 
-  mineState.bet = starsVal; updateUI(); 
-}
-
-function startMines() {
-  if (mineState.active || STATE.balance < mineState.bet) return;
-  STATE.balance -= mineState.bet; updateUI(); animateBalance();
-  mineState.active = true; mineState.opened = 0; mineState.currentMult = 1.0;
-  
-  let stepsPool;
-  if (mineState.bet < 100) {
-      stepsPool = mineState.mode === 'easy' ? [4, 5, 6, 7] : (mineState.mode === 'medium' ? [6, 8, 10] : [10, 12, 15]);
-  } else if (mineState.bet < 500) {
-      stepsPool = mineState.mode === 'easy' ? [1, 2, 3] : (mineState.mode === 'medium' ? [3, 4, 5] : [4, 6, 8]);
-  } else {
-      stepsPool = [0, 1, 1];
-  }
-  mineState.deadlyStep = stepsPool[Math.floor(Math.random() * stepsPool.length)];
-
-  document.getElementById('minesBetPanel').style.display = 'none';
-  document.getElementById('mineStartBtn').style.display = 'none';
-  document.getElementById('mineCashoutBtn').classList.add('show');
-  document.getElementById('multiplierDisplay').classList.add('show');
-  updateUI();
-}
-
-function clickMineCell(index) {
-  if (!mineState.active) return;
-  const cellData = mineState.grid[index];
-  if (cellData.isOpened) return;
-  cellData.isOpened = true;
-  
-  if (mineState.opened === mineState.deadlyStep) {
-    cellData.el.classList.add('bomb'); cellData.el.innerHTML = ''; mineState.active = false;
-    let bombsToShow = mineState.mode === 'easy' ? 1 : (mineState.mode === 'medium' ? 3 : 5); bombsToShow--;
-    let unopened = mineState.grid.filter(c => !c.isOpened);
-    while(bombsToShow > 0 && unopened.length > 0) {
-      let r = Math.floor(Math.random() * unopened.length);
-      unopened[r].el.classList.add('bomb'); unopened[r].el.innerHTML = ''; unopened[r].el.style.opacity = '0.4';
-      unopened.splice(r, 1); bombsToShow--;
-    }
-    SOUNDS.bomb();
-    setTimeout(() => {
-      document.getElementById('mineCashoutBtn').classList.remove('show');
-      document.getElementById('mineStartBtn').style.display = 'block';
-      document.getElementById('minesBetPanel').style.display = 'flex';
-      document.getElementById('multiplierDisplay').classList.remove('show');
-      addHistory('Майнер', mineState.bet, 0);
-      showLoseModal(false, 'Вы наткнулись на мину!');
-      resetMinesBoard();
-    }, 1500);
-  } else {
-    cellData.el.classList.add('gem'); cellData.el.innerHTML = ''; mineState.opened++;
-    SOUNDS.gem();
-    const multTable = MULT_TABLES[mineState.mode];
-    mineState.currentMult = multTable[Math.min(mineState.opened - 1, multTable.length - 1)];
-    updateUI();
-    if (mineState.opened === multTable.length) cashoutMines();
-  }
-}
-
-function cashoutMines() {
-  if (!mineState.active || mineState.opened === 0) return;
-  const winAmountStars = Math.floor(mineState.bet * mineState.currentMult);
-  STATE.balance += winAmountStars; 
-  addHistory('Майнер', mineState.bet, winAmountStars);
-  updateUI(); animateBalance();
-  mineState.active = false;
-  
-  document.getElementById('mineCashoutBtn').classList.remove('show');
-  document.getElementById('mineStartBtn').style.display = 'block';
-  document.getElementById('minesBetPanel').style.display = 'flex';
-  document.getElementById('multiplierDisplay').classList.remove('show');
-  
-  SOUNDS.cashout();
-  showWinModal(formatMoney(winAmountStars), getCurrencyIcon(), mineState.currentMult.toFixed(1));
-  resetMinesBoard();
-}
-
-/* ================= КОЛЕСО (CSS) ================= */
-let wheelState = { bet: 10, spinning: false, currentRotation: 0 };
-const WHEEL_MULTS = [1.2, 0, 1.5, 0, 2.5, 0];
-
-function resetWheel() {
-  if (wheelState.spinning) return;
-  const wheel = document.getElementById('wheelSpinner');
-  wheelState.currentRotation = 0;
-  wheel.style.transition = 'none';
-  wheel.style.transform = `rotate(0deg)`;
-  updateUI();
-}
-
-function changeWheelBet(d) {
-  if (wheelState.spinning) return;
-  let stepStars = STATE.currency === 'rub' ? (10 / STATE.rubRate) : 1;
-  let nb = wheelState.bet + (d * stepStars);
-  let minBet = STATE.currency === 'rub' ? (10 / STATE.rubRate) : 1;
-  if (nb >= minBet && nb <= STATE.balance) { wheelState.bet = nb; updateUI(); }
-}
-
-function validateWheelBetInput() {
-  if (wheelState.spinning) return;
-  let inputVal = parseFloat(document.getElementById('wheel-betInput').value) || 1;
-  let starsVal = STATE.currency === 'rub' ? (inputVal / STATE.rubRate) : inputVal;
-  let minBet = STATE.currency === 'rub' ? (10 / STATE.rubRate) : 1;
-  if (starsVal < minBet) starsVal = minBet;
-  if (starsVal > STATE.balance) starsVal = STATE.balance;
-  wheelState.bet = starsVal; updateUI();
-}
-
-function spinWheel() {
-  if (wheelState.spinning || STATE.balance < wheelState.bet) return;
-  wheelState.spinning = true;
-  STATE.balance -= wheelState.bet;
-  updateUI(); animateBalance();
-  
-  const btn = document.getElementById('wheelSpinBtn');
-  btn.disabled = true;
-  
-  let targetSector;
-  const winSectors = [0, 2, 4]; // x1.2, x1.5, x2.5
-  const loseSectors = [1, 3, 5]; // x0
-  
-  if (wheelState.bet < 100) {
-      if (Math.random() < 0.75) targetSector = winSectors[Math.floor(Math.random() * winSectors.length)];
-      else targetSector = loseSectors[Math.floor(Math.random() * loseSectors.length)];
-  } else if (wheelState.bet < 500) {
-      if (Math.random() < 0.40) targetSector = winSectors[Math.floor(Math.random() * winSectors.length)];
-      else targetSector = loseSectors[Math.floor(Math.random() * loseSectors.length)];
-  } else {
-      targetSector = loseSectors[Math.floor(Math.random() * loseSectors.length)];
-  }
-
-  const actualMult = WHEEL_MULTS[targetSector];
-  
-  const extraDegrees = 360 * 5;
-  const targetAngle = extraDegrees + (360 - (targetSector * 60 + 30));
-  const finalRotation = wheelState.currentRotation + targetAngle;
-  
-  const wheel = document.getElementById('wheelSpinner');
-  const startRotation = wheelState.currentRotation;
-  const duration = 4500;
-  const startTime = performance.now();
-  let lastSector = Math.floor(startRotation / 60);
-
-  function animateWheel(time) {
-    let elapsed = time - startTime;
-    let progress = Math.min(elapsed / duration, 1);
-    
-    let easeOut = 1 - Math.pow(1 - progress, 4);
-    let currentRot = startRotation + (finalRotation - startRotation) * easeOut;
-    
-    wheel.style.transform = `rotate(${currentRot}deg)`;
-    
-    let currentSector = Math.floor(currentRot / 60);
-    if (currentSector !== lastSector) {
-      SOUNDS.wheelTick();
-      lastSector = currentSector;
-    }
-
-    if (progress < 1) {
-      requestAnimationFrame(animateWheel);
-    } else {
-      wheelState.currentRotation = finalRotation;
-      
-      if (actualMult > 0) {
-        const winAmountStars = Math.floor(wheelState.bet * actualMult);
-        STATE.balance += winAmountStars;
-        addHistory('Колесо', wheelState.bet, winAmountStars);
-        SOUNDS.win(); animateBalance();
-        showWinModal(formatMoney(winAmountStars), getCurrencyIcon(), actualMult);
-      } else {
-        addHistory('Колесо', wheelState.bet, 0);
-        SOUNDS.lose();
-        showLoseModal(false, 'Колесо остановилось на пустом секторе... Повезет в следующий раз!');
-      }
-      
-      updateUI();
-      wheelState.spinning = false;
-      btn.disabled = false;
-    }
-  }
-  
-  requestAnimationFrame(animateWheel);
-}
-
-/* ================= МОДАЛКИ И СИСТЕМА ЗАЯВОК ================= */
-function openDepositModal() {
-  const mask = document.getElementById('modalMask');
-  const box = document.getElementById('modalBox');
-  const icon = document.getElementById('modalIcon');
-  const title = document.getElementById('modalTitle');
-  const text = document.getElementById('modalText');
-  const content = document.getElementById('modalContent');
-  const btn = document.getElementById('modalBtn');
-
-  box.className = 'modal'; icon.className = ''; icon.innerHTML = '💳';
-  title.textContent = 'Пополнение';
-  text.innerHTML = 'Выберите удобный способ:';
-  
-  content.innerHTML = `
-    <div class="dep-method">
-      <div class="dep-option" onclick="showDepositForm('stars')">
-        <div class="icon">⭐</div>
-        <div class="text"><b>Telegram Stars</b><span>Мгновенно и безопасно</span></div>
-      </div>
-      <div class="dep-option" onclick="showDepositForm('card')">
-        <div class="icon">💳</div>
-        <div class="text"><b>Банковская карта / СБП</b><span>От 100 ₽</span></div>
-      </div>
-    </div>
-  `;
-  
-  btn.className = 'modal-btn red'; btn.textContent = 'Закрыть';
-  btn.onclick = closeModal;
-  mask.classList.add('show');
-}
-
-function showDepositForm(type) {
-  const text = document.getElementById('modalText');
-  const content = document.getElementById('modalContent');
-  const btn = document.getElementById('modalBtn');
-  
-  if (type === 'stars') {
-    text.innerHTML = 'Введите количество звезд:';
-    content.innerHTML = `
-      <div class="input-group">
-        <input type="number" id="depStarsInput" placeholder="Например: 100" min="1">
-      </div>
-    `;
-    btn.textContent = 'Оплатить Stars';
-    btn.onclick = () => {
-      const val = parseInt(document.getElementById('depStarsInput').value) || 0;
-      if (val > 0) {
-        STATE.balance += val;
-        STATE.totalDepositedRub += (val * STATE.rubRate); 
-        updateUI(); animateBalance(); closeModal(); SOUNDS.win();
-        showWinModal(val, '⭐', 'Пополнение Stars');
-      }
-    };
-  } else {
-    text.innerHTML = 'Введите сумму в рублях (Демо):';
-    content.innerHTML = `
-      <div class="input-group">
-        <input type="number" id="depCardInput" placeholder="Например: 500" min="100">
-      </div>
-    `;
-    btn.textContent = 'Оплатить картой';
-    btn.onclick = () => {
-      const rub = parseInt(document.getElementById('depCardInput').value) || 0;
-      if (rub >= 100) {
-        const starsToAdd = Math.floor(rub / STATE.rubRate);
-        STATE.balance += starsToAdd;
-        STATE.totalDepositedRub += rub;
-        updateUI(); animateBalance(); closeModal(); SOUNDS.win();
-        showWinModal(starsToAdd, '⭐', `Пополнение на ${rub}₽`);
-      }
-    };
-  }
-  btn.className = 'modal-btn green';
-}
-
-function openWithdrawModal() {
-  const mask = document.getElementById('modalMask');
-  const box = document.getElementById('modalBox');
-  const icon = document.getElementById('modalIcon');
-  const title = document.getElementById('modalTitle');
-  const text = document.getElementById('modalText');
-  const content = document.getElementById('modalContent');
-  const btn = document.getElementById('modalBtn');
-
-  box.className = 'modal'; icon.className = ''; icon.innerHTML = '💸';
-  title.textContent = 'Вывод средств';
-  
-  const { current } = getLevelData(STATE.totalDepositedRub);
-  let commission = 5;
-  if (current.lvl >= 4) commission = 0;
-  else if (current.lvl >= 3) commission = 3;
-
-  text.innerHTML = `Ваша комиссия на вывод: <b>${commission}%</b>`;
-  
-  content.innerHTML = `
-    <div class="dep-method">
-      <div class="dep-option" onclick="showWithdrawForm('card', ${commission})">
-        <div class="icon">💳</div>
-        <div class="text"><b>На карту (Рубли)</b><span>Мин. 1100 ₽</span></div>
-      </div>
-      <div class="dep-option" onclick="showWithdrawForm('stars', 0)">
-        <div class="icon">⭐</div>
-        <div class="text"><b>Звёздами</b><span>Мин. 500 ⭐ (кратно 100)</span></div>
-      </div>
-    </div>
-  `;
-  
-  btn.className = 'modal-btn red'; btn.textContent = 'Отмена';
-  btn.onclick = closeModal;
-  mask.classList.add('show');
-}
-
-function showWithdrawForm(type, commission) {
-  const text = document.getElementById('modalText');
-  const content = document.getElementById('modalContent');
-  const btn = document.getElementById('modalBtn');
-  const currentBalanceStars = STATE.balance;
-
-  if (type === 'card') {
-    text.innerHTML = `Введите сумму в рублях и номер карты:`;
-    content.innerHTML = `
-      <div class="input-group">
-        <label>Сумма (₽)</label>
-        <input type="number" id="wdCardAmount" placeholder="Мин. 1100" min="1100">
-      </div>
-      <div class="input-group">
-        <label>Номер карты</label>
-        <input type="text" id="wdCardNumber" placeholder="0000 0000 0000 0000" maxlength="19">
-      </div>
-      <p style="font-size:10px; color:var(--muted); margin-top:10px;">Комиссия ${commission}%. К выводу: <b id="wdPreview">0 ₽</b></p>
-    `;
-    btn.textContent = 'Создать заявку';
-    btn.className = 'modal-btn green';
-    
-    document.getElementById('wdCardAmount').addEventListener('input', (e) => {
-      const v = parseInt(e.target.value) || 0;
-      document.getElementById('wdPreview').textContent = Math.floor(v * ((100-commission)/100)) + ' ₽';
-    });
-
-    btn.onclick = () => {
-      const rub = parseInt(document.getElementById('wdCardAmount').value) || 0;
-      const card = document.getElementById('wdCardNumber').value;
-      const starsNeeded = Math.floor(rub / STATE.rubRate);
-
-      if (rub < 1100) return showLoseModal(false, 'Минимальная сумма вывода на карту — 1100 ₽');
-      if (card.length < 16) return showLoseModal(false, 'Введите корректный номер карты');
-      if (starsNeeded > currentBalanceStars) return showLoseModal(false, 'Недостаточно средств на балансе!');
-
-      STATE.balance -= starsNeeded;
-      updateUI(); animateBalance(); closeModal(); SOUNDS.cashout();
-      
-      saveWithdrawRequest('Карта', rub, card);
-      
-      showWinModal(0, '💸', `Заявка на вывод ${rub} ₽ создана! Ожидайте обработки.`);
-      document.querySelector('.win-amount').style.display = 'none';
-    };
-  } else {
-    text.innerHTML = `Введите количество звезд для вывода:`;
-    content.innerHTML = `
-      <div class="input-group">
-        <label>Сумма (⭐)</label>
-        <input type="number" id="wdStarsAmount" placeholder="Мин. 500" min="500" step="100">
-      </div>
-      <p style="font-size:10px; color:var(--muted); margin-top:10px;">Сумма должна быть кратна 100.</p>
-    `;
-    btn.textContent = 'Создать заявку';
-    btn.className = 'modal-btn green';
-
-    btn.onclick = () => {
-      const stars = parseInt(document.getElementById('wdStarsAmount').value) || 0;
-
-      if (stars < 500) return showLoseModal(false, 'Минимальная сумма вывода — 500 ⭐');
-      if (stars % 100 !== 0) return showLoseModal(false, 'Сумма должна быть кратна 100');
-      if (stars > currentBalanceStars) return showLoseModal(false, 'Недостаточно средств на балансе!');
-
-      STATE.balance -= stars;
-      updateUI(); animateBalance(); closeModal(); SOUNDS.cashout();
-      
-      saveWithdrawRequest('Звезды', stars, 'Telegram');
-      
-      showWinModal(0, '💸', `Заявка на вывод ${stars} ⭐ создана! Ожидайте обработки.`);
-      document.querySelector('.win-amount').style.display = 'none';
-    };
-  }
-}
-
-function saveWithdrawRequest(method, amount, target) {
-  let requests = JSON.parse(localStorage.getItem('garisDropWithdraws') || '[]');
-  requests.push({ userId: STATE.userId, method: method, amount: amount, target: target, date: new Date().toLocaleString() });
-  localStorage.setItem('garisDropWithdraws', JSON.stringify(requests));
-}
-
-function showLoseModal(isNearMiss, customText = '') {
-  const box = document.getElementById('modalBox');
-  const icon = document.getElementById('modalIcon');
-  const title = document.getElementById('modalTitle');
-  const text = document.getElementById('modalText');
-  const content = document.getElementById('modalContent');
-  const btn = document.getElementById('modalBtn');
-  
-  box.className = 'modal lose'; icon.className = 'icon-lose'; icon.innerHTML = '✕';
-  content.innerHTML = '';
-  
-  if (customText) { title.textContent = 'Внимание!'; text.innerHTML = customText; }
-  else if (isNearMiss) { title.textContent = 'Ух, почти!'; text.innerHTML = `На центральной линии не хватило всего одного символа!<br>Попробуйте еще раз!`; }
-  else { title.textContent = 'Очень жаль...'; text.innerHTML = 'В этот раз не повезло.<br>Попробуйте еще раз!'; }
-  
-  btn.className = 'modal-btn red'; btn.textContent = 'Закрыть';
-  btn.onclick = closeModal;
-  document.getElementById('modalMask').classList.add('show');
-}
-
-function showWinModal(displayAmount, currencySymbol, mult) {
-  const box = document.getElementById('modalBox');
-  const icon = document.getElementById('modalIcon');
-  const title = document.getElementById('modalTitle');
-  const text = document.getElementById('modalText');
-  const content = document.getElementById('modalContent');
-  const btn = document.getElementById('modalBtn');
-  
-  box.className = 'modal win'; icon.className = 'icon-win'; icon.innerHTML = '★';
-  title.textContent = 'Поздравляем!';
-  content.innerHTML = '';
-  
-  if (typeof mult === 'string') {
-    text.innerHTML = `${mult}<span class="win-amount">${displayAmount > 0 ? '+'+displayAmount : ''} ${displayAmount > 0 ? currencySymbol : ''}</span>`;
-  } else {
-    text.innerHTML = `Вы забрали выигрыш (x${mult})!<span class="win-amount">+${displayAmount} ${currencySymbol}</span>`;
-  }
-  
-  btn.className = 'modal-btn green'; btn.textContent = 'Забрать';
-  btn.onclick = closeModal;
-  document.getElementById('modalMask').classList.add('show');
-}
-
-function closeModal() { document.getElementById('modalMask').classList.remove('show'); }
-
-// --- СТАРТ ---
-loadState(); 
-updateUI();
-setSlotMode('easy');
-</script>
-</body>
-</html>
+  if (nb >= minBet && nb <= STATE
