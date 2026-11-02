@@ -308,6 +308,7 @@
 </div>
 
 <script>
+// ВАЖНО: Здесь мы убрали ?v=100, чтобы не было конфликтов
 const API_URL = 'https://garisdrop-backend.garisnazar1.workers.dev';
 
 let soundEnabled = true;
@@ -683,10 +684,17 @@ async function processStarsPayment() {
   closeModal();
   showLoader(async () => {
     try {
-      const response = await fetch(`${API_URL}/create-invoice`, {
+      // ВОТ ЗДЕСЬ ТЕПЕРЬ /pay
+      const response = await fetch(`${API_URL}/pay`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: STATE.userId, amount: amount })
       });
+      
+      // Проверка на HTML-ответ (если Cloudflare выдал 404, он вернет HTML, а не JSON)
+      if (!response.ok) {
+          throw new Error(`Сервер вернул статус ${response.status}. Проверь код в Cloudflare!`);
+      }
+
       const data = await response.json();
       
       if (data.success && data.invoiceLink) {
@@ -700,7 +708,6 @@ async function processStarsPayment() {
         showLoseModal(false, 'Ошибка сервера: ' + (data.error || 'Неизвестная ошибка')); 
       }
     } catch (e) { 
-      // ВОТ ЗДЕСЬ МЫ ТЕПЕРЬ УВИДИМ ТОЧНУЮ ОШИБКУ
       showLoseModal(false, 'ОШИБКА: ' + e.message); 
     }
   });
