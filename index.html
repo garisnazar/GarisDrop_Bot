@@ -308,7 +308,6 @@
 </div>
 
 <script>
-// ВАЖНО: Здесь мы убрали ?v=100, чтобы не было конфликтов
 const API_URL = 'https://garisdrop-backend.garisnazar1.workers.dev';
 
 let soundEnabled = true;
@@ -684,18 +683,20 @@ async function processStarsPayment() {
   closeModal();
   showLoader(async () => {
     try {
-      // ВОТ ЗДЕСЬ ТЕПЕРЬ /pay
       const response = await fetch(`${API_URL}/pay`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: STATE.userId, amount: amount })
       });
       
-      // Проверка на HTML-ответ (если Cloudflare выдал 404, он вернет HTML, а не JSON)
-      if (!response.ok) {
-          throw new Error(`Сервер вернул статус ${response.status}. Проверь код в Cloudflare!`);
+      const textData = await response.text(); // Получаем ответ как текст (может быть JSON или HTML)
+      let data;
+      
+      try {
+        data = JSON.parse(textData); // Пытаемся распарсить как JSON
+      } catch(e) {
+        // Если не получилось, значит пришел HTML (ошибка Cloudflare)
+        return showLoseModal(false, `Сервер вернул HTML: ${textData.substring(0, 100)}...`);
       }
-
-      const data = await response.json();
       
       if (data.success && data.invoiceLink) {
         if (window.Telegram?.WebApp) {
@@ -705,10 +706,10 @@ async function processStarsPayment() {
           });
         } else { window.open(data.invoiceLink, '_blank'); }
       } else { 
-        showLoseModal(false, 'Ошибка сервера: ' + (data.error || 'Неизвестная ошибка')); 
+        showLoseModal(false, 'Ответ: ' + JSON.stringify(data)); 
       }
     } catch (e) { 
-      showLoseModal(false, 'ОШИБКА: ' + e.message); 
+      showLoseModal(false, 'ОШИБКА СЕТИ: ' + e.message); 
     }
   });
 }
