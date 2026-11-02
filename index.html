@@ -411,7 +411,6 @@ function finishLoading() {
   document.getElementById('loader').classList.remove('show');
 }
 
-// САЙТ ТЕПЕРЬ НЕ МОЖЕТ ПИСАТЬ В БАЗУ! (Только читать)
 async function updateBalanceInDb(newBalance, newHistory) {
   console.log("Баланс изменяется только через сервер.");
 }
@@ -556,7 +555,6 @@ async function spinSlots() {
   const modeData = SLOT_MODES[slotState.mode];
   const cols = modeData.cols;
   
-  // Визуальная анимация (начинаем крутить)
   for (let col = 0; col < cols; col++) {
     const spinInterval = setInterval(() => {
       for (let row = 0; row < 3; row++) {
@@ -571,7 +569,6 @@ async function spinSlots() {
   }
 
   try {
-    // Отправляем запрос на сервер (СЕРВЕР РЕШАЕТ ВЫИГРЫШ)
     const response = await fetch(`${API_URL}/spin`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId: STATE.userId, bet: slotState.bet, mode: slotState.mode })
@@ -580,17 +577,14 @@ async function spinSlots() {
     const data = await response.json();
 
     if (!data.success) {
-      // Если ошибка (например, не хватило денег на сервере)
       slotState.spinning = false;
       document.getElementById('spinBtn').disabled = false;
       document.getElementById('slot-betMinus').disabled = false;
       document.getElementById('slot-betPlus').disabled = false;
       document.getElementById('slot-betInput').disabled = false;
-      // Принудительно обновляем баланс, так как он мог измениться
       return showLoseModal(false, data.error);
     }
 
-    // Сервер ответил. Останавливаем барабаны по очереди
     for (let col = 0; col < cols; col++) {
       setTimeout(() => {
         for (let row = 0; row < 3; row++) {
@@ -694,6 +688,7 @@ async function processStarsPayment() {
         body: JSON.stringify({ userId: STATE.userId, amount: amount })
       });
       const data = await response.json();
+      
       if (data.success && data.invoiceLink) {
         if (window.Telegram?.WebApp) {
           window.Telegram.WebApp.openInvoice(data.invoiceLink, (status) => {
@@ -701,8 +696,13 @@ async function processStarsPayment() {
             else showToast('Оплата отменена.');
           });
         } else { window.open(data.invoiceLink, '_blank'); }
-      } else { showLoseModal(false, data.error || 'Ошибка при создании счета.'); }
-    } catch (e) { showLoseModal(false, 'Ошибка сети: ' + e.message); }
+      } else { 
+        showLoseModal(false, 'Ошибка сервера: ' + (data.error || 'Неизвестная ошибка')); 
+      }
+    } catch (e) { 
+      // ВОТ ЗДЕСЬ МЫ ТЕПЕРЬ УВИДИМ ТОЧНУЮ ОШИБКУ
+      showLoseModal(false, 'ОШИБКА: ' + e.message); 
+    }
   });
 }
 
@@ -737,7 +737,7 @@ async function submitWithdraw() {
       });
       const data = await response.json();
       if (data.success) {
-        STATE.balance = data.newBalance; // Сервер прислал новый баланс
+        STATE.balance = data.newBalance;
         updateUI();
         showWinModal(amount, '⭐', 'Заявка отправлена!');
         document.getElementById('modalText').innerHTML = 'Ожидайте связи от администратора.';
