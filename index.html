@@ -30,12 +30,10 @@
 <style>
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; }
   
-  /* НОВАЯ МЯГКАЯ ЦВЕТОВАЯ ПАЛИТРА */
   :root{ 
-    --accent: #34d399;      /* Мягкий изумрудный */
-    --accent-dark: #059669; /* Темный изумрудный для кнопок */
-    --bg: #0f172a;          /* Глубокий графитовый */
-    --card: #1e293b;        /* Мягкий серо-синий для карточек */
+    --accent: #34d399;
+    --bg: #0f172a;
+    --card: #1e293b;
     --border: rgba(255,255,255,0.08);
     --text: #f8fafc;
     --muted: #94a3b8;
@@ -51,23 +49,20 @@
   
   #app{ position:fixed; inset:0; z-index:1; display:flex; flex-direction:column; padding:16px 16px calc(96px + env(safe-area-inset-bottom)); overflow:hidden; }
   
-  /* ШАПКА */
   .header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; flex-shrink: 0; width: 100%;}
-  .logo{ font-weight:800; font-size:18px; color:var(--text); letter-spacing: -0.5px;}
+  .logo{ font-weight:800; font-size:18px; color:var(--text); letter-spacing: -0.5px; display: flex; align-items: center; gap: 6px;}
   .header-right{ display:flex; align-items:center; gap:8px; flex-shrink: 0;}
   
-  .deposit-btn-large { background: var(--accent); border: none; color: #064e3b; height: 36px; padding: 0 14px; border-radius: 12px; font-size: 13px; font-weight: 800; cursor: pointer; transition: transform 0.1s; display: flex; align-items: center; justify-content: center;}
+  .deposit-btn-large { background: var(--accent); border: none; color: #064e3b; height: 36px; padding: 0 14px; border-radius: 12px; font-size: 13px; font-weight: 800; cursor: pointer; transition: transform 0.1s; display: flex; align-items: center; justify-content: center; gap: 4px;}
   .deposit-btn-large:active { transform: scale(0.95); }
   
   .balance-pill{ background:var(--card); border:1px solid var(--border); height: 36px; padding: 0 12px; border-radius:12px; font-size:15px; font-weight:800; color:var(--accent); display:flex; align-items:center; gap:4px; transition: all 0.2s;}
   .balance-pill.update { transform: scale(1.05); border-color: var(--accent); }
   
-  /* СТРОКА ОНЛАЙНА */
   .online-bar { display: flex; align-items: center; justify-content: flex-start; gap: 6px; font-size: 12px; color: var(--muted); margin-bottom: 16px; }
   .online-dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 8px var(--accent); }
   .online-bar b { color: var(--text); }
 
-  /* СТРАНИЦЫ */
   .page{ flex:1; min-height: 0; overflow-y:auto; display:none; flex-direction: column; padding-bottom:12px; }
   .page.active{ display:flex; animation: fadeIn 0.3s ease;}
   @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
@@ -76,7 +71,6 @@
   .back-btn { background: var(--card); border: 1px solid var(--border); color: var(--text); padding: 10px 16px; border-radius: 12px; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; margin-bottom: 16px; width: fit-content; transition: transform 0.1s; }
   .back-btn:active { transform: scale(0.95); }
   
-  /* КАРТОЧКИ ИГР */
   .games-grid{ display:grid; grid-template-columns:1fr; gap:16px; align-content: start; }
   .game-card{ position:relative; background:var(--card); border:1px solid var(--border); border-radius:24px; padding:24px 16px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; cursor:pointer; transition: all 0.2s; }
   .game-card:active{ transform:scale(.97); border-color: var(--accent);}
@@ -85,7 +79,6 @@
   .game-card .tag{ font-size:13px; color:var(--muted); text-align: center; font-weight: 500;}
   .game-card .nft-badge{ position:absolute; top:16px; right:16px; font-size:10px; font-weight:800; padding:4px 10px; border-radius:8px; background:var(--accent); color:#064e3b; }
   
-  /* СЛОТЫ */
   .game-wrap{ display:flex; flex-direction:column; align-items:center; gap:16px; width: 100%; }
   .mode-selector { display: flex; gap: 8px; width: 100%; max-width: 400px; margin-bottom: 4px; }
   .mode-btn { flex: 1; padding: 12px 0; border-radius: 14px; border: 1px solid var(--border); background: var(--card); color: var(--muted); font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.2s; }
@@ -103,6 +96,9 @@
   
   .cell{ aspect-ratio:1; border-radius:16px; background:rgba(15,23,42,0.6); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size: clamp(24px, 7vw, 36px); transition: transform 0.1s, opacity 0.1s; position: relative; z-index: 1; }
   
+  /* Стили для картинок внутри слотов */
+  .cell img { width: 65%; height: 65%; object-fit: contain; }
+  
   .cell.spinning { animation: slotSpin 0.2s linear infinite; filter: blur(2px); opacity: 0.7; }
   @keyframes slotSpin { 0% { transform: translateY(-30%); opacity: 0; } 50% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(30%); opacity: 0; } }
 
@@ -119,7 +115,6 @@
   .main-action-btn{ width:100%; max-width:340px; padding:18px; border:none; border-radius:18px; font-size:17px; font-weight:800; color: #064e3b; background:var(--accent); cursor:pointer; transition: all 0.2s; margin-top: 16px; }
   .main-action-btn:active{ transform:scale(.97); } .main-action-btn:disabled{ opacity:.5; cursor:not-allowed; }
   
-  /* ПРОФИЛЬ */
   .profile-card{ background:var(--card); border:1px solid var(--border); border-radius:28px; padding:32px 24px; text-align:center; margin-bottom:20px; display: flex; flex-direction: column; align-items: center;}
   
   .avatar{ width:90px; height:90px; border-radius:50%; margin:0 auto 16px; background:var(--bg); border: 3px solid var(--card); display:flex; align-items:center; justify-content:center; font-size:40px; position: relative; overflow: hidden;}
@@ -134,19 +129,16 @@
   .action-btn-icon:active { background: rgba(255,255,255,0.05); }
   .action-btn-icon .ic { font-size: 18px; }
   
-  /* БОНУСЫ */
   .bonus-card { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 24px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 12px;}
   .bonus-card h3 { color: var(--text); font-size: 18px; font-weight: 800;}
   .bonus-card p { font-size: 14px; color: var(--muted); line-height: 1.4;}
   .bonus-btn { width: 100%; padding: 16px; border-radius: 16px; border: none; font-weight: 800; font-size: 15px; cursor: pointer; background: rgba(52,211,153,0.1); color: var(--accent); transition: 0.2s; }
   .bonus-btn:active { background: rgba(52,211,153,0.2); }
   
-  /* НАВИГАЦИЯ */
   .nav{ position:fixed; left:16px; right:16px; bottom:calc(16px + env(safe-area-inset-bottom)); background:rgba(30,41,59,0.9); border:1px solid var(--border); border-radius:24px; display:flex; padding:8px; z-index:10; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
   .nav-btn{ flex:1; padding:14px 5px; border-radius:16px; border:none; background:transparent; color:var(--muted); font-weight:700; cursor:pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 12px;}
   .nav-btn.active{ background:var(--card); color:var(--accent); }
   
-  /* МОДАЛКИ */
   .modal-mask{ position:fixed; inset:0; z-index:50; display:none; background:rgba(15,23,42,0.8); align-items:center; justify-content:center; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
   .modal-mask.show{ display:flex; }
   
@@ -170,8 +162,7 @@
   .modal.lose h3 { color: var(--text); font-size: 22px; font-weight: 800; margin-bottom: 8px; }
   .modal.lose p { color: var(--muted); font-size: 15px; margin-bottom: 24px; line-height: 1.4; }
   
-  .win-amount { font-size: 36px; font-weight: 800; color: var(--text); display: block; margin: 12px 0; letter-spacing: -1px;}
-  .win-amount span { font-size: 24px; color: var(--accent); }
+  .win-amount { font-size: 36px; font-weight: 800; color: var(--text); display: block; margin: 12px 0; letter-spacing: -1px; display: flex; justify-content: center; align-items: center; gap: 8px;}
   
   .modal-btn { width: 100%; padding: 18px; border-radius: 16px; border: none; font-weight: 800; font-size: 16px; cursor: pointer; margin-top: 12px; transition: transform 0.15s; }
   .modal-btn:active { transform: scale(0.96); }
@@ -179,8 +170,8 @@
   .modal-btn.purple { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
   
   .history-item { display: flex; justify-content: space-between; padding: 16px; border-bottom: 1px solid var(--border); font-size: 15px; font-weight: 600;}
-  .history-win { color: var(--accent); }
-  .history-lose { color: var(--red); }
+  .history-win { color: var(--accent); display: flex; align-items: center; gap: 4px;}
+  .history-lose { color: var(--red); display: flex; align-items: center; gap: 4px;}
   
   .input-group { display: flex; flex-direction: column; text-align: left; width: 100%; margin-top: 16px; gap: 8px; }
   .input-group label { font-size: 13px; color: var(--muted); font-weight: 600;}
@@ -191,6 +182,22 @@
   .toast { background: var(--card); border: 1px solid var(--border); color: var(--text); padding: 12px 24px; border-radius: 16px; font-weight: 700; font-size: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); animation: slideDown 0.3s ease, fadeOut 0.3s ease 2.7s forwards; }
   @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
   @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+
+  /* Специальный класс для звездочек в тексте */
+  .star-icon {
+    width: 1em;
+    height: 1em;
+    vertical-align: middle;
+    display: inline-block;
+    object-fit: contain;
+  }
+  .star-icon-large {
+    width: 1.2em;
+    height: 1.2em;
+    vertical-align: middle;
+    display: inline-block;
+    object-fit: contain;
+  }
 </style>
 </head>
 <body>
@@ -204,7 +211,7 @@
     <div class="header-right">
       <button class="deposit-btn-large" onclick="openDepositModal()">Пополнить</button>
       <div class="balance-pill" id="balancePillHeader">
-        <span id="currencyIcon">⭐</span> <span id="balanceTop">0</span>
+        <span id="currencyIcon"><img src="https://i.ibb.co/mCMTLBfh/image.png" class="star-icon" alt="star"></span> <span id="balanceTop">0</span>
       </div>
     </div>
   </div>
@@ -267,7 +274,7 @@
       <div class="avatar" id="profileAvatar">🐸</div>
       <div class="profile-name" id="userName">Игрок</div>
       <div class="profile-id" id="userId">ID: ...</div>
-      <div class="profile-balance"><span id="profileCurrencyIcon">⭐</span> <span id="balanceProfile">0</span></div>
+      <div class="profile-balance"><span id="profileCurrencyIcon"><img src="https://i.ibb.co/mCMTLBfh/image.png" class="star-icon-large" alt="star"></span> <span id="balanceProfile">0</span></div>
     </div>
     <div class="action-grid">
       <button class="action-btn-icon" onclick="switchPage('history')"><span class="ic">📊</span> История</button>
@@ -300,7 +307,8 @@
 </div>
 
 <script>
-const SYMBOLS = ['🍌','🎰','💎','🍒','⭐']; 
+// МАССИВ ИКОНОК ДЛЯ СЛОТОВ. ВМЕСТО ЗВЕЗДЫ ТЕПЕРЬ ТВОЯ ССЫЛКА.
+const SYMBOLS = ['🍌','🎰','💎','🍒','https://i.ibb.co/mCMTLBfh/image.png']; 
 const API_URL = 'https://garisdrop-backend.garisnazar1.workers.dev';
 
 function showToast(text) {
@@ -323,7 +331,6 @@ function initUserId() {
   return savedId;
 }
 
-// ОБНОВЛЕНИЕ ОНЛАЙНА
 async function updateOnlineStatus() {
   if (!userDocRef) return;
   try {
@@ -365,7 +372,6 @@ async function initUserData() {
     renderHistory();
     finishLoading(); 
     
-    // Запускаем онлайн-статус
     updateOnlineStatus();
     setInterval(updateOnlineStatus, 30000);
   } catch (e) {
@@ -377,7 +383,6 @@ function finishLoading() {
   document.getElementById('loader').classList.remove('show');
 }
 
-// АВАТАРКА ИЗ ТЕЛЕГРАМ
 if (window.Telegram?.WebApp) {
   Telegram.WebApp.ready(); Telegram.WebApp.expand();
   const tgUser = Telegram.WebApp.initDataUnsafe?.user;
@@ -420,7 +425,9 @@ function renderHistory() {
     const div = document.createElement('div');
     div.className = 'history-item';
     const resClass = item.isWin ? 'history-win' : 'history-lose';
-    const resText = item.isWin ? `+${formatMoney(item.winStars)} ⭐` : `-${formatMoney(item.betStars)} ⭐`;
+    // Используем твою картинку в истории
+    const imgTag = `<img src="https://i.ibb.co/mCMTLBfh/image.png" class="star-icon" alt="star">`;
+    const resText = item.isWin ? `+${formatMoney(item.winStars)} ${imgTag}` : `-${formatMoney(item.betStars)} ${imgTag}`;
     div.innerHTML = `<span>${item.game}</span><span class="${resClass}">${resText}</span>`;
     list.appendChild(div);
   });
@@ -452,6 +459,15 @@ function openGame(game) {
 const SLOT_MODES = { easy: { cols: 3, mult: 1.5 }, medium: { cols: 4, mult: 2.0 }, hard: { cols: 5, mult: 4.0 } };
 let slotState = { mode: 'easy', bet: 5, spinning: false };
 
+// Вспомогательная функция для отрисовки символа (если это звезда - рисуем картинку)
+function renderSymbol(cell, symbol) {
+  if (symbol === 'https://i.ibb.co/mCMTLBfh/image.png') {
+    cell.innerHTML = `<img src="${symbol}" alt="star">`;
+  } else {
+    cell.textContent = symbol;
+  }
+}
+
 function setSlotMode(mode) {
   if (slotState.spinning) return;
   slotState.mode = mode;
@@ -465,7 +481,8 @@ function setSlotMode(mode) {
     for (let col = 0; col < cols; col++) {
       let cell = document.createElement('div');
       cell.className = 'cell'; cell.dataset.col = col; cell.dataset.row = row;
-      cell.textContent = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+      const randomSymbol = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+      renderSymbol(cell, randomSymbol);
       slotsContainer.appendChild(cell);
     }
   }
@@ -507,7 +524,8 @@ async function spinSlots() {
         const cell = document.querySelector(`.cell[data-col="${col}"][data-row="${row}"]`);
         if (!cell.classList.contains('win')) {
           cell.classList.add('spinning');
-          cell.textContent = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+          const randomSymbol = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+          renderSymbol(cell, randomSymbol);
         }
       }
     }, 50);
@@ -538,10 +556,14 @@ async function spinSlots() {
         for (let row = 0; row < 3; row++) {
           const cell = document.querySelector(`.cell[data-col="${col}"][data-row="${row}"]`);
           cell.classList.remove('spinning');
+          
           if (row === 1 && data.isWin) {
-             cell.textContent = '💎'; cell.classList.add('win');
+             // При выигрыше ставим твою звезду
+             renderSymbol(cell, 'https://i.ibb.co/mCMTLBfh/image.png');
+             cell.classList.add('win');
           } else {
-             cell.textContent = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+             const randomSymbol = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+             renderSymbol(cell, randomSymbol);
              cell.classList.remove('win');
           }
         }
@@ -584,7 +606,8 @@ function showWinModal(amount, currency, title) {
   modal.className = 'modal win';
   document.getElementById('modalIcon').innerHTML = `<div class="icon-win"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>`;
   document.getElementById('modalTitle').textContent = title;
-  document.getElementById('modalText').innerHTML = `Вы заработали:<br><span class="win-amount">${formatMoney(amount)} <span>${currency}</span></span>`;
+  // Твоя звезда в окне выигрыша
+  document.getElementById('modalText').innerHTML = `Вы заработали:<br><span class="win-amount">${formatMoney(amount)} <img src="https://i.ibb.co/mCMTLBfh/image.png" class="star-icon-large" alt="star"></span>`;
   const btn = document.getElementById('modalBtn');
   btn.className = 'modal-btn green'; btn.textContent = 'Забрать'; btn.style.display = 'block';
   document.getElementById('modalMask').classList.add('show');
@@ -610,7 +633,7 @@ function openDepositModal() {
   const content = document.getElementById('modalContent');
   content.innerHTML = `
     <div class="input-group"><input type="number" id="depositAmountInput" placeholder="Мин. 10" min="10"></div>
-    <button class="main-action-btn" style="margin-top: 15px;" onclick="processStarsPayment()">Оплатить Stars ⭐</button>
+    <button class="main-action-btn" style="margin-top: 15px; display: flex; justify-content: center; align-items: center; gap: 6px;" onclick="processStarsPayment()">Оплатить <img src="https://i.ibb.co/mCMTLBfh/image.png" class="star-icon" alt="star"></button>
   `;
   document.getElementById('modalBtn').style.display = 'none';
   document.getElementById('modalMask').classList.add('show');
@@ -618,7 +641,7 @@ function openDepositModal() {
 
 async function processStarsPayment() {
   const amount = parseInt(document.getElementById('depositAmountInput').value);
-  if (!amount || amount < 10) return showToast('Минимальная сумма пополнения 10 ⭐');
+  if (!amount || amount < 10) return showToast('Минимальная сумма пополнения 10');
   closeModal();
   document.getElementById('loader').classList.add('show');
   try {
