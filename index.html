@@ -21,7 +21,11 @@
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
-  window.db = db; window.doc = doc; window.getDoc = getDoc; window.setDoc = setDoc; window.updateDoc = updateDoc;
+  
+  // ВОТ ЗДЕСЬ БЫЛА ОШИБКА: Добавил collection и getDocs для работы онлайна
+  window.db = db; 
+  window.doc = doc; window.getDoc = getDoc; window.setDoc = setDoc; window.updateDoc = updateDoc;
+  window.collection = collection; window.getDocs = getDocs; 
 </script>
 
 <style>
@@ -62,7 +66,17 @@
   .games-grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; align-content: start; }
   .game-card{ position:relative; background:var(--card); border:1px solid var(--border); border-radius:24px; padding:20px 10px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; cursor:pointer; transition: all 0.2s; }
   .game-card:active{ transform:scale(.97); border-color: var(--accent);}
-  .game-icon { width: 90px; height: 90px; object-fit: cover; border-radius: 20px; border: 2px solid var(--border); margin-bottom: 4px; }
+  
+  /* ИСПРАВЛЕНИЕ КАРТИНОК: Жесткое скругление и обрезка (object-fit) */
+  .game-icon { 
+    width: 90px; 
+    height: 90px; 
+    object-fit: cover; 
+    border-radius: 22px; 
+    border: 2px solid var(--border); 
+    margin-bottom: 4px; 
+  }
+  
   .game-card .name{ font-size:16px; font-weight:800; text-align: center; }
   .game-card .tag{ font-size:11px; color:var(--muted); text-align: center; font-weight: 500;}
   
@@ -247,7 +261,6 @@
     </div>
   </div>
 
-  <!-- СТРАНИЦА АПГРЕЙДЕРА (СОВРЕМЕННАЯ) -->
   <div class="page" id="page-upgrade">
     <button class="back-btn" onclick="switchPage('games')">← Назад</button>
     <div class="game-wrap">
@@ -283,7 +296,7 @@
     </div>
   </div>
 
-  <!-- ПРОФИЛЬ (БЕЗ ИСТОРИИ) -->
+  <!-- ПРОФИЛЬ (БЕЗ РЕЙТИНГА) -->
   <div class="page" id="page-profile">
     <div class="title">Профиль</div>
     <div class="profile-card">
@@ -294,10 +307,8 @@
       <div class="profile-id" id="userId">ID: ...</div>
       <div class="profile-balance"><span id="profileCurrencyIcon"><img src="https://i.ibb.co/mCMTLBfh/image.png" class="star-icon-large" alt="star"></span> <span id="balanceProfile">0</span></div>
     </div>
-    <div class="action-grid" style="grid-template-columns: 1fr;">
-      <button class="action-btn-icon" onclick="openComingSoon()"><span class="ic">🏆</span> Рейтинг</button>
-    </div>
-    <div class="action-grid">
+    
+    <div class="action-grid" style="grid-template-columns: 1fr 1fr;">
       <button class="action-btn-icon" onclick="openDepositModal()">＋ Пополнить</button>
       <button class="action-btn-icon" onclick="openWithdrawModal()">↗ Вывести</button>
     </div>
@@ -500,8 +511,6 @@ function copyRefLink() {
   linkInput.setSelectionRange(0, 99999);
   navigator.clipboard.writeText(linkInput.value).then(() => { showToast('Ссылка скопирована!'); });
 }
-
-function openComingSoon() { showLoseModal(false, 'Эта функция появится в следующих обновлениях!'); }
 
 function switchPage(name) {
   document.querySelectorAll('.page').forEach(p => { p.classList.remove('active'); p.style.display = 'none'; });
