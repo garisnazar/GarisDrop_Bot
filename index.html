@@ -50,7 +50,11 @@
   #app{ position:fixed; inset:0; z-index:1; display:flex; flex-direction:column; padding:16px 16px calc(96px + env(safe-area-inset-bottom)); overflow:hidden; }
   
   .header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; flex-shrink: 0; width: 100%;}
-  .logo{ font-weight:800; font-size:18px; color:var(--text); letter-spacing: -0.5px; display: flex; align-items: center; gap: 6px;}
+  
+  /* ЛОГОТИП В ШАПКЕ */
+  .logo{ font-weight:800; font-size:18px; color:var(--text); letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px;}
+  .header-logo { width: 28px; height: 28px; object-fit: contain; border-radius: 50%; }
+  
   .header-right{ display:flex; align-items:center; gap:8px; flex-shrink: 0;}
   
   .deposit-btn-large { background: var(--accent); border: none; color: #064e3b; height: 36px; padding: 0 14px; border-radius: 12px; font-size: 13px; font-weight: 800; cursor: pointer; transition: transform 0.1s; display: flex; align-items: center; justify-content: center; gap: 4px;}
@@ -95,8 +99,6 @@
   .win-line-bottom { top: 66.66%; transform: translateY(-50%); }
   
   .cell{ aspect-ratio:1; border-radius:16px; background:rgba(15,23,42,0.6); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size: clamp(24px, 7vw, 36px); transition: transform 0.1s, opacity 0.1s; position: relative; z-index: 1; }
-  
-  /* Стили для картинок внутри слотов */
   .cell img { width: 65%; height: 65%; object-fit: contain; }
   
   .cell.spinning { animation: slotSpin 0.2s linear infinite; filter: blur(2px); opacity: 0.7; }
@@ -183,21 +185,8 @@
   @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
   @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
 
-  /* Специальный класс для звездочек в тексте */
-  .star-icon {
-    width: 1em;
-    height: 1em;
-    vertical-align: middle;
-    display: inline-block;
-    object-fit: contain;
-  }
-  .star-icon-large {
-    width: 1.2em;
-    height: 1.2em;
-    vertical-align: middle;
-    display: inline-block;
-    object-fit: contain;
-  }
+  .star-icon { width: 1em; height: 1em; vertical-align: middle; display: inline-block; object-fit: contain; }
+  .star-icon-large { width: 1.2em; height: 1.2em; vertical-align: middle; display: inline-block; object-fit: contain; }
 </style>
 </head>
 <body>
@@ -207,7 +196,11 @@
 
 <div id="app">
   <div class="header">
-    <div class="logo">🐸 GARISDROP</div>
+    <!-- ЛОГОТИП В ШАПКЕ -->
+    <div class="logo">
+      <img src="https://i.ibb.co/dszwWHNB/Garis-Drop.png" class="header-logo" alt="logo">
+      GARISDROP
+    </div>
     <div class="header-right">
       <button class="deposit-btn-large" onclick="openDepositModal()">Пополнить</button>
       <div class="balance-pill" id="balancePillHeader">
@@ -271,7 +264,10 @@
   <div class="page" id="page-profile">
     <div class="title">Профиль</div>
     <div class="profile-card">
-      <div class="avatar" id="profileAvatar">🐸</div>
+      <!-- ЛОГОТИП В ПРОФИЛЕ -->
+      <div class="avatar" id="profileAvatar">
+        <img src="https://i.ibb.co/dszwWHNB/Garis-Drop.png" alt="logo">
+      </div>
       <div class="profile-name" id="userName">Игрок</div>
       <div class="profile-id" id="userId">ID: ...</div>
       <div class="profile-balance"><span id="profileCurrencyIcon"><img src="https://i.ibb.co/mCMTLBfh/image.png" class="star-icon-large" alt="star"></span> <span id="balanceProfile">0</span></div>
@@ -307,7 +303,6 @@
 </div>
 
 <script>
-// МАССИВ ИКОНОК ДЛЯ СЛОТОВ. ВМЕСТО ЗВЕЗДЫ ТЕПЕРЬ ТВОЯ ССЫЛКА.
 const SYMBOLS = ['🍌','🎰','💎','🍒','https://i.ibb.co/mCMTLBfh/image.png']; 
 const API_URL = 'https://garisdrop-backend.garisnazar1.workers.dev';
 
@@ -388,6 +383,7 @@ if (window.Telegram?.WebApp) {
   const tgUser = Telegram.WebApp.initDataUnsafe?.user;
   if (tgUser) {
     document.getElementById('userName').textContent = tgUser.first_name || 'Игрок';
+    // Если у юзера есть аватарка в ТГ, она перекроет логотип
     if (tgUser.photo_url) {
       document.getElementById('profileAvatar').innerHTML = `<img src="${tgUser.photo_url}" alt="avatar">`;
     }
@@ -425,7 +421,6 @@ function renderHistory() {
     const div = document.createElement('div');
     div.className = 'history-item';
     const resClass = item.isWin ? 'history-win' : 'history-lose';
-    // Используем твою картинку в истории
     const imgTag = `<img src="https://i.ibb.co/mCMTLBfh/image.png" class="star-icon" alt="star">`;
     const resText = item.isWin ? `+${formatMoney(item.winStars)} ${imgTag}` : `-${formatMoney(item.betStars)} ${imgTag}`;
     div.innerHTML = `<span>${item.game}</span><span class="${resClass}">${resText}</span>`;
@@ -459,7 +454,6 @@ function openGame(game) {
 const SLOT_MODES = { easy: { cols: 3, mult: 1.5 }, medium: { cols: 4, mult: 2.0 }, hard: { cols: 5, mult: 4.0 } };
 let slotState = { mode: 'easy', bet: 5, spinning: false };
 
-// Вспомогательная функция для отрисовки символа (если это звезда - рисуем картинку)
 function renderSymbol(cell, symbol) {
   if (symbol === 'https://i.ibb.co/mCMTLBfh/image.png') {
     cell.innerHTML = `<img src="${symbol}" alt="star">`;
@@ -558,7 +552,6 @@ async function spinSlots() {
           cell.classList.remove('spinning');
           
           if (row === 1 && data.isWin) {
-             // При выигрыше ставим твою звезду
              renderSymbol(cell, 'https://i.ibb.co/mCMTLBfh/image.png');
              cell.classList.add('win');
           } else {
@@ -606,7 +599,6 @@ function showWinModal(amount, currency, title) {
   modal.className = 'modal win';
   document.getElementById('modalIcon').innerHTML = `<div class="icon-win"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>`;
   document.getElementById('modalTitle').textContent = title;
-  // Твоя звезда в окне выигрыша
   document.getElementById('modalText').innerHTML = `Вы заработали:<br><span class="win-amount">${formatMoney(amount)} <img src="https://i.ibb.co/mCMTLBfh/image.png" class="star-icon-large" alt="star"></span>`;
   const btn = document.getElementById('modalBtn');
   btn.className = 'modal-btn green'; btn.textContent = 'Забрать'; btn.style.display = 'block';
