@@ -25,7 +25,7 @@
 </script>
 
 <style>
-  /* ... ТВОИ СТИЛИ (ОНИ ОЧЕНЬ ДЛИННЫЕ, Я ОСТАВИЛ ВСЕ КАК БЫЛО) ... */
+  /* ТВОИ СТИЛИ ОСТАЮТСЯ ПРЕЖНИМИ */
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; }
   :root{ --accent: #34d399; --bg: #0f172a; --card: #1e293b; --border: rgba(255,255,255,0.08); --text: #f8fafc; --muted: #94a3b8; --red: #fb7185; }
   html,body{ height:100%; background:var(--bg); color:var(--text); overflow:hidden; }
@@ -90,7 +90,7 @@
   .profile-id{ font-size:13px; color:var(--muted); margin-top: 6px; font-weight: 500;}
   .profile-balance{ font-size:40px; font-weight:800; color:var(--text); margin-top:24px; display: flex; align-items: center; gap: 8px;}
   .action-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; width: 100%;}
-  .action-btn-icon { padding:18px 12px; border-radius:18px; border:1px solid var(--border); background:var(--card); color:var(--text); font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; font-size:14px; transition: 0.2s;}
+  .action-btn-icon { padding:18px 12px; border-radius:18px; border:1px solid var(--border); background:var(--card); color:var(--text); font-weight:700; cursor:pointer; display:flex; align-items: center; justify-content: center; gap:8px; font-size:14px; transition: 0.2s;}
   .action-btn-icon:active { background: rgba(255,255,255,0.05); }
   .action-btn-icon .ic { font-size: 18px; }
   .bonus-card { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 24px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 12px;}
@@ -177,7 +177,6 @@
   <div class="page" id="page-bonus">
     <div class="title">Бонусы</div>
     
-    <!-- ОБНОВЛЕННЫЙ БЛОК РЕФЕРАЛЬНОЙ ПРОГРАММЫ -->
     <div class="bonus-card">
       <h3>👥 Пригласи друга</h3>
       <p>Отправь другу свою ссылку. Когда он зайдет и начнет играть, вы оба получите бонусы!</p>
@@ -286,7 +285,6 @@ function initUserId() {
   return savedId;
 }
 
-// ЛОГИКА РЕФЕРАЛЬНОЙ СИСТЕМЫ
 async function checkReferral() {
   const urlParams = new URLSearchParams(window.location.search);
   const startParam = window.Telegram?.WebApp?.initDataUnsafe?.start_param || urlParams.get('startapp');
@@ -340,7 +338,6 @@ async function initUserData() {
       STATE.referralsCount = data.referralsCount || 0;
     }
     
-    // Генерируем ссылку
     const refLink = `https://t.me/GarisDrop_Bot?startapp=${STATE.userId}`;
     document.getElementById('refLinkInput').value = refLink;
     document.getElementById('refCount').textContent = STATE.referralsCount;
@@ -349,7 +346,7 @@ async function initUserData() {
     renderHistory();
     finishLoading(); 
     
-    checkReferral(); // Проверяем, не зашел ли он по чужой ссылке
+    checkReferral();
     updateOnlineStatus();
     setInterval(updateOnlineStatus, 30000);
   } catch (e) {
@@ -657,8 +654,68 @@ async function processStarsPayment() {
   }
 }
 
+// ОБНОВЛЕННЫЙ ВЫВОД
 function openWithdrawModal() {
-  showLoseModal(false, 'Вывод средств временно недоступен. Мы работаем над улучшением системы выплат!');
+  const modal = document.getElementById('modalBox');
+  modal.className = 'modal win';
+  document.getElementById('modalIcon').innerHTML = '<div class="icon-win">💸</div>';
+  document.getElementById('modalTitle').textContent = 'Вывод средств';
+  document.getElementById('modalText').innerHTML = 'Заявка будет отправлена администратору для ручной выплаты:';
+  
+  const content = document.getElementById('modalContent');
+  content.innerHTML = `
+    <div class="input-group">
+      <label>Сумма (Мин. 100 ⭐)</label>
+      <input type="number" id="withdrawAmountInput" placeholder="100" min="100">
+    </div>
+    <div class="input-group">
+      <label>Ваш Telegram (для перевода)</label>
+      <input type="text" id="withdrawUsernameInput" placeholder="@username">
+    </div>
+    <div style="background: rgba(251, 113, 133, 0.1); border: 1px solid rgba(251, 113, 133, 0.3); padding: 12px; border-radius: 12px; margin-top: 15px; text-align: left;">
+      <p style="color: var(--red); font-size: 12px; font-weight: 700; margin: 0;">⚠️ Внимание: Убедитесь, что ваш ник написан верно. Изменить его после отправки заявки будет невозможно!</p>
+    </div>
+    <button class="main-action-btn" style="margin-top: 20px;" onclick="submitWithdraw()">Отправить заявку</button>
+  `;
+  
+  document.getElementById('modalBtn').style.display = 'none';
+  document.getElementById('modalMask').classList.add('show');
+}
+
+async function submitWithdraw() {
+  const amount = parseInt(document.getElementById('withdrawAmountInput').value);
+  const username = document.getElementById('withdrawUsernameInput').value.trim();
+
+  if (!amount || amount < 100) return showToast('Минимальная сумма вывода 100 ⭐');
+  if (!username || username.length < 3) return showToast('Введите ваш Telegram ник!');
+  if (amount > STATE.balance) return showToast('Недостаточно средств!');
+
+  closeModal();
+  document.getElementById('loader').classList.add('show');
+  
+  try {
+    const response = await fetch(`${API_URL}/withdraw`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: STATE.userId, amount: amount, tgUsername: username })
+    });
+    const data = await response.json();
+    
+    document.getElementById('loader').classList.remove('show');
+    
+    if (data.success) {
+      STATE.balance = data.newBalance;
+      updateUI();
+      
+      showWinModal(amount, '⭐', 'Заявка отправлена!');
+      document.getElementById('modalText').innerHTML = 'Администратор свяжется с вами и переведет звезды на ваш аккаунт.';
+      document.querySelector('.win-amount').style.display = 'none'; 
+    } else { 
+      showLoseModal(false, data.error || 'Ошибка при выводе.'); 
+    }
+  } catch (e) { 
+    document.getElementById('loader').classList.remove('show');
+    showLoseModal(false, 'Ошибка сети.'); 
+  }
 }
 
 if (window.Telegram?.WebApp) {
