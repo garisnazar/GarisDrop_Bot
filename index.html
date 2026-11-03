@@ -390,6 +390,15 @@ async function initUserData() {
       updateUI(); 
       finishLoading();
     } else {
+      // ИСПРАВЛЕНИЕ: Сразу берем данные из первого запроса!
+      const initialData = docSnap.data();
+      STATE.balance = initialData.balance || 0;
+      STATE.history = initialData.history || [];
+      updateUI(); // <-- Мгновенно показываем баланс
+      renderHistory();
+      finishLoading(); // Убираем загрузку
+
+      // И ТОЛЬКО ПОТОМ включаем слушатель для будущих изменений
       onSnapshot(userDocRef, (doc) => {
         if (doc.exists()) {
           const data = doc.data();
@@ -397,7 +406,6 @@ async function initUserData() {
           STATE.history = data.history || [];
           updateUI(); 
           renderHistory();
-          if (!isDataLoaded) finishLoading();
         }
       });
     }
@@ -704,7 +712,11 @@ async function processStarsPayment() {
       if (data.success && data.invoiceLink) {
         if (window.Telegram?.WebApp) {
           window.Telegram.WebApp.openInvoice(data.invoiceLink, (status) => {
-            if (status === 'paid') showToast('Оплата прошла!');
+            if (status === 'paid') {
+              showToast('Оплата прошла!');
+              // Небольшая задержка, чтобы вебхук успел обновить базу
+              setTimeout(() => window.location.reload(), 2000); 
+            }
             else showToast('Оплата отменена.');
           });
         } else { window.open(data.invoiceLink, '_blank'); }
