@@ -8,7 +8,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-  import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+  import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyCgrphceMHytjNPu0FMH4ZQAyykOHnnwt8",
@@ -22,7 +22,7 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
   
-  window.db = db; window.doc = doc; window.getDoc = getDoc; window.setDoc = setDoc; window.updateDoc = updateDoc; window.onSnapshot = onSnapshot;
+  window.db = db; window.doc = doc; window.getDoc = getDoc; window.setDoc = setDoc; window.updateDoc = updateDoc;
 </script>
 
 <style>
@@ -89,17 +89,8 @@
   
   .cell{ aspect-ratio:1; border-radius:12px; background:#0d1f18; border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size: clamp(20px, 6vw, 32px); transition: transform 0.1s, opacity 0.1s, box-shadow 0.2s, border-color 0.2s; position: relative; z-index: 1; }
   
-  /* Красивая анимация кручения */
-  .cell.spinning { 
-    animation: slotSpin 0.2s linear infinite; 
-    filter: blur(2px);
-    opacity: 0.7;
-  }
-  @keyframes slotSpin { 
-    0% { transform: translateY(-40%); opacity: 0; } 
-    50% { transform: translateY(0); opacity: 1; } 
-    100% { transform: translateY(40%); opacity: 0; } 
-  }
+  .cell.spinning { animation: slotSpin 0.2s linear infinite; filter: blur(2px); opacity: 0.7; }
+  @keyframes slotSpin { 0% { transform: translateY(-40%); opacity: 0; } 50% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(40%); opacity: 0; } }
 
   .cell.win{ border-color:var(--neon); box-shadow: 0 0 20px rgba(0,255,157,0.8), inset 0 0 10px rgba(0,255,157,0.4); background: rgba(0,255,157,0.1); transform: scale(1.05); z-index: 4; }
   
@@ -118,7 +109,7 @@
   .badge { position: absolute; bottom: 0; right: -5px; background: var(--purple); color: white; font-size: 9px; padding: 2px 6px; border-radius: 10px; font-weight: 900; }
   .profile-name{ font-size:18px; font-weight:900; }
   .profile-id{ font-size:12px; color:var(--muted); margin-top: 4px; }
-  .profile-balance{ font-size:34px; font-weight:900; color:var(--neon); margin-top:10px; }
+  .profile-balance{ font-size:34px; font-weight:900; color:var(--neon); margin-top:15px; }
   
   .action-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px; }
   .action-btn-icon { padding:18px; border-radius:20px; border:1px solid var(--border); background:var(--card2); color:white; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; font-size:14px;}
@@ -138,7 +129,6 @@
   .nav-btn{ flex:1; padding:12px 5px; border-radius:18px; border:none; background:transparent; color:var(--muted); font-weight:800; cursor:pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12px;}
   .nav-btn.active{ background:rgba(0,255,157,.15); color:var(--neon); }
   
-  /* === МОДАЛКИ === */
   .modal-mask{ position:fixed; inset:0; z-index:50; display:none; background:rgba(0,0,0,.7); align-items:center; justify-content:center; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
   .modal-mask.show{ display:flex; }
   
@@ -217,13 +207,11 @@
 
   <div class="page" id="page-bonus">
     <div class="title">Бонусы <span>▸</span></div>
-    
     <div class="bonus-card">
       <h3>👥 Пригласи друга</h3>
       <p>Отправь другу свою ссылку. Когда он зайдет и начнет играть, вы оба получите бонусы!</p>
       <button class="bonus-btn" onclick="copyRefLink()">Скопировать ссылку</button>
     </div>
-
     <div class="info-block" style="margin-top: 10px;">
       <h4>⭐ Твои бонусы за уровни:</h4>
       <p id="levelBonusText">Пополни баланс, чтобы открыть бонусы и рамки!</p>
@@ -260,20 +248,15 @@
   <div class="page" id="page-profile">
     <div class="title">Профиль <span>▸</span></div>
     <div class="profile-card">
-      <div class="avatar" id="profileAvatar">🐸<div class="badge" id="vipBadge" style="display:none;">VIP</div></div>
+      <div class="avatar" id="profileAvatar">🐸</div>
       <div class="profile-name" id="userName">Игрок</div>
       <div class="profile-id" id="userId">ID: ...</div>
-      
-      <!-- УРОВНИ УДАЛЕНЫ ОТСЮДА -->
-      
-      <div class="profile-balance" style="margin-top: 15px;"><span id="profileCurrencyIcon">⭐</span> <span id="balanceProfile">0</span></div>
+      <div class="profile-balance"><span id="profileCurrencyIcon">⭐</span> <span id="balanceProfile">0</span></div>
     </div>
-
     <div class="action-grid">
       <button class="action-btn-icon" onclick="switchPage('history')"><span class="ic">📊</span> История игр</button>
       <button class="action-btn-icon" onclick="openComingSoon()"><span class="ic">🏆</span> Рейтинг</button>
     </div>
-
     <div class="action-grid" style="grid-template-columns: 1fr 1fr; margin-top: -5px;">
       <button class="action-btn-icon" style="border-color:rgba(0,255,157,0.4);" onclick="openDepositModal()">＋ Пополнить</button>
       <button class="action-btn-icon" onclick="openWithdrawModal()">↗ Вывести</button>
@@ -290,7 +273,6 @@
 <div class="modal-mask" id="modalMask">
   <div class="modal" id="modalBox">
     <button class="modal-close-btn" onclick="closeModal()">✕</button>
-    
     <div class="modal-brand-top">GarisDrop</div>
     <div id="modalIcon"></div>
     <h3 id="modalTitle"></h3>
@@ -380,14 +362,13 @@ async function initUserData() {
       await setDoc(userDocRef, { balance: 0, history: [], createdAt: new Date() });
       STATE.balance = 0;
       STATE.history = [];
-      updateUI(); 
     } else {
       const data = docSnap.data();
       STATE.balance = data.balance || 0;
       STATE.history = data.history || [];
-      updateUI(); 
-      renderHistory();
     }
+    updateUI(); 
+    renderHistory();
     finishLoading(); 
   } catch (e) {
     finishLoading();
@@ -454,16 +435,13 @@ function openComingSoon() { showLoseModal(false, 'Эта функция появ
 function switchPage(name) {
   document.querySelectorAll('.page').forEach(p => { p.classList.remove('active'); p.style.display = 'none'; });
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  
   const targetPage = document.getElementById('page-' + name);
   if (targetPage) { targetPage.classList.add('active'); targetPage.style.display = 'flex'; }
-  
   if(name === 'games' || name === 'profile' || name === 'bonus') {
     const nav = document.getElementById('nav-' + name); if(nav) nav.classList.add('active');
   } else if (name === 'history') {
     const nav = document.getElementById('nav-profile'); if(nav) nav.classList.add('active');
   }
-  
   if(name === 'history') renderHistory();
 }
 
@@ -513,7 +491,7 @@ function changeSlotBet(d) {
 
 function validateSlotBetInput() {
   let val = parseInt(document.getElementById('slot-betInput').value);
-  if (isNaN(val) || val < 1) val = 1;
+  if (isNaN(val) || val < 1) val = 1; // Запрет на 0
   if (val > STATE.balance) val = STATE.balance;
   slotState.bet = val;
   updateUI();
@@ -521,7 +499,7 @@ function validateSlotBetInput() {
 
 async function spinSlots() {
   if (slotState.spinning) return;
-  if (slotState.bet < 1) return showToast('Ставка должна быть больше 0!');
+  if (slotState.bet < 1) return showToast('Ставка должна быть минимум 1!');
   if (STATE.balance < slotState.bet) return showLoseModal(false, 'Недостаточно средств на балансе!');
 
   slotState.spinning = true;
@@ -534,7 +512,6 @@ async function spinSlots() {
   const modeData = SLOT_MODES[slotState.mode];
   const cols = modeData.cols;
   
-  // Запускаем анимацию
   const spinIntervals = [];
   for (let col = 0; col < cols; col++) {
     const interval = setInterval(() => {
@@ -558,7 +535,6 @@ async function spinSlots() {
     const data = await response.json();
 
     if (!data.success) {
-      // Если сервер вернул ошибку, останавливаем всё
       spinIntervals.forEach(clearInterval);
       document.querySelectorAll('.cell').forEach(c => c.classList.remove('spinning'));
       slotState.spinning = false;
@@ -569,11 +545,9 @@ async function spinSlots() {
       return showLoseModal(false, data.error);
     }
 
-    // Сервер ответил. Останавливаем по очереди
     for (let col = 0; col < cols; col++) {
       setTimeout(() => {
-        clearInterval(spinIntervals[col]); // Останавливаем конкретную колонку
-        
+        clearInterval(spinIntervals[col]);
         for (let row = 0; row < 3; row++) {
           const cell = document.querySelector(`.cell[data-col="${col}"][data-row="${row}"]`);
           cell.classList.remove('spinning');
@@ -758,9 +732,18 @@ async function submitWithdraw() {
   }
 }
 
-initUserData();
-setSlotMode('easy'); 
-updateUI();
+// ЗАПУСК С ЗАДЕРЖКОЙ ДЛЯ TELEGRAM
+if (window.Telegram?.WebApp) {
+  Telegram.WebApp.ready();
+  Telegram.WebApp.expand();
+  setTimeout(() => {
+    initUserData();
+    setSlotMode('easy'); 
+  }, 100);
+} else {
+  initUserData();
+  setSlotMode('easy'); 
+}
 </script>
 </body>
 </html>
