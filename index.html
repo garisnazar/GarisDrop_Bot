@@ -742,13 +742,24 @@ async function submitWithdraw() {
     
     document.getElementById('loader').classList.remove('show');
     
+    // ИСПРАВЛЕННЫЙ БЛОК ВЫВОДА (БЕЗ ОШИБКИ)
     if (data.success) {
       STATE.balance = data.newBalance;
       updateUI();
       
-      showWinModal(amount, '⭐', 'Заявка отправлена!');
+      const modal = document.getElementById('modalBox');
+      modal.className = 'modal win';
+      document.getElementById('modalIcon').innerHTML = `<div class="icon-win"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>`;
+      document.getElementById('modalTitle').textContent = 'Заявка отправлена!';
       document.getElementById('modalText').innerHTML = 'Администратор свяжется с вами и переведет звезды на ваш аккаунт.';
-      document.querySelector('.win-amount').style.display = 'none'; 
+      document.getElementById('modalContent').innerHTML = ''; 
+      
+      const btn = document.getElementById('modalBtn');
+      btn.className = 'modal-btn green';
+      btn.textContent = 'Отлично';
+      btn.style.display = 'block';
+      
+      document.getElementById('modalMask').classList.add('show');
     } else { 
       showLoseModal(false, data.error || 'Ошибка при выводе.'); 
     }
