@@ -309,6 +309,7 @@
 
 <script>
 const API_URL = 'https://garisdrop-backend.garisnazar1.workers.dev';
+const SYMBOLS = ['🍌','🎰','💎','🍒','⭐']; // <--- Я ВЕРНУЛ ЭТУ СТРОЧКУ, БЕЗ НЕЕ ВСЕ ЛОМАЛОСЬ!
 
 let soundEnabled = true;
 const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -381,7 +382,6 @@ async function initUserData() {
   userDocRef = doc(window.db, "users", STATE.userId);
 
   try {
-    // Принудительно читаем документ
     const docSnap = await getDoc(userDocRef);
     
     if (!docSnap.exists()) {
@@ -391,13 +391,22 @@ async function initUserData() {
       updateUI(); 
       finishLoading();
     } else {
-      // Если документ есть - берем данные
-      const data = docSnap.data();
-      STATE.balance = data.balance || 0;
-      STATE.history = data.history || [];
+      const initialData = docSnap.data();
+      STATE.balance = initialData.balance || 0;
+      STATE.history = initialData.history || [];
       updateUI(); 
       renderHistory();
       finishLoading(); 
+
+      onSnapshot(userDocRef, (doc) => {
+        if (doc.exists()) {
+          const data = doc.data();
+          STATE.balance = data.balance || 0;
+          STATE.history = data.history || [];
+          updateUI(); 
+          renderHistory();
+        }
+      });
     }
   } catch (e) {
     console.error("Ошибка Firebase:", e);
