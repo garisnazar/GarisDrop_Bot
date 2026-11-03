@@ -106,7 +106,6 @@
   
   .profile-card{ background:var(--card2); border:1px solid var(--border); border-radius:24px; padding:22px; text-align:center; margin-bottom:14px; position: relative;}
   .avatar{ width:78px; height:78px; border-radius:50%; margin:0 auto 12px; background:radial-gradient(circle, #7de86a, #2f7d24); display:flex; align-items:center; justify-content:center; font-size:36px; transition: all 0.3s; position: relative;}
-  .badge { position: absolute; bottom: 0; right: -5px; background: var(--purple); color: white; font-size: 9px; padding: 2px 6px; border-radius: 10px; font-weight: 900; }
   .profile-name{ font-size:18px; font-weight:900; }
   .profile-id{ font-size:12px; color:var(--muted); margin-top: 4px; }
   .profile-balance{ font-size:34px; font-weight:900; color:var(--neon); margin-top:15px; }
@@ -193,7 +192,6 @@
     <div class="live-wins-bar">
       <span id="liveWinsText">🍀 Здесь будут отображаться реальные выигрыши...</span>
     </div>
-    
     <div class="title">Игры <span>▸</span></div>
     <div class="games-grid">
       <div class="game-card" onclick="openGame('slots')">
@@ -233,7 +231,8 @@
       </div>
       <div class="bet-row">
         <button class="bet-btn" id="slot-betMinus" onclick="changeSlotBet(-1)">−</button>
-        <div class="bet-input-wrap"><span>Ставка:</span><input type="number" id="slot-betInput" value="1" min="1" onchange="validateSlotBetInput()"></div>
+        <!-- МИНИМАЛЬНАЯ СТАВКА 5 -->
+        <div class="bet-input-wrap"><span>Ставка:</span><input type="number" id="slot-betInput" value="5" min="5" onchange="validateSlotBetInput()"></div>
         <button class="bet-btn" id="slot-betPlus" onclick="changeSlotBet(1)">+</button>
       </div>
       <button class="main-action-btn" id="spinBtn" onclick="spinSlots()">КРУТИТЬ 🎰</button>
@@ -259,6 +258,7 @@
     </div>
     <div class="action-grid" style="grid-template-columns: 1fr 1fr; margin-top: -5px;">
       <button class="action-btn-icon" style="border-color:rgba(0,255,157,0.4);" onclick="openDepositModal()">＋ Пополнить</button>
+      <!-- ВЫВОД ЗАБЛОКИРОВАН -->
       <button class="action-btn-icon" onclick="openWithdrawModal()">↗ Вывести</button>
     </div>
   </div>
@@ -458,7 +458,8 @@ const SLOT_MODES = {
   medium: { cols: 4, mult: 2.0 },
   hard: { cols: 5, mult: 4.0 }
 };
-let slotState = { mode: 'easy', bet: 1, spinning: false };
+// МИНИМАЛЬНАЯ СТАВКА 5
+let slotState = { mode: 'easy', bet: 5, spinning: false };
 
 function setSlotMode(mode) {
   if (slotState.spinning) return;
@@ -483,7 +484,8 @@ function setSlotMode(mode) {
 function changeSlotBet(d) {
   if (slotState.spinning) return;
   let nb = slotState.bet + d;
-  if (nb >= 1 && nb <= STATE.balance) {
+  // МИНИМУМ 5
+  if (nb >= 5 && nb <= STATE.balance) {
     slotState.bet = nb;
     updateUI();
   }
@@ -491,7 +493,8 @@ function changeSlotBet(d) {
 
 function validateSlotBetInput() {
   let val = parseInt(document.getElementById('slot-betInput').value);
-  if (isNaN(val) || val < 1) val = 1; // Запрет на 0
+  // МИНИМУМ 5
+  if (isNaN(val) || val < 5) val = 5; 
   if (val > STATE.balance) val = STATE.balance;
   slotState.bet = val;
   updateUI();
@@ -499,7 +502,8 @@ function validateSlotBetInput() {
 
 async function spinSlots() {
   if (slotState.spinning) return;
-  if (slotState.bet < 1) return showToast('Ставка должна быть минимум 1!');
+  // МИНИМУМ 5
+  if (slotState.bet < 5) return showToast('Минимальная ставка 5 звезд!');
   if (STATE.balance < slotState.bet) return showLoseModal(false, 'Недостаточно средств на балансе!');
 
   slotState.spinning = true;
@@ -633,8 +637,9 @@ function openDepositModal() {
   document.getElementById('modalTitle').textContent = 'Пополнение';
   document.getElementById('modalText').innerHTML = 'Введите сумму в звездах:';
   const content = document.getElementById('modalContent');
+  // МИНИМАЛЬНОЕ ПОПОЛНЕНИЕ 10
   content.innerHTML = `
-    <div class="input-group"><input type="number" id="depositAmountInput" placeholder="Например: 100" min="1"></div>
+    <div class="input-group"><input type="number" id="depositAmountInput" placeholder="Мин. 10" min="10"></div>
     <button class="main-action-btn" style="margin-top: 15px;" onclick="processStarsPayment()">Оплатить Stars ⭐</button>
   `;
   document.getElementById('modalBtn').style.display = 'none';
@@ -643,7 +648,8 @@ function openDepositModal() {
 
 async function processStarsPayment() {
   const amount = parseInt(document.getElementById('depositAmountInput').value);
-  if (!amount || amount < 1) return showToast('Введите корректную сумму!');
+  // МИНИМУМ 10
+  if (!amount || amount < 10) return showToast('Минимальная сумма пополнения 10 ⭐');
   closeModal();
   document.getElementById('loader').classList.add('show');
   try {
@@ -686,53 +692,12 @@ async function processStarsPayment() {
   }
 }
 
+// ВЫВОД ВРЕМЕННО ЗАБЛОКИРОВАН
 function openWithdrawModal() {
-  const modal = document.getElementById('modalBox');
-  modal.className = 'modal win';
-  document.getElementById('modalIcon').innerHTML = '<div class="icon-win">💸</div>';
-  document.getElementById('modalTitle').textContent = 'Вывод средств';
-  document.getElementById('modalText').innerHTML = 'Заявка уйдет администратору:';
-  const content = document.getElementById('modalContent');
-  content.innerHTML = `
-    <div class="input-group"><label>Сумма (⭐)</label><input type="number" id="withdrawAmountInput" placeholder="Мин. 100" min="100"></div>
-    <div class="input-group"><label>Реквизиты</label><input type="text" id="withdrawDetailsInput" placeholder="Карта или кошелек"></div>
-    <button class="main-action-btn" style="margin-top: 15px;" onclick="submitWithdraw()">Отправить</button>
-  `;
-  document.getElementById('modalBtn').style.display = 'none';
-  document.getElementById('modalMask').classList.add('show');
+  showLoseModal(false, 'Вывод средств временно недоступен. Мы работаем над улучшением системы выплат!');
 }
 
-async function submitWithdraw() {
-  const amount = parseInt(document.getElementById('withdrawAmountInput').value);
-  const details = document.getElementById('withdrawDetailsInput').value.trim();
-  if (!amount || amount < 100) return showToast('Мин. сумма 100⭐');
-  if (!details) return showToast('Введите реквизиты!');
-  if (amount > STATE.balance) return showToast('Недостаточно средств!');
-  closeModal();
-  document.getElementById('loader').classList.add('show');
-  try {
-    const response = await fetch(`${API_URL}/withdraw`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId: STATE.userId, amount: amount, details: details })
-    });
-    const data = await response.json();
-    document.getElementById('loader').classList.remove('show');
-    if (data.success) {
-      STATE.balance = data.newBalance;
-      updateUI();
-      showWinModal(amount, '⭐', 'Заявка отправлена!');
-      document.getElementById('modalText').innerHTML = 'Ожидайте связи от администратора.';
-      document.querySelector('.win-amount').style.display = 'none'; 
-    } else { 
-      showLoseModal(false, data.error || 'Ошибка.'); 
-    }
-  } catch (e) { 
-    document.getElementById('loader').classList.remove('show');
-    showLoseModal(false, 'Ошибка сети.'); 
-  }
-}
-
-// ЗАПУСК С ЗАДЕРЖКОЙ ДЛЯ TELEGRAM
+// ЗАПУСК
 if (window.Telegram?.WebApp) {
   Telegram.WebApp.ready();
   Telegram.WebApp.expand();
