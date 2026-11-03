@@ -22,7 +22,6 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
   
-  // ВОТ ЗДЕСЬ БЫЛА ОШИБКА: Добавил collection и getDocs для работы онлайна
   window.db = db; 
   window.doc = doc; window.getDoc = getDoc; window.setDoc = setDoc; window.updateDoc = updateDoc;
   window.collection = collection; window.getDocs = getDocs; 
@@ -67,14 +66,22 @@
   .game-card{ position:relative; background:var(--card); border:1px solid var(--border); border-radius:24px; padding:20px 10px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; cursor:pointer; transition: all 0.2s; }
   .game-card:active{ transform:scale(.97); border-color: var(--accent);}
   
-  /* ИСПРАВЛЕНИЕ КАРТИНОК: Жесткое скругление и обрезка (object-fit) */
-  .game-icon { 
-    width: 90px; 
-    height: 90px; 
-    object-fit: cover; 
-    border-radius: 22px; 
-    border: 2px solid var(--border); 
-    margin-bottom: 4px; 
+  /* ИСПРАВЛЕНИЕ: Жесткий контейнер для картинок */
+  .game-icon-container {
+    width: 90px;
+    height: 90px;
+    border-radius: 22px;
+    border: 2px solid var(--border);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 4px;
+  }
+  .game-icon-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
   
   .game-card .name{ font-size:16px; font-weight:800; text-align: center; }
@@ -211,12 +218,17 @@
     <div class="title">Игры</div>
     <div class="games-grid">
       <div class="game-card" onclick="openGame('slots')">
-        <img src="https://i.ibb.co/MD04bpxG/1793517333251.png" alt="Слоты" class="game-icon">
+        <div class="game-icon-container">
+          <img src="https://i.ibb.co/MD04bpxG/1793517333251.png" alt="Слоты">
+        </div>
         <div class="name">Слоты</div>
         <div class="tag">3 режима</div>
       </div>
       <div class="game-card" onclick="openGame('upgrade')">
-        <img src="https://i.ibb.co/B2ztwf31/b2d8f271-535d-4ccd-94a1-26c5c8e23e31.png" alt="Апгрейдер" class="game-icon">
+        <div class="game-icon-container">
+          <!-- ТВОЯ НОВАЯ ССЫЛКА -->
+          <img src="https://i.ibb.co/sdXJbB9c/acd9550b-0175-406c-bada-7e647b883525.png" alt="Апгрейдер">
+        </div>
         <div class="name">Апгрейдер</div>
         <div class="tag">Испытай удачу</div>
       </div>
@@ -296,7 +308,6 @@
     </div>
   </div>
 
-  <!-- ПРОФИЛЬ (БЕЗ РЕЙТИНГА) -->
   <div class="page" id="page-profile">
     <div class="title">Профиль</div>
     <div class="profile-card">
