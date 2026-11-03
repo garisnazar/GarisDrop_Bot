@@ -8,7 +8,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-  import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+  import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyCgrphceMHytjNPu0FMH4ZQAyykOHnnwt8",
@@ -22,177 +22,200 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
   
-  window.db = db; window.doc = doc; window.getDoc = getDoc; window.setDoc = setDoc; window.updateDoc = updateDoc;
+  window.db = db; 
+  window.doc = doc; window.getDoc = getDoc; window.setDoc = setDoc; window.updateDoc = updateDoc;
+  window.collection = collection; window.getDocs = getDocs;
 </script>
 
 <style>
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; }
-  :root{ --neon:#00ff9d; --bg:#050505; --card:#0a1410; --card2:#0f1f18; --border:rgba(0,255,157,.15); --text:#e6fff5; --muted:#5f8a78; --red:#ff4d6d; --yellow:#ffd700; --purple:#a855f7; }
+  
+  /* НОВАЯ МЯГКАЯ ЦВЕТОВАЯ ПАЛИТРА */
+  :root{ 
+    --accent: #34d399;      /* Мягкий изумрудный */
+    --accent-dark: #059669; /* Темный изумрудный для кнопок */
+    --bg: #0f172a;          /* Глубокий графитовый */
+    --card: #1e293b;        /* Мягкий серо-синий для карточек */
+    --border: rgba(255,255,255,0.08);
+    --text: #f8fafc;
+    --muted: #94a3b8;
+    --red: #fb7185;
+  }
+
   html,body{ height:100%; background:var(--bg); color:var(--text); overflow:hidden; }
-  #bg{ position:fixed; inset:0; z-index:0; overflow:hidden; background: radial-gradient(circle at 20% 15%, rgba(0,255,157,.08), transparent 40%), radial-gradient(circle at 85% 75%, rgba(92,191,74,.06), transparent 45%), #000; }
-  #bg::before{ content:""; position:absolute; inset:-50%; background-image:radial-gradient(var(--neon) 1.5px, transparent 1.5px); background-size:36px 36px; opacity:.2; animation: drift 24s linear infinite; }
-  #bg::after{ content:""; position:absolute; inset:-50%; background-image:radial-gradient(var(--neon) 1px, transparent 1px); background-size:20px 20px; opacity:.1; animation: drift2 40s linear infinite reverse; }
-  @keyframes drift{ to{ transform:translate(36px,36px);} } @keyframes drift2{ to{ transform:translate(-20px,20px);} }
-  .loader-overlay { position: fixed; inset: 0; z-index: 999; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+  
+  .loader-overlay { position: fixed; inset: 0; z-index: 999; background: rgba(15,23,42,0.9); display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
   .loader-overlay.show { display: flex; }
-  .spinner { width: 50px; height: 50px; border: 4px solid rgba(0, 255, 157, 0.2); border-top-color: var(--neon); border-radius: 50%; animation: spin 0.8s linear infinite; box-shadow: 0 0 15px rgba(0,255,157,0.3); }
+  .spinner { width: 40px; height: 40px; border: 3px solid rgba(52, 211, 153, 0.2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
   @keyframes spin { 100% { transform: rotate(360deg); } }
-  #app{ position:fixed; inset:0; z-index:1; display:flex; flex-direction:column; padding:12px 12px calc(92px + env(safe-area-inset-bottom)); overflow:hidden; }
-  .header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; flex-shrink: 0; gap: 4px; padding: 0 2px; width: 100%;}
-  .logo{ font-weight:900; font-size:16px; background:linear-gradient(90deg,#00ff9d,#5cbf4a,#00ff9d); -webkit-background-clip:text; background-clip:text; color:transparent; white-space: nowrap;}
-  .header-right{ display:flex; align-items:center; gap:6px; flex-shrink: 0;}
-  .deposit-btn-large { background: linear-gradient(135deg, #00ff9d, #5cbf4a); border: none; color: #001a10; height: 32px; padding: 0 10px; border-radius: 999px; font-size: 11px; font-weight: 900; cursor: pointer; box-shadow: 0 0 15px rgba(0,255,157,0.4); display: flex; align-items: center; justify-content: center; transition: transform 0.1s; white-space: nowrap;}
-  .deposit-btn-large:active { transform: scale(0.9); }
   
-  .balance-pill{ background:var(--card); border:1px solid var(--border); height: 32px; padding: 0 8px; border-radius:999px; font-size:14px; font-weight:900; color:var(--neon); display:flex; align-items:center; gap:2px; box-shadow: 0 0 10px rgba(0,255,157,0.1); max-width: 85px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; transition: all 0.2s;}
-  .balance-pill.update { transform: scale(1.05); box-shadow: 0 0 20px rgba(0,255,157,0.5); }
-  .sound-toggle { background: none; border: none; font-size: 16px; cursor: pointer; color: var(--muted); transition: color 0.2s; padding: 0 2px; flex-shrink: 0;}
-  .sound-toggle.active { color: var(--neon); }
+  #app{ position:fixed; inset:0; z-index:1; display:flex; flex-direction:column; padding:16px 16px calc(96px + env(safe-area-inset-bottom)); overflow:hidden; }
   
-  .page{ flex:1; min-height: 0; overflow-y:auto; display:none; flex-direction: column; padding-bottom:12px; color: var(--text); }
+  /* ШАПКА */
+  .header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; flex-shrink: 0; width: 100%;}
+  .logo{ font-weight:800; font-size:18px; color:var(--text); letter-spacing: -0.5px;}
+  .header-right{ display:flex; align-items:center; gap:8px; flex-shrink: 0;}
+  
+  .deposit-btn-large { background: var(--accent); border: none; color: #064e3b; height: 36px; padding: 0 14px; border-radius: 12px; font-size: 13px; font-weight: 800; cursor: pointer; transition: transform 0.1s; display: flex; align-items: center; justify-content: center;}
+  .deposit-btn-large:active { transform: scale(0.95); }
+  
+  .balance-pill{ background:var(--card); border:1px solid var(--border); height: 36px; padding: 0 12px; border-radius:12px; font-size:15px; font-weight:800; color:var(--accent); display:flex; align-items:center; gap:4px; transition: all 0.2s;}
+  .balance-pill.update { transform: scale(1.05); border-color: var(--accent); }
+  
+  /* СТРОКА ОНЛАЙНА */
+  .online-bar { display: flex; align-items: center; justify-content: flex-start; gap: 6px; font-size: 12px; color: var(--muted); margin-bottom: 16px; }
+  .online-dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 8px var(--accent); }
+  .online-bar b { color: var(--text); }
+
+  /* СТРАНИЦЫ */
+  .page{ flex:1; min-height: 0; overflow-y:auto; display:none; flex-direction: column; padding-bottom:12px; }
   .page.active{ display:flex; animation: fadeIn 0.3s ease;}
   @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
-  .title{ font-size:22px; font-weight:900; margin-bottom:12px; flex-shrink: 0; }
-  .title span{ color:var(--neon); }
-  .back-btn { background: var(--card2); border: 1px solid var(--border); color: var(--neon); padding: 10px 16px; border-radius: 14px; font-size: 14px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; margin-bottom: 16px; width: fit-content; transition: transform 0.1s; }
+  .title{ font-size:24px; font-weight:800; margin-bottom:16px; flex-shrink: 0; letter-spacing: -0.5px;}
+  
+  .back-btn { background: var(--card); border: 1px solid var(--border); color: var(--text); padding: 10px 16px; border-radius: 12px; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; margin-bottom: 16px; width: fit-content; transition: transform 0.1s; }
   .back-btn:active { transform: scale(0.95); }
   
-  .live-wins-bar { background: rgba(0,255,157,0.05); border: 1px solid var(--border); border-radius: 12px; padding: 8px 12px; font-size: 12px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; position: relative; color: var(--neon); text-shadow: 0 0 8px rgba(0,255,157,0.3); overflow: hidden; width: 100%;}
-  .live-wins-bar span { display: inline-block; white-space: nowrap; animation: slide 15s linear infinite; padding-left: 100%; }
-  @keyframes slide { 0% { transform: translateX(0); } 100% { transform: translateX(-150%); } }
+  /* КАРТОЧКИ ИГР */
+  .games-grid{ display:grid; grid-template-columns:1fr; gap:16px; align-content: start; }
+  .game-card{ position:relative; background:var(--card); border:1px solid var(--border); border-radius:24px; padding:24px 16px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; cursor:pointer; transition: all 0.2s; }
+  .game-card:active{ transform:scale(.97); border-color: var(--accent);}
+  .game-icon { width: 90px; height: 90px; object-fit: cover; border-radius: 20px; border: 2px solid var(--border); margin-bottom: 4px; }
+  .game-card .name{ font-size:20px; font-weight:800; text-align: center; }
+  .game-card .tag{ font-size:13px; color:var(--muted); text-align: center; font-weight: 500;}
+  .game-card .nft-badge{ position:absolute; top:16px; right:16px; font-size:10px; font-weight:800; padding:4px 10px; border-radius:8px; background:var(--accent); color:#064e3b; }
   
-  .games-grid{ display:grid; grid-template-columns:1fr; gap:12px; align-content: start; }
-  .game-card{ position:relative; background:var(--card2); border:1px solid var(--border); border-radius:22px; padding:25px 14px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; cursor:pointer; transition: all 0.2s; min-height: 150px; }
-  .game-card:active{ transform:scale(.96); border-color: var(--neon);}
-  .game-icon { width: 80px; height: 80px; object-fit: cover; border-radius: 18px; border: 2px solid var(--border); box-shadow: 0 0 15px rgba(0,255,157,0.25); margin-bottom: 5px; }
-  .game-card .name{ font-size:18px; font-weight:900; text-align: center; }
-  .game-card .tag{ font-size:12px; color:var(--muted); text-align: center; }
-  .game-card .nft-badge{ position:absolute; top:12px; right:12px; font-size:10px; font-weight:900; padding:4px 8px; border-radius:999px; background:var(--neon); color:#001a10; }
+  /* СЛОТЫ */
+  .game-wrap{ display:flex; flex-direction:column; align-items:center; gap:16px; width: 100%; }
+  .mode-selector { display: flex; gap: 8px; width: 100%; max-width: 400px; margin-bottom: 4px; }
+  .mode-btn { flex: 1; padding: 12px 0; border-radius: 14px; border: 1px solid var(--border); background: var(--card); color: var(--muted); font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.2s; }
+  .mode-btn.active { background: rgba(52, 211, 153, 0.1); color: var(--accent); border-color: var(--accent); }
   
-  .game-wrap{ display:flex; flex-direction:column; align-items:center; gap:12px; width: 100%; }
-  .mode-selector { display: flex; gap: 6px; width: 100%; max-width: 400px; margin-bottom: 4px; z-index: 10; }
-  .mode-btn { flex: 1; padding: 10px 0; border-radius: 12px; border: 1px solid var(--border); background: var(--card); color: var(--muted); font-weight: 800; font-size: 13px; cursor: pointer; transition: all 0.2s; }
-  .mode-btn.active { background: rgba(0, 255, 157, 0.15); color: var(--neon); border-color: var(--neon); box-shadow: 0 0 10px rgba(0,255,157,0.2); }
+  .slots-wrapper { position: relative; width: 100%; max-width: 400px; padding: 0; }
+  .slots{ display:grid; grid-template-columns: repeat(var(--cols, 3), 1fr); gap:8px; width:100%; background:var(--card); border:1px solid var(--border); border-radius:24px; padding:16px; position: relative; overflow: hidden; }
   
-  .slots-wrapper { position: relative; width: 100%; max-width: 400px; padding: 0 20px; }
-  .slots{ display:grid; grid-template-columns: repeat(var(--cols, 3), 1fr); gap:8px; width:100%; background:var(--card); border:1px solid var(--border); border-radius:24px; padding:14px; box-shadow: 0 0 30px rgba(0,255,157,0.05); position: relative; overflow: hidden; }
-  
-  .slots::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 25%; background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent); pointer-events: none; z-index: 2; border-radius: 24px 24px 0 0; }
-  .slots::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 25%; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); pointer-events: none; z-index: 2; border-radius: 0 0 24px 24px; }
+  .slots::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 25%; background: linear-gradient(to bottom, rgba(30,41,59,1), transparent); pointer-events: none; z-index: 2; }
+  .slots::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 25%; background: linear-gradient(to top, rgba(30,41,59,1), transparent); pointer-events: none; z-index: 2; }
 
-  .win-line-top, .win-line-bottom { position: absolute; left: 10px; right: 10px; height: 2px; background: rgba(255, 77, 109, 0.6); box-shadow: 0 0 10px rgba(255, 77, 109, 0.8); z-index: 3; pointer-events: none; }
+  .win-line-top, .win-line-bottom { position: absolute; left: 10px; right: 10px; height: 1px; background: rgba(251, 113, 133, 0.3); z-index: 3; pointer-events: none; }
   .win-line-top { top: 33.33%; transform: translateY(-50%); }
   .win-line-bottom { top: 66.66%; transform: translateY(-50%); }
-  .red-arrow { position: absolute; top: 50%; transform: translateY(-50%); color: var(--red); font-size: 24px; z-index: 5; text-shadow: 0 0 15px rgba(255, 77, 109, 0.9); animation: pulseArrow 1s infinite alternate; pointer-events: none; }
-  .red-arrow.left { left: -4px; } .red-arrow.right { right: -4px; }
-  @keyframes pulseArrow { from { opacity: 0.6; transform: translateY(-50%) scale(0.9); } to { opacity: 1; transform: translateY(-50%) scale(1.1); } }
   
-  .cell{ aspect-ratio:1; border-radius:12px; background:#0d1f18; border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size: clamp(20px, 6vw, 32px); transition: transform 0.1s, opacity 0.1s, box-shadow 0.2s, border-color 0.2s; position: relative; z-index: 1; }
+  .cell{ aspect-ratio:1; border-radius:16px; background:rgba(15,23,42,0.6); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size: clamp(24px, 7vw, 36px); transition: transform 0.1s, opacity 0.1s; position: relative; z-index: 1; }
   
   .cell.spinning { animation: slotSpin 0.2s linear infinite; filter: blur(2px); opacity: 0.7; }
-  @keyframes slotSpin { 0% { transform: translateY(-40%); opacity: 0; } 50% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(40%); opacity: 0; } }
+  @keyframes slotSpin { 0% { transform: translateY(-30%); opacity: 0; } 50% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(30%); opacity: 0; } }
 
-  .cell.win{ border-color:var(--neon); box-shadow: 0 0 20px rgba(0,255,157,0.8), inset 0 0 10px rgba(0,255,157,0.4); background: rgba(0,255,157,0.1); transform: scale(1.05); z-index: 4; }
+  .cell.win{ border-color:var(--accent); box-shadow: inset 0 0 15px rgba(52,211,153,0.3); background: rgba(52,211,153,0.1); transform: scale(1.05); z-index: 4; }
   
-  .bet-row{ display:flex; align-items:center; gap:10px; margin-top: 10px; z-index: 10; justify-content: center; width: 100%; }
-  .bet-btn{ width:44px; height:44px; border-radius:14px; background:var(--card); border:1px solid var(--border); color:var(--neon); font-size:20px; font-weight:800; cursor:pointer; transition: transform 0.1s; }
-  .bet-btn:active{ transform:scale(0.9); } .bet-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-  .bet-input-wrap { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:0 10px; display:flex; align-items:center; height:44px; }
-  .bet-input-wrap span { color:var(--muted); font-size:14px; margin-right:5px; }
-  .bet-input-wrap input { width: 60px; background: transparent; border: none; outline: none; color: var(--neon); font-size: 16px; font-weight: 800; text-align: center; }
+  .bet-row{ display:flex; align-items:center; gap:12px; margin-top: 16px; justify-content: center; width: 100%; }
+  .bet-btn{ width:48px; height:48px; border-radius:16px; background:var(--card); border:1px solid var(--border); color:var(--text); font-size:24px; font-weight:600; cursor:pointer; transition: transform 0.1s; display: flex; align-items: center; justify-content: center;}
+  .bet-btn:active{ transform:scale(0.9); } .bet-btn:disabled { opacity: 0.3; }
+  .bet-input-wrap { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:0 16px; display:flex; align-items:center; height:48px; }
+  .bet-input-wrap span { color:var(--muted); font-size:14px; margin-right:8px; font-weight: 600;}
+  .bet-input-wrap input { width: 60px; background: transparent; border: none; outline: none; color: var(--accent); font-size: 18px; font-weight: 800; text-align: center; }
   .bet-input-wrap input:disabled { opacity: 0.5; }
-  .main-action-btn{ width:100%; max-width:340px; padding:16px; border:none; border-radius:20px; font-size:17px; font-weight:900; color:#001a10; background:linear-gradient(135deg,#00ff9d,#5cbf4a); cursor:pointer; transition: all 0.2s; box-shadow: 0 5px 15px rgba(0,255,157,0.3); margin-top: 10px; }
-  .main-action-btn:active{ transform:scale(.97); } .main-action-btn:disabled{ opacity:.5; box-shadow:none; cursor:not-allowed; }
   
-  .profile-card{ background:var(--card2); border:1px solid var(--border); border-radius:24px; padding:22px; text-align:center; margin-bottom:14px; position: relative;}
-  .avatar{ width:78px; height:78px; border-radius:50%; margin:0 auto 12px; background:radial-gradient(circle, #7de86a, #2f7d24); display:flex; align-items:center; justify-content:center; font-size:36px; transition: all 0.3s; position: relative;}
-  .profile-name{ font-size:18px; font-weight:900; }
-  .profile-id{ font-size:12px; color:var(--muted); margin-top: 4px; }
-  .profile-balance{ font-size:34px; font-weight:900; color:var(--neon); margin-top:15px; }
+  .main-action-btn{ width:100%; max-width:340px; padding:18px; border:none; border-radius:18px; font-size:17px; font-weight:800; color: #064e3b; background:var(--accent); cursor:pointer; transition: all 0.2s; margin-top: 16px; }
+  .main-action-btn:active{ transform:scale(.97); } .main-action-btn:disabled{ opacity:.5; cursor:not-allowed; }
   
-  .action-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px; }
-  .action-btn-icon { padding:18px; border-radius:20px; border:1px solid var(--border); background:var(--card2); color:white; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; font-size:14px;}
-  .action-btn-icon .ic { font-size: 20px; }
+  /* ПРОФИЛЬ */
+  .profile-card{ background:var(--card); border:1px solid var(--border); border-radius:28px; padding:32px 24px; text-align:center; margin-bottom:20px; display: flex; flex-direction: column; align-items: center;}
   
-  .info-block{ background:var(--card); border:1px solid var(--border); border-radius:18px; padding:16px; margin-bottom:12px; }
-  .info-block h4{ font-size:13px; color:var(--neon); margin-bottom:8px; }
-  .info-block p{ font-size:12px; color:var(--muted); line-height:1.5; }
+  .avatar{ width:90px; height:90px; border-radius:50%; margin:0 auto 16px; background:var(--bg); border: 3px solid var(--card); display:flex; align-items:center; justify-content:center; font-size:40px; position: relative; overflow: hidden;}
+  .avatar img { width: 100%; height: 100%; object-fit: cover; }
   
-  .bonus-card { background: var(--card2); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 10px;}
-  .bonus-card h3 { color: var(--neon); font-size: 16px; }
-  .bonus-card p { font-size: 12px; color: var(--muted); }
-  .bonus-btn { width: 100%; padding: 14px; border-radius: 14px; border: none; font-weight: 900; font-size: 14px; cursor: pointer; background: linear-gradient(135deg, #00ff9d, #5cbf4a); color: #001a10; transition: 0.2s; }
-  .bonus-btn:disabled { background: var(--card); color: var(--muted); box-shadow: none; cursor: not-allowed; }
+  .profile-name{ font-size:22px; font-weight:800; letter-spacing: -0.5px;}
+  .profile-id{ font-size:13px; color:var(--muted); margin-top: 6px; font-weight: 500;}
+  .profile-balance{ font-size:40px; font-weight:800; color:var(--text); margin-top:24px; display: flex; align-items: center; gap: 8px;}
   
-  .nav{ position:fixed; left:12px; right:12px; bottom:calc(12px + env(safe-area-inset-bottom)); background:rgba(8,20,16,.7); border:1px solid var(--border); border-radius:24px; display:flex; padding:8px; z-index:10; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); box-shadow: 0 10px 30px rgba(0,0,0,0.5);}
-  .nav-btn{ flex:1; padding:12px 5px; border-radius:18px; border:none; background:transparent; color:var(--muted); font-weight:800; cursor:pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12px;}
-  .nav-btn.active{ background:rgba(0,255,157,.15); color:var(--neon); }
+  .action-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; width: 100%;}
+  .action-btn-icon { padding:18px 12px; border-radius:18px; border:1px solid var(--border); background:var(--card); color:var(--text); font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; font-size:14px; transition: 0.2s;}
+  .action-btn-icon:active { background: rgba(255,255,255,0.05); }
+  .action-btn-icon .ic { font-size: 18px; }
   
-  .modal-mask{ position:fixed; inset:0; z-index:50; display:none; background:rgba(0,0,0,.7); align-items:center; justify-content:center; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+  /* БОНУСЫ */
+  .bonus-card { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 24px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 12px;}
+  .bonus-card h3 { color: var(--text); font-size: 18px; font-weight: 800;}
+  .bonus-card p { font-size: 14px; color: var(--muted); line-height: 1.4;}
+  .bonus-btn { width: 100%; padding: 16px; border-radius: 16px; border: none; font-weight: 800; font-size: 15px; cursor: pointer; background: rgba(52,211,153,0.1); color: var(--accent); transition: 0.2s; }
+  .bonus-btn:active { background: rgba(52,211,153,0.2); }
+  
+  /* НАВИГАЦИЯ */
+  .nav{ position:fixed; left:16px; right:16px; bottom:calc(16px + env(safe-area-inset-bottom)); background:rgba(30,41,59,0.9); border:1px solid var(--border); border-radius:24px; display:flex; padding:8px; z-index:10; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+  .nav-btn{ flex:1; padding:14px 5px; border-radius:16px; border:none; background:transparent; color:var(--muted); font-weight:700; cursor:pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 12px;}
+  .nav-btn.active{ background:var(--card); color:var(--accent); }
+  
+  /* МОДАЛКИ */
+  .modal-mask{ position:fixed; inset:0; z-index:50; display:none; background:rgba(15,23,42,0.8); align-items:center; justify-content:center; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
   .modal-mask.show{ display:flex; }
   
-  .modal{ width:90%; max-width:320px; background:linear-gradient(160deg, var(--card2), #050d0a); border-radius:32px; padding:30px 24px; position:relative; text-align:center; box-shadow: 0 20px 60px rgba(0,0,0,0.9); animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
-  @keyframes popIn { from { transform: scale(0.85) translateY(20px); opacity: 0;} to { transform: scale(1) translateY(0); opacity: 1;} }
+  .modal{ width:90%; max-width:340px; background:var(--card); border-radius:28px; padding:32px 24px; position:relative; text-align:center; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; align-items: center; border: 1px solid var(--border); }
+  @keyframes popIn { from { transform: scale(0.9) translateY(10px); opacity: 0;} to { transform: scale(1) translateY(0); opacity: 1;} }
   
-  .modal-close-btn { position: absolute; top: 15px; right: 15px; width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--muted); display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; transition: all 0.2s; z-index: 10; }
-  .modal-close-btn:active { background: rgba(255,255,255,0.15); color: white; transform: scale(0.9); }
+  .modal-close-btn { position: absolute; top: 16px; right: 16px; width: 32px; height: 32px; border-radius: 50%; background: var(--bg); border: 1px solid var(--border); color: var(--muted); display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; transition: all 0.2s; }
+  .modal-close-btn:active { background: rgba(255,255,255,0.1); color: white; }
 
-  .modal-brand-top { font-size: 18px; font-weight: 900; letter-spacing: 1px; color: var(--muted); margin-bottom: 20px; text-transform: uppercase; }
-  .modal-brand-bottom { font-size: 11px; font-weight: 600; color: rgba(95, 138, 120, 0.5); margin-top: 25px; }
+  .modal-brand-top { font-size: 20px; font-weight: 900; letter-spacing: 1px; color: var(--text); margin-bottom: 24px; }
+  .modal-brand-bottom { font-size: 12px; font-weight: 600; color: var(--muted); margin-top: 24px; }
   
-  .modal.win { border: 1px solid rgba(0, 255, 157, 0.3); box-shadow: 0 0 40px rgba(0, 255, 157, 0.15), inset 0 0 20px rgba(0, 255, 157, 0.05); }
-  .icon-win { width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, rgba(0, 255, 157, 0.15), rgba(92, 191, 74, 0.15)); border: 2px solid var(--neon); display: flex; align-items: center; justify-content: center; margin-bottom: 15px; box-shadow: 0 0 20px rgba(0, 255, 157, 0.3); }
-  .icon-win svg { width: 36px; height: 36px; stroke: var(--neon); stroke-width: 3; fill: none; stroke-linecap: round; stroke-linejoin: round; }
-  .modal.win h3 { color: var(--neon); font-size: 22px; font-weight: 900; margin-bottom: 8px; }
-  .modal.win p { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
+  .modal.win { border: 1px solid rgba(52, 211, 153, 0.4); box-shadow: 0 0 40px rgba(52, 211, 153, 0.1); }
+  .icon-win { width: 80px; height: 80px; border-radius: 50%; background: rgba(52,211,153,0.1); border: 2px solid var(--accent); display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
+  .icon-win svg { width: 40px; height: 40px; stroke: var(--accent); stroke-width: 3; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .modal.win h3 { color: var(--text); font-size: 24px; font-weight: 800; margin-bottom: 8px; }
   
-  .modal.lose { border: 1px solid rgba(168, 85, 247, 0.2); box-shadow: 0 0 40px rgba(0, 0, 0, 0.5); background: linear-gradient(160deg, #101317, #050505); }
-  .icon-lose { width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(168, 85, 247, 0.05)); border: 2px solid rgba(168, 85, 247, 0.4); display: flex; align-items: center; justify-content: center; margin-bottom: 15px; }
-  .icon-lose svg { width: 32px; height: 32px; stroke: var(--purple); stroke-width: 2.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
-  .modal.lose h3 { color: #e6fff5; font-size: 20px; font-weight: 800; margin-bottom: 8px; }
-  .modal.lose p { color: var(--muted); font-size: 14px; margin-bottom: 20px; line-height: 1.4; }
-
-  .win-amount { font-size: 32px; font-weight: 900; color: #fff; display: block; margin: 10px 0; text-shadow: 0 0 20px rgba(0, 255, 157, 0.6); letter-spacing: -0.5px; }
-  .win-amount span { font-size: 20px; color: var(--neon); }
+  .modal.lose { border: 1px solid var(--border); }
+  .icon-lose { width: 80px; height: 80px; border-radius: 50%; background: var(--bg); border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
+  .icon-lose svg { width: 36px; height: 36px; stroke: var(--muted); stroke-width: 2.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .modal.lose h3 { color: var(--text); font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+  .modal.lose p { color: var(--muted); font-size: 15px; margin-bottom: 24px; line-height: 1.4; }
   
-  .modal-btn { width: 100%; padding: 16px; border-radius: 18px; border: none; font-weight: 900; font-size: 15px; cursor: pointer; margin-top: 10px; transition: transform 0.15s, opacity 0.15s; }
-  .modal-btn:active { transform: scale(0.96); opacity: 0.9; }
-  .modal-btn.green { background: linear-gradient(135deg, #00ff9d, #5cbf4a); color: #001a10; box-shadow: 0 5px 20px rgba(0, 255, 157, 0.3); }
-  .modal-btn.purple { background: rgba(168, 85, 247, 0.15); color: var(--purple); border: 1px solid rgba(168, 85, 247, 0.3); }
+  .win-amount { font-size: 36px; font-weight: 800; color: var(--text); display: block; margin: 12px 0; letter-spacing: -1px;}
+  .win-amount span { font-size: 24px; color: var(--accent); }
   
-  .history-item { display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; font-weight: bold; }
-  .history-win { color: var(--neon); }
+  .modal-btn { width: 100%; padding: 18px; border-radius: 16px; border: none; font-weight: 800; font-size: 16px; cursor: pointer; margin-top: 12px; transition: transform 0.15s; }
+  .modal-btn:active { transform: scale(0.96); }
+  .modal-btn.green { background: var(--accent); color: #064e3b; }
+  .modal-btn.purple { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
+  
+  .history-item { display: flex; justify-content: space-between; padding: 16px; border-bottom: 1px solid var(--border); font-size: 15px; font-weight: 600;}
+  .history-win { color: var(--accent); }
   .history-lose { color: var(--red); }
   
-  .input-group { display: flex; flex-direction: column; text-align: left; width: 100%; margin-top: 15px; gap: 5px; }
-  .input-group label { font-size: 12px; color: var(--muted); }
-  .input-group input { width: 100%; padding: 14px; background: var(--card); border: 1px solid var(--border); border-radius: 14px; color: white; font-size: 16px; font-weight: bold; outline: none; }
-  .input-group input:focus { border-color: var(--neon); }
+  .input-group { display: flex; flex-direction: column; text-align: left; width: 100%; margin-top: 16px; gap: 8px; }
+  .input-group label { font-size: 13px; color: var(--muted); font-weight: 600;}
+  .input-group input { width: 100%; padding: 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 16px; color: var(--text); font-size: 16px; font-weight: 700; outline: none; transition: border 0.2s;}
+  .input-group input:focus { border-color: var(--accent); }
+  
+  #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+  .toast { background: var(--card); border: 1px solid var(--border); color: var(--text); padding: 12px 24px; border-radius: 16px; font-weight: 700; font-size: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); animation: slideDown 0.3s ease, fadeOut 0.3s ease 2.7s forwards; }
+  @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
 </style>
 </head>
 <body>
 
 <div id="loader" class="loader-overlay show"><div class="spinner"></div></div>
-<div id="bg"></div>
 <div id="toast-container"></div>
 
 <div id="app">
   <div class="header">
     <div class="logo">🐸 GARISDROP</div>
     <div class="header-right">
-      <button class="deposit-btn-large" onclick="openDepositModal()">+ Пополнить</button>
+      <button class="deposit-btn-large" onclick="openDepositModal()">Пополнить</button>
       <div class="balance-pill" id="balancePillHeader">
         <span id="currencyIcon">⭐</span> <span id="balanceTop">0</span>
       </div>
-      <button class="sound-toggle active" id="soundBtn" onclick="toggleSound()">🔊</button>
     </div>
   </div>
 
+  <div class="online-bar">
+    <div class="online-dot"></div>
+    <span>Онлайн: <b id="onlineCount">...</b></span>
+  </div>
+
   <div class="page active" id="page-games">
-    <div class="live-wins-bar">
-      <span id="liveWinsText">🍀 Здесь будут отображаться реальные выигрыши...</span>
-    </div>
-    <div class="title">Игры <span>▸</span></div>
+    <div class="title">Игры</div>
     <div class="games-grid">
       <div class="game-card" onclick="openGame('slots')">
         <div class="nft-badge">HOT</div>
@@ -204,34 +227,28 @@
   </div>
 
   <div class="page" id="page-bonus">
-    <div class="title">Бонусы <span>▸</span></div>
+    <div class="title">Бонусы</div>
     <div class="bonus-card">
       <h3>👥 Пригласи друга</h3>
       <p>Отправь другу свою ссылку. Когда он зайдет и начнет играть, вы оба получите бонусы!</p>
       <button class="bonus-btn" onclick="copyRefLink()">Скопировать ссылку</button>
     </div>
-    <div class="info-block" style="margin-top: 10px;">
-      <h4>⭐ Твои бонусы за уровни:</h4>
-      <p id="levelBonusText">Пополни баланс, чтобы открыть бонусы и рамки!</p>
-    </div>
   </div>
 
   <div class="page" id="page-slots">
-    <button class="back-btn" onclick="switchPage('games')">← Назад в меню</button>
+    <button class="back-btn" onclick="switchPage('games')">← Назад</button>
     <div class="game-wrap">
       <div class="mode-selector">
-        <button class="mode-btn active" id="btn-slot-easy" onclick="setSlotMode('easy')">Легкий (x1.5)</button>
-        <button class="mode-btn" id="btn-slot-medium" onclick="setSlotMode('medium')">Средний (x2)</button>
-        <button class="mode-btn" id="btn-slot-hard" onclick="setSlotMode('hard')">Сложный (x4)</button>
+        <button class="mode-btn active" id="btn-slot-easy" onclick="setSlotMode('easy')">Легкий</button>
+        <button class="mode-btn" id="btn-slot-medium" onclick="setSlotMode('medium')">Средний</button>
+        <button class="mode-btn" id="btn-slot-hard" onclick="setSlotMode('hard')">Сложный</button>
       </div>
       <div class="slots-wrapper">
         <div class="win-line-top"></div><div class="win-line-bottom"></div>
-        <div class="red-arrow left">▶</div><div class="red-arrow right">◀</div>
         <div class="slots" id="slots"></div>
       </div>
       <div class="bet-row">
         <button class="bet-btn" id="slot-betMinus" onclick="changeSlotBet(-1)">−</button>
-        <!-- МИНИМАЛЬНАЯ СТАВКА 5 -->
         <div class="bet-input-wrap"><span>Ставка:</span><input type="number" id="slot-betInput" value="5" min="5" onchange="validateSlotBetInput()"></div>
         <button class="bet-btn" id="slot-betPlus" onclick="changeSlotBet(1)">+</button>
       </div>
@@ -240,12 +257,12 @@
   </div>
 
   <div class="page" id="page-history">
-    <button class="back-btn" onclick="switchPage('profile')">← Назад в профиль</button>
+    <button class="back-btn" onclick="switchPage('profile')">← Назад</button>
     <div id="historyList"></div>
   </div>
 
   <div class="page" id="page-profile">
-    <div class="title">Профиль <span>▸</span></div>
+    <div class="title">Профиль</div>
     <div class="profile-card">
       <div class="avatar" id="profileAvatar">🐸</div>
       <div class="profile-name" id="userName">Игрок</div>
@@ -253,12 +270,11 @@
       <div class="profile-balance"><span id="profileCurrencyIcon">⭐</span> <span id="balanceProfile">0</span></div>
     </div>
     <div class="action-grid">
-      <button class="action-btn-icon" onclick="switchPage('history')"><span class="ic">📊</span> История игр</button>
+      <button class="action-btn-icon" onclick="switchPage('history')"><span class="ic">📊</span> История</button>
       <button class="action-btn-icon" onclick="openComingSoon()"><span class="ic">🏆</span> Рейтинг</button>
     </div>
-    <div class="action-grid" style="grid-template-columns: 1fr 1fr; margin-top: -5px;">
-      <button class="action-btn-icon" style="border-color:rgba(0,255,157,0.4);" onclick="openDepositModal()">＋ Пополнить</button>
-      <!-- ВЫВОД ЗАБЛОКИРОВАН -->
+    <div class="action-grid">
+      <button class="action-btn-icon" onclick="openDepositModal()">＋ Пополнить</button>
       <button class="action-btn-icon" onclick="openWithdrawModal()">↗ Вывести</button>
     </div>
   </div>
@@ -287,21 +303,6 @@
 const SYMBOLS = ['🍌','🎰','💎','🍒','⭐']; 
 const API_URL = 'https://garisdrop-backend.garisnazar1.workers.dev';
 
-let soundEnabled = true;
-const AudioContext = window.AudioContext || window.webkitAudioContext;
-let audioCtx;
-document.body.addEventListener('click', () => {
-  if (!audioCtx) audioCtx = new AudioContext();
-  if (audioCtx.state === 'suspended') audioCtx.resume();
-}, { once: true });
-
-function toggleSound() {
-  soundEnabled = !soundEnabled;
-  const btn = document.getElementById('soundBtn');
-  btn.textContent = soundEnabled ? '🔊' : '🔇';
-  btn.className = soundEnabled ? 'sound-toggle active' : 'sound-toggle';
-}
-
 function showToast(text) {
   const container = document.getElementById('toast-container');
   const toast = document.createElement('div');
@@ -311,28 +312,7 @@ function showToast(text) {
   setTimeout(() => { toast.remove(); }, 3000);
 }
 
-function playTone(freq, type, duration, vol = 0.02) {
-  if (!audioCtx || !soundEnabled) return;
-  const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-  osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-  gain.gain.setValueAtTime(0, audioCtx.currentTime);
-  gain.gain.linearRampToValueAtTime(vol, audioCtx.currentTime + 0.02);
-  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-  osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + duration);
-}
-
-const SOUNDS = {
-  click: () => playTone(600, 'sine', 0.05, 0.015),
-  win: () => { playTone(440.00, 'sine', 0.4, 0.03); setTimeout(() => playTone(554.37, 'sine', 0.4, 0.03), 150); setTimeout(() => playTone(659.25, 'sine', 0.6, 0.04), 300); },
-  lose: () => { playTone(392.00, 'sine', 0.3, 0.02); setTimeout(() => playTone(349.23, 'sine', 0.4, 0.02), 200); },
-  spinTick: () => playTone(800, 'triangle', 0.02, 0.008)
-};
-
-document.querySelectorAll('button, .game-card, .nav-btn, .back-btn, .bonus-btn').forEach(el => {
-  el.addEventListener('click', () => SOUNDS.click());
-});
-
-let STATE = { balance: 0, currency: 'stars', history: [], userId: null };
+let STATE = { balance: 0, history: [], userId: null };
 let userDocRef = null;
 
 function initUserId() {
@@ -343,25 +323,39 @@ function initUserId() {
   return savedId;
 }
 
+// ОБНОВЛЕНИЕ ОНЛАЙНА
+async function updateOnlineStatus() {
+  if (!userDocRef) return;
+  try {
+    await window.updateDoc(userDocRef, { lastSeen: new Date() });
+    const usersRef = window.collection(window.db, "users");
+    const snapshot = await window.getDocs(usersRef);
+    let count = 0;
+    const now = Date.now();
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      if (data.lastSeen) {
+        const time = data.lastSeen.toMillis ? data.lastSeen.toMillis() : new Date(data.lastSeen).getTime();
+        if (now - time < 5 * 60 * 1000) count++;
+      }
+    });
+    document.getElementById('onlineCount').textContent = count;
+  } catch(e) { console.log("Online update error", e); }
+}
+
 async function initUserData() {
   STATE.userId = initUserId();
   updateUI(); 
   
-  if (!window.db) {
-    finishLoading();
-    return;
-  }
+  if (!window.db) return finishLoading();
 
   const { doc, getDoc, setDoc } = window;
   userDocRef = doc(window.db, "users", STATE.userId);
 
   try {
     const docSnap = await getDoc(userDocRef);
-    
     if (!docSnap.exists()) {
-      await setDoc(userDocRef, { balance: 0, history: [], createdAt: new Date() });
-      STATE.balance = 0;
-      STATE.history = [];
+      await setDoc(userDocRef, { balance: 0, history: [], lastSeen: new Date(), createdAt: new Date() });
     } else {
       const data = docSnap.data();
       STATE.balance = data.balance || 0;
@@ -370,6 +364,10 @@ async function initUserData() {
     updateUI(); 
     renderHistory();
     finishLoading(); 
+    
+    // Запускаем онлайн-статус
+    updateOnlineStatus();
+    setInterval(updateOnlineStatus, 30000);
   } catch (e) {
     finishLoading();
   }
@@ -379,9 +377,16 @@ function finishLoading() {
   document.getElementById('loader').classList.remove('show');
 }
 
+// АВАТАРКА ИЗ ТЕЛЕГРАМ
 if (window.Telegram?.WebApp) {
   Telegram.WebApp.ready(); Telegram.WebApp.expand();
-  if (Telegram.WebApp.initDataUnsafe?.user) document.getElementById('userName').textContent = Telegram.WebApp.initDataUnsafe.user.first_name;
+  const tgUser = Telegram.WebApp.initDataUnsafe?.user;
+  if (tgUser) {
+    document.getElementById('userName').textContent = tgUser.first_name || 'Игрок';
+    if (tgUser.photo_url) {
+      document.getElementById('profileAvatar').innerHTML = `<img src="${tgUser.photo_url}" alt="avatar">`;
+    }
+  }
 }
 
 function formatMoney(starsAmount) {
@@ -392,26 +397,17 @@ function formatMoney(starsAmount) {
   return amount.toLocaleString('ru-RU');
 }
 
-function animateBalance() {
-  const el = document.getElementById('balancePillHeader');
-  el.classList.add('update');
-  setTimeout(() => el.classList.remove('update'), 200);
-}
-
 function updateUI() {
   const displayBalance = formatMoney(STATE.balance);
   document.getElementById('balanceTop').textContent = displayBalance;
   document.getElementById('balanceProfile').textContent = formatMoney(STATE.balance);
   document.getElementById('userId').textContent = `ID: ${STATE.userId}`; 
-  
   if (document.getElementById('slot-betInput')) {
     document.getElementById('slot-betInput').value = formatMoney(slotState.bet);
   }
 }
 
-function copyRefLink() {
-  showLoseModal(false, 'Реферальная программа временно закрыта.');
-}
+function copyRefLink() { showLoseModal(false, 'Реферальная программа временно закрыта.'); }
 
 function renderHistory() {
   const list = document.getElementById('historyList');
@@ -453,12 +449,7 @@ function openGame(game) {
   }, 300);
 }
 
-const SLOT_MODES = {
-  easy: { cols: 3, mult: 1.5 }, 
-  medium: { cols: 4, mult: 2.0 },
-  hard: { cols: 5, mult: 4.0 }
-};
-// МИНИМАЛЬНАЯ СТАВКА 5
+const SLOT_MODES = { easy: { cols: 3, mult: 1.5 }, medium: { cols: 4, mult: 2.0 }, hard: { cols: 5, mult: 4.0 } };
 let slotState = { mode: 'easy', bet: 5, spinning: false };
 
 function setSlotMode(mode) {
@@ -484,17 +475,12 @@ function setSlotMode(mode) {
 function changeSlotBet(d) {
   if (slotState.spinning) return;
   let nb = slotState.bet + d;
-  // МИНИМУМ 5
-  if (nb >= 5 && nb <= STATE.balance) {
-    slotState.bet = nb;
-    updateUI();
-  }
+  if (nb >= 5 && nb <= STATE.balance) { slotState.bet = nb; updateUI(); }
 }
 
 function validateSlotBetInput() {
   let val = parseInt(document.getElementById('slot-betInput').value);
-  // МИНИМУМ 5
-  if (isNaN(val) || val < 5) val = 5; 
+  if (isNaN(val) || val < 5) val = 5;
   if (val > STATE.balance) val = STATE.balance;
   slotState.bet = val;
   updateUI();
@@ -502,12 +488,10 @@ function validateSlotBetInput() {
 
 async function spinSlots() {
   if (slotState.spinning) return;
-  // МИНИМУМ 5
   if (slotState.bet < 5) return showToast('Минимальная ставка 5 звезд!');
   if (STATE.balance < slotState.bet) return showLoseModal(false, 'Недостаточно средств на балансе!');
 
   slotState.spinning = true;
-  
   document.getElementById('spinBtn').disabled = true;
   document.getElementById('slot-betMinus').disabled = true;
   document.getElementById('slot-betPlus').disabled = true;
@@ -535,7 +519,6 @@ async function spinSlots() {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId: STATE.userId, bet: slotState.bet, mode: slotState.mode })
     });
-    
     const data = await response.json();
 
     if (!data.success) {
@@ -555,23 +538,16 @@ async function spinSlots() {
         for (let row = 0; row < 3; row++) {
           const cell = document.querySelector(`.cell[data-col="${col}"][data-row="${row}"]`);
           cell.classList.remove('spinning');
-          
           if (row === 1 && data.isWin) {
-             cell.textContent = '💎'; 
-             cell.classList.add('win');
+             cell.textContent = '💎'; cell.classList.add('win');
           } else {
              cell.textContent = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
              cell.classList.remove('win');
           }
         }
-        SOUNDS.spinTick(); 
-        
-        if (col === cols - 1) {
-          setTimeout(() => endSpinSecure(data), 300);
-        }
+        if (col === cols - 1) setTimeout(() => endSpinSecure(data), 300);
       }, (col + 1) * 400);
     }
-
   } catch (e) {
     spinIntervals.forEach(clearInterval);
     document.querySelectorAll('.cell').forEach(c => c.classList.remove('spinning'));
@@ -586,13 +562,8 @@ async function spinSlots() {
 
 function endSpinSecure(data) {
   STATE.balance = data.newBalance;
-  
-  if (data.isWin) {
-    SOUNDS.win(); animateBalance();
-    showWinModal(data.winAmount, '⭐', 'Отличный выигрыш!');
-  } else {
-    SOUNDS.lose(); showLoseModal(true, 'Повезет в следующий раз!');
-  }
+  if (data.isWin) showWinModal(data.winAmount, '⭐', 'Отличный выигрыш!');
+  else showLoseModal(true, 'Повезет в следующий раз!');
 
   slotState.spinning = false;
   document.getElementById('spinBtn').disabled = false;
@@ -637,7 +608,6 @@ function openDepositModal() {
   document.getElementById('modalTitle').textContent = 'Пополнение';
   document.getElementById('modalText').innerHTML = 'Введите сумму в звездах:';
   const content = document.getElementById('modalContent');
-  // МИНИМАЛЬНОЕ ПОПОЛНЕНИЕ 10
   content.innerHTML = `
     <div class="input-group"><input type="number" id="depositAmountInput" placeholder="Мин. 10" min="10"></div>
     <button class="main-action-btn" style="margin-top: 15px;" onclick="processStarsPayment()">Оплатить Stars ⭐</button>
@@ -648,7 +618,6 @@ function openDepositModal() {
 
 async function processStarsPayment() {
   const amount = parseInt(document.getElementById('depositAmountInput').value);
-  // МИНИМУМ 10
   if (!amount || amount < 10) return showToast('Минимальная сумма пополнения 10 ⭐');
   closeModal();
   document.getElementById('loader').classList.add('show');
@@ -657,16 +626,9 @@ async function processStarsPayment() {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId: STATE.userId, amount: amount })
     });
-    
     const textData = await response.text(); 
     let data;
-    
-    try {
-      data = JSON.parse(textData); 
-    } catch(e) {
-      document.getElementById('loader').classList.remove('show');
-      return showLoseModal(false, `Сервер вернул HTML: ${textData.substring(0, 100)}...`);
-    }
+    try { data = JSON.parse(textData); } catch(e) { return showLoseModal(false, `Ошибка сервера`); }
     
     if (data.success && data.invoiceLink) {
       if (window.Telegram?.WebApp) {
@@ -675,8 +637,7 @@ async function processStarsPayment() {
           if (status === 'paid') {
             showToast('Оплата прошла!');
             setTimeout(() => window.location.reload(), 2000); 
-          }
-          else showToast('Оплата отменена.');
+          } else showToast('Оплата отменена.');
         });
       } else { 
         document.getElementById('loader').classList.remove('show');
@@ -688,26 +649,19 @@ async function processStarsPayment() {
     }
   } catch (e) { 
     document.getElementById('loader').classList.remove('show');
-    showLoseModal(false, 'ОШИБКА СЕТИ: ' + e.message); 
+    showLoseModal(false, 'ОШИБКА СЕТИ'); 
   }
 }
 
-// ВЫВОД ВРЕМЕННО ЗАБЛОКИРОВАН
 function openWithdrawModal() {
   showLoseModal(false, 'Вывод средств временно недоступен. Мы работаем над улучшением системы выплат!');
 }
 
-// ЗАПУСК
 if (window.Telegram?.WebApp) {
-  Telegram.WebApp.ready();
-  Telegram.WebApp.expand();
-  setTimeout(() => {
-    initUserData();
-    setSlotMode('easy'); 
-  }, 100);
+  Telegram.WebApp.ready(); Telegram.WebApp.expand();
+  setTimeout(() => { initUserData(); setSlotMode('easy'); }, 100);
 } else {
-  initUserData();
-  setSlotMode('easy'); 
+  initUserData(); setSlotMode('easy'); 
 }
 </script>
 </body>
