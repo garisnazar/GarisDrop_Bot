@@ -66,14 +66,12 @@
   .game-card{ position:relative; background:var(--card); border:1px solid var(--border); border-radius:24px; padding:24px 10px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; cursor:pointer; transition: all 0.2s; }
   .game-card:active{ transform:scale(.97); border-color: var(--accent);}
   
-  /* ИДЕАЛЬНЫЕ КАРТИНКИ БЕЗ РАМОК */
   .game-icon-container {
     width: 100px;
     height: 100px;
-    border-radius: 24px; /* Идеально плавное скругление */
+    border-radius: 24px;
     overflow: hidden;
     position: relative;
-    /* Убрали зеленую рамку, оставили только легкую тень для объема */
     box-shadow: 0 4px 10px rgba(0,0,0,0.3); 
   }
   
@@ -81,7 +79,6 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    /* ЗУМ: Увеличиваем картинку внутри, чтобы обрезать все лишние края */
     transform: scale(1.15); 
   }
   
@@ -497,12 +494,10 @@ if (window.Telegram?.WebApp) {
   }
 }
 
+// ОБНОВЛЕННАЯ ФУНКЦИЯ ФОРМАТИРОВАНИЯ (БЕЗ К И M)
 function formatMoney(starsAmount) {
   if (isNaN(starsAmount) || !isFinite(starsAmount)) return '0';
-  const amount = Math.floor(starsAmount);
-  if (amount >= 1000000) return (amount / 1000000).toFixed(1) + 'M';
-  if (amount >= 10000) return (amount / 1000).toFixed(1) + 'K';
-  return amount.toLocaleString('ru-RU');
+  return Math.floor(starsAmount).toLocaleString('ru-RU'); // Возвращает полное число с пробелами (например 25 000)
 }
 
 function updateUI() {
