@@ -79,10 +79,9 @@
   .game-card{ position:relative; background:var(--card); border:1px solid var(--border); border-radius:28px; padding:24px 12px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; cursor:pointer; backdrop-filter: blur(15px); transition: all 0.2s; box-shadow: 0 8px 32px rgba(0,0,0,0.2);}
   .game-card:active{ transform:scale(.96); border-color: var(--accent);}
   
-  /* КВАДРАТНЫЕ ИКОНКИ ИГР С ЗАКРУГЛЕНИЕМ */
   .game-icon-container {
     width: 100px; height: 100px;
-    border-radius: 24px; /* Закругленный квадрат */
+    border-radius: 24px; 
     overflow: hidden;
     position: relative;
     box-shadow: 0 8px 20px rgba(0,0,0,0.4); 
@@ -110,7 +109,6 @@
   @keyframes slotSpin { 0% { transform: translateY(-30%); opacity: 0; } 50% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(30%); opacity: 0; } }
   .cell.win{ border-color:var(--accent); box-shadow: inset 0 0 20px rgba(52,211,153,0.4); background: rgba(52,211,153,0.1); transform: scale(1.05); z-index: 4; }
   
-  /* КРУГОВОЙ АПГРЕЙДЕР */
   .upgrade-circle-wrapper {
     position: relative;
     width: 260px;
@@ -209,17 +207,17 @@
   .bonus-card p { font-size: 14px; color: var(--muted); line-height: 1.5;}
   .bonus-btn { width: 100%; padding: 18px; border-radius: 16px; border: none; font-weight: 900; font-size: 16px; cursor: pointer; background: rgba(52,211,153,0.15); color: var(--accent); transition: 0.2s; }
   .bonus-btn:active { background: rgba(52,211,153,0.25); transform: scale(0.98);}
-  
+  .bonus-btn:disabled { background: rgba(255,255,255,0.05); color: var(--muted); cursor: not-allowed; }
+
   .nav{ position:fixed; left:16px; right:16px; bottom:calc(16px + env(safe-area-inset-bottom)); background:rgba(10, 15, 28, 0.8); border:1px solid var(--border); border-radius:28px; display:flex; padding:10px; z-index:10; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: 0 10px 40px rgba(0,0,0,0.5);}
   .nav-btn{ flex:1; padding:12px 5px; border-radius:20px; border:none; background:transparent; color:var(--muted); font-weight:800; cursor:pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;}
   .nav-btn.active{ background:rgba(52, 211, 153, 0.1); color:var(--accent); }
   
-  /* КВАДРАТНЫЕ ИКОНКИ В МЕНЮ С ЗАКРУГЛЕНИЕМ */
   .nav-icon-img {
     width: 28px;
     height: 28px;
     object-fit: cover;
-    border-radius: 8px; /* Закругленный квадрат, а не круг */
+    border-radius: 8px; 
     mix-blend-mode: screen; 
     filter: drop-shadow(0 0 5px rgba(52, 211, 153, 0.3)); 
     transition: transform 0.2s;
@@ -317,6 +315,14 @@
 
   <div class="page" id="page-bonus">
     <div class="title">Бонусы</div>
+    
+    <!-- ЕЖЕДНЕВНЫЙ БОНУС -->
+    <div class="bonus-card" style="margin-bottom: 20px;">
+      <h3>🎁 Ежедневный бонус</h3>
+      <p>Заходи каждый день и получай бесплатную звезду!</p>
+      <button class="bonus-btn" id="dailyBonusBtn" onclick="claimDailyBonus()">Забрать 1 ⭐</button>
+    </div>
+
     <div class="bonus-card">
       <h3>👥 Пригласи друга</h3>
       <p>Отправь другу свою ссылку. Когда он зайдет и начнет играть, вы оба получите бонусы!</p>
@@ -329,6 +335,7 @@
         <span style="color: var(--muted); font-size: 14px;">Вы пригласили:</span>
         <b style="font-size: 20px; color: var(--accent);"><span id="refCount">0</span> чел.</b>
       </div>
+      <div style="margin-top: 10px; font-size: 12px; color: var(--muted); text-align: center; font-weight: 600;">За каждого друга вы получаете +2 ⭐</div>
     </div>
   </div>
 
@@ -568,11 +575,17 @@ async function initUserData() {
   try {
     const docSnap = await getDoc(userDocRef);
     if (!docSnap.exists()) {
-      await setDoc(userDocRef, { balance: 0, referralsCount: 0, lastSeen: new Date(), createdAt: new Date() });
+      // НОВИЧОК: Баланс 0, бонусов нет
+      await setDoc(userDocRef, { balance: 0, referralsCount: 0, lastDaily: 0, lastSeen: new Date(), createdAt: new Date() });
     } else {
       const data = docSnap.data();
       STATE.balance = data.balance || 0;
       STATE.referralsCount = data.referralsCount || 0;
+      
+      // Проверяем статус ежедневного бонуса
+      let lastDaily = data.lastDaily ? parseInt(data.lastDaily) : 0;
+      let nextClaim = lastDaily > 0 ? lastDaily + 24 * 60 * 60 * 1000 : 0;
+      checkDailyStatus(nextClaim);
     }
     
     const refLink = `https://t.me/GarisDrop_Bot?startapp=${STATE.userId}`;
@@ -626,6 +639,69 @@ function copyRefLink() {
   linkInput.select();
   linkInput.setSelectionRange(0, 99999);
   navigator.clipboard.writeText(linkInput.value).then(() => { showToast('Ссылка скопирована!'); });
+}
+
+/* ================= ЕЖЕДНЕВНЫЙ БОНУС ================= */
+let dailyTimerInterval = null;
+
+function checkDailyStatus(nextClaim) {
+  const btn = document.getElementById('dailyBonusBtn');
+  if (!nextClaim || nextClaim <= Date.now()) {
+    btn.disabled = false;
+    btn.textContent = 'Забрать 1 ⭐';
+    if (dailyTimerInterval) clearInterval(dailyTimerInterval);
+    return;
+  }
+
+  btn.disabled = true;
+  if (dailyTimerInterval) clearInterval(dailyTimerInterval);
+  
+  const updateBtnTimer = () => {
+    const timeLeft = nextClaim - Date.now();
+    if (timeLeft <= 0) {
+      clearInterval(dailyTimerInterval);
+      btn.disabled = false;
+      btn.textContent = 'Забрать 1 ⭐';
+    } else {
+      const hours = Math.floor(timeLeft / (1000 * 60 * 60));
+      const mins = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+      const secs = Math.floor((timeLeft % (1000 * 60)) / 1000);
+      btn.textContent = `Через ${hours}ч ${mins}м ${secs}с`;
+    }
+  };
+  updateBtnTimer();
+  dailyTimerInterval = setInterval(updateBtnTimer, 1000);
+}
+
+async function claimDailyBonus() {
+  const btn = document.getElementById('dailyBonusBtn');
+  if (btn.disabled) return;
+  btn.disabled = true;
+  btn.textContent = 'Загрузка...';
+
+  try {
+    const response = await fetch(`${API_URL}/claim-daily`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: STATE.userId })
+    });
+    const data = await response.json();
+
+    if (data.success) {
+      STATE.balance = data.newBalance;
+      updateUI();
+      SOUNDS.win();
+      showToast('Вы получили 1 ⭐!');
+      checkDailyStatus(data.nextClaim);
+    } else {
+      showToast(data.error || 'Ошибка');
+      if (data.nextClaim) checkDailyStatus(data.nextClaim);
+      else { btn.disabled = false; btn.textContent = 'Забрать 1 ⭐'; }
+    }
+  } catch (e) {
+    showToast('Ошибка сети');
+    btn.disabled = false;
+    btn.textContent = 'Забрать 1 ⭐';
+  }
 }
 
 function switchPage(name) {
