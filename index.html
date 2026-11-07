@@ -79,9 +79,10 @@
   .game-card{ position:relative; background:var(--card); border:1px solid var(--border); border-radius:28px; padding:24px 12px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; cursor:pointer; backdrop-filter: blur(15px); transition: all 0.2s; box-shadow: 0 8px 32px rgba(0,0,0,0.2);}
   .game-card:active{ transform:scale(.96); border-color: var(--accent);}
   
+  /* КВАДРАТНЫЕ ИКОНКИ ИГР С ЗАКРУГЛЕНИЕМ */
   .game-icon-container {
     width: 100px; height: 100px;
-    border-radius: 24px;
+    border-radius: 24px; /* Закругленный квадрат */
     overflow: hidden;
     position: relative;
     box-shadow: 0 8px 20px rgba(0,0,0,0.4); 
@@ -142,7 +143,6 @@
     border-radius: 50%;
     z-index: 2;
     pointer-events: none;
-    /* Убрали transition по умолчанию, он задается через JS для точной анимации */
   }
 
   .upgrade-arrow {
@@ -214,10 +214,12 @@
   .nav-btn{ flex:1; padding:12px 5px; border-radius:20px; border:none; background:transparent; color:var(--muted); font-weight:800; cursor:pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;}
   .nav-btn.active{ background:rgba(52, 211, 153, 0.1); color:var(--accent); }
   
+  /* КВАДРАТНЫЕ ИКОНКИ В МЕНЮ С ЗАКРУГЛЕНИЕМ */
   .nav-icon-img {
-    width: 26px;
-    height: 26px;
-    object-fit: contain;
+    width: 28px;
+    height: 28px;
+    object-fit: cover;
+    border-radius: 8px; /* Закругленный квадрат, а не круг */
     mix-blend-mode: screen; 
     filter: drop-shadow(0 0 5px rgba(52, 211, 153, 0.3)); 
     transition: transform 0.2s;
@@ -467,7 +469,6 @@ const SOUNDS = {
   spinTick: () => playTone(1200, 'triangle', 0.02, 0.005)
 };
 
-// ФУНКЦИЯ ЗВУКА ДЛЯ АПГРЕЙДЕРА (Замедляющиеся щелчки)
 function playUpgradeTicks(durationMs) {
   if (!audioCtx) return;
   let startTime = Date.now();
@@ -476,7 +477,6 @@ function playUpgradeTicks(durationMs) {
     let elapsed = Date.now() - startTime;
     if (elapsed > durationMs) return;
     
-    // Звук щелчка
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
     osc.type = 'sine';
@@ -489,9 +489,7 @@ function playUpgradeTicks(durationMs) {
     osc.start();
     osc.stop(audioCtx.currentTime + 0.05);
     
-    // Вычисляем следующую задержку (в начале быстро, в конце медленно)
     let progress = elapsed / durationMs;
-    // Квадратичная функция для плавного замедления
     let delay = 30 + (Math.pow(progress, 4) * 350); 
     
     if (elapsed + delay < durationMs) {
@@ -824,14 +822,10 @@ async function playUpgrade() {
         return showLoseModal(false, data.error);
       }
 
-      // 4 полных оборота (360 * 4) + угол выпадения
       const totalRotation = (360 * 4) + ((data.roll / 100) * 360);
-      
-      // Включаем плавную анимацию на 4 секунды (долгий спадающий эффект)
       arrow.style.transition = 'transform 4s cubic-bezier(0.1, 0.8, 0.2, 1)';
       arrow.style.transform = `rotate(${totalRotation}deg)`;
 
-      // Запускаем звук тиканья колеса на 4 секунды
       playUpgradeTicks(4000);
 
       setTimeout(() => {
